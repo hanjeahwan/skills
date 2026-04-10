@@ -1,0 +1,4 @@
+interface:
+  display_name: "Talent AI Worktree"
+  short_description: "Create BE-only or paired FE/BE worktrees by scope"
+  default_prompt: "Use $talent-ai-worktree to create a backend-only worktree for BE-only changes or paired talent-platform-vibe and de-backoffice-cr worktrees for FE+BE changes. Do not use it for frontend-only work."

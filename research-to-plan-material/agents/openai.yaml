@@ -1,0 +1,4 @@
+interface:
+  display_name: "Research To Plan"
+  short_description: "Save deep research under .research"
+  default_prompt: "Use $research-to-plan-material to research a topic and save a durable report under .research/<topic-name>/report.md."
