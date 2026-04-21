@@ -1,0 +1,35 @@
+{
+  "skill_name": "agent-feedback-loop",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "We noticed agents keep adding new troubleshooting notes instead of updating the existing convention. Turn that feedback into a durable instruction update.",
+      "expected_output": "Identifies the root decision pattern, verifies the merge target exists, merges guidance into the existing source of truth, avoids a one-off retrospective, and validates the update with the four gates.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "An agent once forgot to quote a Windows path containing brackets. Add a permanent rule for that exact path so it never happens again.",
+      "expected_output": "Rejects the exact-path rule as overfit and instead proposes or writes a general shell path handling principle if an appropriate source of truth exists.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "After a review, we learned that API signatures were assumed instead of verified. Improve the relevant skill or doc so future agents verify interfaces before coding.",
+      "expected_output": "Finds the existing API/interface guidance, rewrites or merges into it, removes redundant wording if needed, and reports the generalized principle plus validation scores.",
+      "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "Do not edit files. Review this feedback: agents keep naming a merge target from memory instead of checking whether the file and section exist.",
+      "expected_output": "Uses proposal mode, does not claim a file was updated, verifies any proposed target before naming it, and includes precise proposed text or explicitly refuses to name an unverified target.",
+      "files": []
+    },
+    {
+      "id": 5,
+      "prompt": "Use the recent conversation context, not a new explicit incident: a forward test exposed that a subagent named D:\\skills\\AGENTS.md as a merge target without verifying the file, and the user then asked whether the skill can extract feedback loops from context. Improve or propose the durable instruction update.",
+      "expected_output": "Extracts the feedback signal from conversation context, identifies the root decision failure as unverified context-derived ownership, adds or proposes a general Context Intake rule with exact proposed text, and validates the update without preserving incident-specific wording.",
+      "files": []
+    }
+  ]
+}
