@@ -1,0 +1,1436 @@
+[
+  {
+    "id": "synthetic-en-broad-self",
+    "suite": "synthetic",
+    "language": "en",
+    "query": "what do you know about Hanje",
+    "expected_intent": "self_knowledge",
+    "expected_first_context": "context:self_model.master_persona",
+    "style_contract": "third_person_identity",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports",
+      "source_id",
+      "private_trace_refs",
+      "git_commit:"
+    ]
+  },
+  {
+    "id": "synthetic-en-coding-style",
+    "suite": "synthetic",
+    "language": "en",
+    "query": "how should I code in Hanje's style",
+    "expected_intent": "coding_style",
+    "expected_first_context": "context:self_model.coding_style",
+    "style_contract": "neutral_guidance",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports",
+      "source_id",
+      "private_trace_refs"
+    ]
+  },
+  {
+    "id": "synthetic-en-architecture",
+    "suite": "synthetic",
+    "language": "en",
+    "query": "what would Hanje prefer for frontend architecture",
+    "expected_intent": "act_as_me",
+    "expected_first_context": "context:self_model.architecture_judgment",
+    "style_contract": "neutral_guidance",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports",
+      "source_id",
+      "private_trace_refs"
+    ]
+  },
+  {
+    "id": "synthetic-en-bootstrap",
+    "suite": "synthetic",
+    "language": "en",
+    "query": "what should an agent know before acting as Hanje",
+    "expected_intent": "act_as_me",
+    "expected_first_context": "context:self_model.agent_operating_context",
+    "style_contract": "first_person_contract",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [],
+    "must_not_contain": [
+      "this supports",
+      "source_id",
+      "private_trace_refs"
+    ]
+  },
+  {
+    "id": "synthetic-en-proof-react",
+    "suite": "synthetic",
+    "language": "en",
+    "query": "show proof for the React claim",
+    "expected_intent": "proof",
+    "expected_first_context": "context:topic.react",
+    "style_contract": "neutral_guidance",
+    "provenance_policy": "required_when_requested",
+    "must_contain": [
+      "react"
+    ],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports"
+    ]
+  },
+  {
+    "id": "synthetic-zh-broad-self",
+    "suite": "synthetic",
+    "language": "zh-CN",
+    "query": "你知道 Hanje 什么",
+    "expected_intent": "self_knowledge",
+    "expected_first_context": "context:self_model.master_persona",
+    "style_contract": "third_person_identity",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports",
+      "source_id",
+      "private_trace_refs",
+      "git_commit:"
+    ]
+  },
+  {
+    "id": "synthetic-zh-coding-style",
+    "suite": "synthetic",
+    "language": "zh-CN",
+    "query": "我应该怎么按 Hanje 的代码风格写",
+    "expected_intent": "coding_style",
+    "expected_first_context": "context:self_model.coding_style",
+    "style_contract": "neutral_guidance",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports",
+      "source_id",
+      "private_trace_refs"
+    ]
+  },
+  {
+    "id": "synthetic-zh-architecture",
+    "suite": "synthetic",
+    "language": "zh-CN",
+    "query": "替我选架构方案",
+    "expected_intent": "act_as_me",
+    "expected_first_context": "context:self_model.architecture_judgment",
+    "style_contract": "neutral_guidance",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports",
+      "source_id",
+      "private_trace_refs"
+    ]
+  },
+  {
+    "id": "synthetic-zh-bootstrap",
+    "suite": "synthetic",
+    "language": "zh-CN",
+    "query": "代表我做事前要知道什么",
+    "expected_intent": "act_as_me",
+    "expected_first_context": "context:self_model.agent_operating_context",
+    "style_contract": "first_person_contract",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [],
+    "must_not_contain": [
+      "this supports",
+      "source_id",
+      "private_trace_refs"
+    ]
+  },
+  {
+    "id": "synthetic-zh-proof-react",
+    "suite": "synthetic",
+    "language": "zh-CN",
+    "query": "给我 React 能力的证据",
+    "expected_intent": "proof",
+    "expected_first_context": "context:topic.react",
+    "style_contract": "neutral_guidance",
+    "provenance_policy": "required_when_requested",
+    "must_contain": [
+      "react"
+    ],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports"
+    ]
+  },
+  {
+    "id": "real-en-broad-self",
+    "suite": "real",
+    "language": "en",
+    "query": "what do you know about Hanje",
+    "expected_intent": "self_knowledge",
+    "expected_first_context": "context:self_model.master_persona",
+    "style_contract": "third_person_identity",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports",
+      "source_id",
+      "private_trace_refs",
+      "git_commit:"
+    ]
+  },
+  {
+    "id": "real-en-coding-style",
+    "suite": "real",
+    "language": "en",
+    "query": "how should I code in Hanje's style",
+    "expected_intent": "coding_style",
+    "expected_first_context": "context:self_model.coding_style",
+    "style_contract": "neutral_guidance",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports",
+      "source_id",
+      "private_trace_refs"
+    ]
+  },
+  {
+    "id": "real-en-architecture",
+    "suite": "real",
+    "language": "en",
+    "query": "what would Hanje prefer for frontend architecture",
+    "expected_intent": "act_as_me",
+    "expected_first_context": "context:self_model.architecture_judgment",
+    "style_contract": "neutral_guidance",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports",
+      "source_id",
+      "private_trace_refs"
+    ]
+  },
+  {
+    "id": "real-en-bootstrap",
+    "suite": "real",
+    "language": "en",
+    "query": "what should an agent know before acting as Hanje",
+    "expected_intent": "act_as_me",
+    "expected_first_context": "context:self_model.agent_operating_context",
+    "style_contract": "first_person_contract",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [],
+    "must_not_contain": [
+      "this supports",
+      "source_id",
+      "private_trace_refs"
+    ]
+  },
+  {
+    "id": "real-en-proof-react",
+    "suite": "real",
+    "language": "en",
+    "query": "show proof for the React claim",
+    "expected_intent": "proof",
+    "expected_first_context": "context:topic.react",
+    "style_contract": "neutral_guidance",
+    "provenance_policy": "required_when_requested",
+    "must_contain": [
+      "react"
+    ],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports"
+    ]
+  },
+  {
+    "id": "real-zh-broad-self",
+    "suite": "real",
+    "language": "zh-CN",
+    "query": "你知道 Hanje 什么",
+    "expected_intent": "self_knowledge",
+    "expected_first_context": "context:self_model.master_persona",
+    "style_contract": "third_person_identity",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports",
+      "source_id",
+      "private_trace_refs",
+      "git_commit:"
+    ]
+  },
+  {
+    "id": "real-zh-coding-style",
+    "suite": "real",
+    "language": "zh-CN",
+    "query": "我应该怎么按 Hanje 的代码风格写",
+    "expected_intent": "coding_style",
+    "expected_first_context": "context:self_model.coding_style",
+    "style_contract": "neutral_guidance",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports",
+      "source_id",
+      "private_trace_refs"
+    ]
+  },
+  {
+    "id": "real-zh-architecture",
+    "suite": "real",
+    "language": "zh-CN",
+    "query": "替我选架构方案",
+    "expected_intent": "act_as_me",
+    "expected_first_context": "context:self_model.architecture_judgment",
+    "style_contract": "neutral_guidance",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports",
+      "source_id",
+      "private_trace_refs"
+    ]
+  },
+  {
+    "id": "real-zh-bootstrap",
+    "suite": "real",
+    "language": "zh-CN",
+    "query": "代表我做事前要知道什么",
+    "expected_intent": "act_as_me",
+    "expected_first_context": "context:self_model.agent_operating_context",
+    "style_contract": "first_person_contract",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [],
+    "must_not_contain": [
+      "this supports",
+      "source_id",
+      "private_trace_refs"
+    ]
+  },
+  {
+    "id": "real-zh-proof-react",
+    "suite": "real",
+    "language": "zh-CN",
+    "query": "给我 React 能力的证据",
+    "expected_intent": "proof",
+    "expected_first_context": "context:topic.react",
+    "style_contract": "neutral_guidance",
+    "provenance_policy": "required_when_requested",
+    "must_contain": [
+      "react"
+    ],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports"
+    ]
+  },
+  {
+    "id": "synthetic-en-years-full-stack",
+    "suite": "synthetic",
+    "language": "en",
+    "query": "how many years exp does Hanje have in full stack engineering",
+    "expected_intent": "work_context",
+    "expected_first_context": "context:self_model.career_timeline",
+    "style_contract": "neutral_guidance",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [
+      "year"
+    ],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports",
+      "source_id",
+      "private_trace_refs"
+    ]
+  },
+  {
+    "id": "synthetic-en-role-identity",
+    "suite": "synthetic",
+    "language": "en",
+    "query": "what kind of engineer is Hanje",
+    "expected_intent": "self_knowledge",
+    "expected_first_context": "context:self_model.role_identity",
+    "style_contract": "third_person_identity",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [
+      "lead"
+    ],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports",
+      "source_id",
+      "private_trace_refs"
+    ]
+  },
+  {
+    "id": "synthetic-en-strengths",
+    "suite": "synthetic",
+    "language": "en",
+    "query": "what is Hanje strong at",
+    "expected_intent": "work_context",
+    "expected_first_context": "context:self_model.experience_scope",
+    "style_contract": "neutral_guidance",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [
+      "frontend"
+    ],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports",
+      "source_id",
+      "private_trace_refs"
+    ]
+  },
+  {
+    "id": "synthetic-en-review-authority",
+    "suite": "synthetic",
+    "language": "en",
+    "query": "how does Hanje review PRs",
+    "expected_intent": "act_as_me",
+    "expected_first_context": "context:self_model.review_style",
+    "style_contract": "neutral_guidance",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [
+      "review"
+    ],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports",
+      "source_id",
+      "private_trace_refs"
+    ]
+  },
+  {
+    "id": "synthetic-en-domain-knowledge",
+    "suite": "synthetic",
+    "language": "en",
+    "query": "what does Hanje know about product and domain",
+    "expected_intent": "self_knowledge",
+    "expected_first_context": "context:self_model.domain_knowledge",
+    "style_contract": "third_person_identity",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports",
+      "source_id",
+      "private_trace_refs"
+    ]
+  },
+  {
+    "id": "synthetic-en-learning-trajectory",
+    "suite": "synthetic",
+    "language": "en",
+    "query": "what has Hanje improved over time",
+    "expected_intent": "work_context",
+    "expected_first_context": "context:self_model.learning_trajectory",
+    "style_contract": "third_person_identity",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [
+      "trajectory"
+    ],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports",
+      "source_id",
+      "private_trace_refs"
+    ]
+  },
+  {
+    "id": "synthetic-zh-years-full-stack",
+    "suite": "synthetic",
+    "language": "zh-CN",
+    "query": "Hanje 有几年 full stack 经验",
+    "expected_intent": "work_context",
+    "expected_first_context": "context:self_model.career_timeline",
+    "style_contract": "neutral_guidance",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [
+      "year"
+    ],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports",
+      "source_id",
+      "private_trace_refs"
+    ]
+  },
+  {
+    "id": "synthetic-zh-role-identity",
+    "suite": "synthetic",
+    "language": "zh-CN",
+    "query": "Hanje 是什么类型的工程师",
+    "expected_intent": "self_knowledge",
+    "expected_first_context": "context:self_model.role_identity",
+    "style_contract": "third_person_identity",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [
+      "lead"
+    ],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports",
+      "source_id",
+      "private_trace_refs"
+    ]
+  },
+  {
+    "id": "synthetic-zh-strengths",
+    "suite": "synthetic",
+    "language": "zh-CN",
+    "query": "Hanje 强项是什么",
+    "expected_intent": "work_context",
+    "expected_first_context": "context:self_model.experience_scope",
+    "style_contract": "neutral_guidance",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [
+      "frontend"
+    ],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports",
+      "source_id",
+      "private_trace_refs"
+    ]
+  },
+  {
+    "id": "synthetic-zh-review-authority",
+    "suite": "synthetic",
+    "language": "zh-CN",
+    "query": "Hanje review PR 关注什么",
+    "expected_intent": "act_as_me",
+    "expected_first_context": "context:self_model.review_style",
+    "style_contract": "neutral_guidance",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [
+      "review"
+    ],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports",
+      "source_id",
+      "private_trace_refs"
+    ]
+  },
+  {
+    "id": "synthetic-zh-domain-knowledge",
+    "suite": "synthetic",
+    "language": "zh-CN",
+    "query": "Hanje 懂哪些业务领域",
+    "expected_intent": "self_knowledge",
+    "expected_first_context": "context:self_model.domain_knowledge",
+    "style_contract": "third_person_identity",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports",
+      "source_id",
+      "private_trace_refs"
+    ]
+  },
+  {
+    "id": "real-en-years-full-stack",
+    "suite": "real",
+    "language": "en",
+    "query": "how many years exp does Hanje have in full stack engineering",
+    "expected_intent": "work_context",
+    "expected_first_context": "context:self_model.career_timeline",
+    "style_contract": "neutral_guidance",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [
+      "year"
+    ],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports",
+      "source_id",
+      "private_trace_refs"
+    ]
+  },
+  {
+    "id": "real-en-role-identity",
+    "suite": "real",
+    "language": "en",
+    "query": "what kind of engineer is Hanje",
+    "expected_intent": "self_knowledge",
+    "expected_first_context": "context:self_model.role_identity",
+    "style_contract": "third_person_identity",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [
+      "lead"
+    ],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports",
+      "source_id",
+      "private_trace_refs"
+    ]
+  },
+  {
+    "id": "real-en-strengths",
+    "suite": "real",
+    "language": "en",
+    "query": "what is Hanje strong at",
+    "expected_intent": "work_context",
+    "expected_first_context": "context:self_model.experience_scope",
+    "style_contract": "neutral_guidance",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [
+      "frontend"
+    ],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports",
+      "source_id",
+      "private_trace_refs"
+    ]
+  },
+  {
+    "id": "real-en-review-authority",
+    "suite": "real",
+    "language": "en",
+    "query": "how does Hanje review PRs",
+    "expected_intent": "act_as_me",
+    "expected_first_context": "context:self_model.review_style",
+    "style_contract": "neutral_guidance",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [
+      "review"
+    ],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports",
+      "source_id",
+      "private_trace_refs"
+    ]
+  },
+  {
+    "id": "real-en-domain-knowledge",
+    "suite": "real",
+    "language": "en",
+    "query": "what does Hanje know about product and domain",
+    "expected_intent": "self_knowledge",
+    "expected_first_context": "context:self_model.domain_knowledge",
+    "style_contract": "third_person_identity",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports",
+      "source_id",
+      "private_trace_refs"
+    ]
+  },
+  {
+    "id": "real-en-learning-trajectory",
+    "suite": "real",
+    "language": "en",
+    "query": "what has Hanje improved over time",
+    "expected_intent": "work_context",
+    "expected_first_context": "context:self_model.learning_trajectory",
+    "style_contract": "third_person_identity",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [
+      "trajectory"
+    ],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports",
+      "source_id",
+      "private_trace_refs"
+    ]
+  },
+  {
+    "id": "real-zh-years-full-stack",
+    "suite": "real",
+    "language": "zh-CN",
+    "query": "Hanje 有几年 full stack 经验",
+    "expected_intent": "work_context",
+    "expected_first_context": "context:self_model.career_timeline",
+    "style_contract": "neutral_guidance",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [
+      "year"
+    ],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports",
+      "source_id",
+      "private_trace_refs"
+    ]
+  },
+  {
+    "id": "real-zh-role-identity",
+    "suite": "real",
+    "language": "zh-CN",
+    "query": "Hanje 是什么类型的工程师",
+    "expected_intent": "self_knowledge",
+    "expected_first_context": "context:self_model.role_identity",
+    "style_contract": "third_person_identity",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [
+      "lead"
+    ],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports",
+      "source_id",
+      "private_trace_refs"
+    ]
+  },
+  {
+    "id": "real-zh-strengths",
+    "suite": "real",
+    "language": "zh-CN",
+    "query": "Hanje 强项是什么",
+    "expected_intent": "work_context",
+    "expected_first_context": "context:self_model.experience_scope",
+    "style_contract": "neutral_guidance",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [
+      "frontend"
+    ],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports",
+      "source_id",
+      "private_trace_refs"
+    ]
+  },
+  {
+    "id": "real-zh-review-authority",
+    "suite": "real",
+    "language": "zh-CN",
+    "query": "Hanje review PR 关注什么",
+    "expected_intent": "act_as_me",
+    "expected_first_context": "context:self_model.review_style",
+    "style_contract": "neutral_guidance",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [
+      "review"
+    ],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports",
+      "source_id",
+      "private_trace_refs"
+    ]
+  },
+  {
+    "id": "real-zh-domain-knowledge",
+    "suite": "real",
+    "language": "zh-CN",
+    "query": "Hanje 懂哪些业务领域",
+    "expected_intent": "self_knowledge",
+    "expected_first_context": "context:self_model.domain_knowledge",
+    "style_contract": "third_person_identity",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports",
+      "source_id",
+      "private_trace_refs"
+    ]
+  },
+  {
+    "id": "synthetic-en-v28-official-role-years",
+    "suite": "synthetic",
+    "language": "en",
+    "query": "what is Hanje's official role and years of experience",
+    "expected_intent": "work_context",
+    "expected_first_context": "context:self_model.declared_profile",
+    "style_contract": "third_person_identity",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports",
+      "source_id",
+      "private_trace_refs",
+      "git_commit:",
+      "jira_ticket:"
+    ]
+  },
+  {
+    "id": "synthetic-zh-v28-official-role-years",
+    "suite": "synthetic",
+    "language": "zh-CN",
+    "query": "Hanje 正式职位和年限是什么",
+    "expected_intent": "work_context",
+    "expected_first_context": "context:self_model.declared_profile",
+    "style_contract": "third_person_identity",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports",
+      "source_id",
+      "private_trace_refs",
+      "git_commit:",
+      "jira_ticket:"
+    ]
+  },
+  {
+    "id": "synthetic-en-v28-review-style",
+    "suite": "synthetic",
+    "language": "en",
+    "query": "how does Hanje review PRs",
+    "expected_intent": "act_as_me",
+    "expected_first_context": "context:self_model.review_style",
+    "style_contract": "neutral_guidance",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports",
+      "source_id",
+      "private_trace_refs",
+      "git_commit:",
+      "jira_ticket:"
+    ]
+  },
+  {
+    "id": "synthetic-zh-v28-review-style",
+    "suite": "synthetic",
+    "language": "zh-CN",
+    "query": "Hanje review PR 关注什么",
+    "expected_intent": "act_as_me",
+    "expected_first_context": "context:self_model.review_style",
+    "style_contract": "neutral_guidance",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports",
+      "source_id",
+      "private_trace_refs",
+      "git_commit:",
+      "jira_ticket:"
+    ]
+  },
+  {
+    "id": "synthetic-en-v28-repo-authority",
+    "suite": "synthetic",
+    "language": "en",
+    "query": "who relies on Hanje for frontend decisions",
+    "expected_intent": "relationship_context",
+    "expected_first_context": "context:self_model.repo_authority",
+    "style_contract": "neutral_guidance",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports",
+      "source_id",
+      "private_trace_refs",
+      "git_commit:",
+      "jira_ticket:"
+    ]
+  },
+  {
+    "id": "synthetic-zh-v28-repo-authority",
+    "suite": "synthetic",
+    "language": "zh-CN",
+    "query": "谁依赖 Hanje 做前端决定",
+    "expected_intent": "relationship_context",
+    "expected_first_context": "context:self_model.repo_authority",
+    "style_contract": "neutral_guidance",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports",
+      "source_id",
+      "private_trace_refs",
+      "git_commit:",
+      "jira_ticket:"
+    ]
+  },
+  {
+    "id": "synthetic-en-v28-release-ownership",
+    "suite": "synthetic",
+    "language": "en",
+    "query": "what release or CI/CD ownership does Hanje have",
+    "expected_intent": "work_context",
+    "expected_first_context": "context:self_model.release_ownership",
+    "style_contract": "neutral_guidance",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports",
+      "source_id",
+      "private_trace_refs",
+      "git_commit:",
+      "jira_ticket:"
+    ]
+  },
+  {
+    "id": "synthetic-zh-v28-release-ownership",
+    "suite": "synthetic",
+    "language": "zh-CN",
+    "query": "Hanje 负责过哪些 release / CI/CD",
+    "expected_intent": "work_context",
+    "expected_first_context": "context:self_model.release_ownership",
+    "style_contract": "neutral_guidance",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports",
+      "source_id",
+      "private_trace_refs",
+      "git_commit:",
+      "jira_ticket:"
+    ]
+  },
+  {
+    "id": "synthetic-en-v28-jira-leadership",
+    "suite": "synthetic",
+    "language": "en",
+    "query": "how does Hanje coordinate Jira, QA, blockers, and Done",
+    "expected_intent": "work_context",
+    "expected_first_context": "context:self_model.jira_leadership",
+    "style_contract": "neutral_guidance",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports",
+      "source_id",
+      "private_trace_refs",
+      "git_commit:",
+      "jira_ticket:"
+    ]
+  },
+  {
+    "id": "synthetic-zh-v28-jira-leadership",
+    "suite": "synthetic",
+    "language": "zh-CN",
+    "query": "Hanje 怎么协调 Jira 和 QA",
+    "expected_intent": "work_context",
+    "expected_first_context": "context:self_model.jira_leadership",
+    "style_contract": "neutral_guidance",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports",
+      "source_id",
+      "private_trace_refs",
+      "git_commit:",
+      "jira_ticket:"
+    ]
+  },
+  {
+    "id": "synthetic-en-v28-architecture-material",
+    "suite": "synthetic",
+    "language": "en",
+    "query": "what architecture docs prove Hanje's judgment",
+    "expected_intent": "work_context",
+    "expected_first_context": "context:self_model.architecture_material",
+    "style_contract": "neutral_guidance",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports",
+      "source_id",
+      "private_trace_refs",
+      "git_commit:",
+      "jira_ticket:"
+    ]
+  },
+  {
+    "id": "synthetic-zh-v28-architecture-material",
+    "suite": "synthetic",
+    "language": "zh-CN",
+    "query": "Hanje 有哪些架构文档",
+    "expected_intent": "work_context",
+    "expected_first_context": "context:self_model.architecture_material",
+    "style_contract": "neutral_guidance",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports",
+      "source_id",
+      "private_trace_refs",
+      "git_commit:",
+      "jira_ticket:"
+    ]
+  },
+  {
+    "id": "synthetic-en-v28-agent-collaboration",
+    "suite": "synthetic",
+    "language": "en",
+    "query": "how should an agent work with Hanje",
+    "expected_intent": "act_as_me",
+    "expected_first_context": "context:self_model.agent_collaboration_style",
+    "style_contract": "neutral_guidance",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports",
+      "source_id",
+      "private_trace_refs",
+      "git_commit:",
+      "jira_ticket:"
+    ]
+  },
+  {
+    "id": "synthetic-zh-v28-agent-collaboration",
+    "suite": "synthetic",
+    "language": "zh-CN",
+    "query": "agent 该怎么和 Hanje 一起工作",
+    "expected_intent": "act_as_me",
+    "expected_first_context": "context:self_model.agent_collaboration_style",
+    "style_contract": "neutral_guidance",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports",
+      "source_id",
+      "private_trace_refs",
+      "git_commit:",
+      "jira_ticket:"
+    ]
+  },
+  {
+    "id": "synthetic-en-v28-portfolio-cases",
+    "suite": "synthetic",
+    "language": "en",
+    "query": "show Hanje's product case studies",
+    "expected_intent": "project_context",
+    "expected_first_context": "context:self_model.portfolio_cases",
+    "style_contract": "neutral_guidance",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports",
+      "source_id",
+      "private_trace_refs",
+      "git_commit:",
+      "jira_ticket:"
+    ]
+  },
+  {
+    "id": "synthetic-zh-v28-portfolio-cases",
+    "suite": "synthetic",
+    "language": "zh-CN",
+    "query": "Hanje 有哪些作品案例",
+    "expected_intent": "project_context",
+    "expected_first_context": "context:self_model.portfolio_cases",
+    "style_contract": "neutral_guidance",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports",
+      "source_id",
+      "private_trace_refs",
+      "git_commit:",
+      "jira_ticket:"
+    ]
+  },
+  {
+    "id": "synthetic-en-v28-personal-preferences",
+    "suite": "synthetic",
+    "language": "en",
+    "query": "what personal preferences should the clone know",
+    "expected_intent": "personal_context",
+    "expected_first_context": "context:self_model.personal_identity",
+    "style_contract": "neutral_guidance",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports",
+      "source_id",
+      "private_trace_refs",
+      "git_commit:",
+      "jira_ticket:"
+    ]
+  },
+  {
+    "id": "synthetic-zh-v28-personal-preferences",
+    "suite": "synthetic",
+    "language": "zh-CN",
+    "query": "Hanje 的个人偏好是什么",
+    "expected_intent": "personal_context",
+    "expected_first_context": "context:self_model.personal_identity",
+    "style_contract": "neutral_guidance",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports",
+      "source_id",
+      "private_trace_refs",
+      "git_commit:",
+      "jira_ticket:"
+    ]
+  },
+  {
+    "id": "real-en-v28-official-role-years",
+    "suite": "real",
+    "language": "en",
+    "query": "what is Hanje's official role and years of experience",
+    "expected_intent": "work_context",
+    "expected_first_context": "context:self_model.declared_profile",
+    "style_contract": "third_person_identity",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports",
+      "source_id",
+      "private_trace_refs",
+      "git_commit:",
+      "jira_ticket:"
+    ]
+  },
+  {
+    "id": "real-zh-v28-official-role-years",
+    "suite": "real",
+    "language": "zh-CN",
+    "query": "Hanje 正式职位和年限是什么",
+    "expected_intent": "work_context",
+    "expected_first_context": "context:self_model.declared_profile",
+    "style_contract": "third_person_identity",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports",
+      "source_id",
+      "private_trace_refs",
+      "git_commit:",
+      "jira_ticket:"
+    ]
+  },
+  {
+    "id": "real-en-v28-review-style",
+    "suite": "real",
+    "language": "en",
+    "query": "how does Hanje review PRs",
+    "expected_intent": "act_as_me",
+    "expected_first_context": "context:self_model.review_style",
+    "style_contract": "neutral_guidance",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports",
+      "source_id",
+      "private_trace_refs",
+      "git_commit:",
+      "jira_ticket:"
+    ]
+  },
+  {
+    "id": "real-zh-v28-review-style",
+    "suite": "real",
+    "language": "zh-CN",
+    "query": "Hanje review PR 关注什么",
+    "expected_intent": "act_as_me",
+    "expected_first_context": "context:self_model.review_style",
+    "style_contract": "neutral_guidance",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports",
+      "source_id",
+      "private_trace_refs",
+      "git_commit:",
+      "jira_ticket:"
+    ]
+  },
+  {
+    "id": "real-en-v28-repo-authority",
+    "suite": "real",
+    "language": "en",
+    "query": "who relies on Hanje for frontend decisions",
+    "expected_intent": "relationship_context",
+    "expected_first_context": "context:self_model.repo_authority",
+    "style_contract": "neutral_guidance",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports",
+      "source_id",
+      "private_trace_refs",
+      "git_commit:",
+      "jira_ticket:"
+    ]
+  },
+  {
+    "id": "real-zh-v28-repo-authority",
+    "suite": "real",
+    "language": "zh-CN",
+    "query": "谁依赖 Hanje 做前端决定",
+    "expected_intent": "relationship_context",
+    "expected_first_context": "context:self_model.repo_authority",
+    "style_contract": "neutral_guidance",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports",
+      "source_id",
+      "private_trace_refs",
+      "git_commit:",
+      "jira_ticket:"
+    ]
+  },
+  {
+    "id": "real-en-v28-release-ownership",
+    "suite": "real",
+    "language": "en",
+    "query": "what release or CI/CD ownership does Hanje have",
+    "expected_intent": "work_context",
+    "expected_first_context": "context:self_model.release_ownership",
+    "style_contract": "neutral_guidance",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports",
+      "source_id",
+      "private_trace_refs",
+      "git_commit:",
+      "jira_ticket:"
+    ]
+  },
+  {
+    "id": "real-zh-v28-release-ownership",
+    "suite": "real",
+    "language": "zh-CN",
+    "query": "Hanje 负责过哪些 release / CI/CD",
+    "expected_intent": "work_context",
+    "expected_first_context": "context:self_model.release_ownership",
+    "style_contract": "neutral_guidance",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports",
+      "source_id",
+      "private_trace_refs",
+      "git_commit:",
+      "jira_ticket:"
+    ]
+  },
+  {
+    "id": "real-en-v28-jira-leadership",
+    "suite": "real",
+    "language": "en",
+    "query": "how does Hanje coordinate Jira, QA, blockers, and Done",
+    "expected_intent": "work_context",
+    "expected_first_context": "context:self_model.jira_leadership",
+    "style_contract": "neutral_guidance",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports",
+      "source_id",
+      "private_trace_refs",
+      "git_commit:",
+      "jira_ticket:"
+    ]
+  },
+  {
+    "id": "real-zh-v28-jira-leadership",
+    "suite": "real",
+    "language": "zh-CN",
+    "query": "Hanje 怎么协调 Jira 和 QA",
+    "expected_intent": "work_context",
+    "expected_first_context": "context:self_model.jira_leadership",
+    "style_contract": "neutral_guidance",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports",
+      "source_id",
+      "private_trace_refs",
+      "git_commit:",
+      "jira_ticket:"
+    ]
+  },
+  {
+    "id": "real-en-v28-architecture-material",
+    "suite": "real",
+    "language": "en",
+    "query": "what architecture docs prove Hanje's judgment",
+    "expected_intent": "work_context",
+    "expected_first_context": "context:self_model.architecture_material",
+    "style_contract": "neutral_guidance",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports",
+      "source_id",
+      "private_trace_refs",
+      "git_commit:",
+      "jira_ticket:"
+    ]
+  },
+  {
+    "id": "real-zh-v28-architecture-material",
+    "suite": "real",
+    "language": "zh-CN",
+    "query": "Hanje 有哪些架构文档",
+    "expected_intent": "work_context",
+    "expected_first_context": "context:self_model.architecture_material",
+    "style_contract": "neutral_guidance",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports",
+      "source_id",
+      "private_trace_refs",
+      "git_commit:",
+      "jira_ticket:"
+    ]
+  },
+  {
+    "id": "real-en-v28-agent-collaboration",
+    "suite": "real",
+    "language": "en",
+    "query": "how should an agent work with Hanje",
+    "expected_intent": "act_as_me",
+    "expected_first_context": "context:self_model.agent_collaboration_style",
+    "style_contract": "neutral_guidance",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports",
+      "source_id",
+      "private_trace_refs",
+      "git_commit:",
+      "jira_ticket:"
+    ]
+  },
+  {
+    "id": "real-zh-v28-agent-collaboration",
+    "suite": "real",
+    "language": "zh-CN",
+    "query": "agent 该怎么和 Hanje 一起工作",
+    "expected_intent": "act_as_me",
+    "expected_first_context": "context:self_model.agent_collaboration_style",
+    "style_contract": "neutral_guidance",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports",
+      "source_id",
+      "private_trace_refs",
+      "git_commit:",
+      "jira_ticket:"
+    ]
+  },
+  {
+    "id": "real-en-v28-portfolio-cases",
+    "suite": "real",
+    "language": "en",
+    "query": "show Hanje's product case studies",
+    "expected_intent": "project_context",
+    "expected_first_context": "context:self_model.portfolio_cases",
+    "style_contract": "neutral_guidance",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports",
+      "source_id",
+      "private_trace_refs",
+      "git_commit:",
+      "jira_ticket:"
+    ]
+  },
+  {
+    "id": "real-zh-v28-portfolio-cases",
+    "suite": "real",
+    "language": "zh-CN",
+    "query": "Hanje 有哪些作品案例",
+    "expected_intent": "project_context",
+    "expected_first_context": "context:self_model.portfolio_cases",
+    "style_contract": "neutral_guidance",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports",
+      "source_id",
+      "private_trace_refs",
+      "git_commit:",
+      "jira_ticket:"
+    ]
+  },
+  {
+    "id": "real-en-v28-personal-preferences",
+    "suite": "real",
+    "language": "en",
+    "query": "what personal preferences should the clone know",
+    "expected_intent": "personal_context",
+    "expected_first_context": "context:self_model.personal_identity",
+    "style_contract": "neutral_guidance",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports",
+      "source_id",
+      "private_trace_refs",
+      "git_commit:",
+      "jira_ticket:"
+    ]
+  },
+  {
+    "id": "real-zh-v28-personal-preferences",
+    "suite": "real",
+    "language": "zh-CN",
+    "query": "Hanje 的个人偏好是什么",
+    "expected_intent": "personal_context",
+    "expected_first_context": "context:self_model.personal_identity",
+    "style_contract": "neutral_guidance",
+    "provenance_policy": "hidden_by_default",
+    "must_contain": [],
+    "must_not_contain": [
+      "raw source evidence",
+      "this supports",
+      "source_id",
+      "private_trace_refs",
+      "git_commit:",
+      "jira_ticket:"
+    ]
+  }
+]

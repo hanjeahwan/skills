@@ -1,0 +1,35 @@
+{
+  "skill_name": "self-context",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Use my GitHub, Jira, code, and notes to build a private MCP memory layer that another agent can query about me.",
+      "expected_output": "Builds memory_atoms.jsonl, self_model.json, and context_packs.jsonl; does not make resume/profile/report the core output.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "What do you know about Hanje?",
+      "expected_output": "Returns useful self-context summaries from context packs without dumping source ids or evidence chains.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "How should I code in Hanje's style?",
+      "expected_output": "Returns coding-style context, preferences, behavioral guidance, and known limits rather than commit counts.",
+      "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "Show proof for the React claim.",
+      "expected_output": "Switches to proof mode and returns private provenance/source ids only because proof was explicitly requested.",
+      "files": []
+    },
+    {
+      "id": 5,
+      "prompt": "Add this personal note to my long-term context and make future agents know it.",
+      "expected_output": "Stores the note in sources/manual.jsonl, rebuilds memory atoms and context packs, and keeps privacy boundaries explicit.",
+      "files": []
+    }
+  ]
+}

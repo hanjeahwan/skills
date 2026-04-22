@@ -1,0 +1,263 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "rawMaterial": {
+      "type": "object",
+      "required": [
+        "id",
+        "source_type",
+        "source_id",
+        "occurred_at",
+        "title",
+        "summary",
+        "url_or_path",
+        "raw_excerpt",
+        "tags",
+        "ingested_at"
+      ],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "source_type": {"type": "string", "minLength": 1},
+        "source_id": {"type": "string", "minLength": 1},
+        "occurred_at": {"type": "string", "minLength": 1},
+        "title": {"type": "string"},
+        "summary": {"type": "string"},
+        "url_or_path": {"type": "string"},
+        "raw_excerpt": {},
+        "tags": {"type": "array", "items": {"type": "string"}},
+        "ingested_at": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": true
+    },
+    "sourceCluster": {
+      "type": "object",
+      "required": [
+        "id",
+        "title",
+        "memory_type",
+        "statement",
+        "useful_context",
+        "topics",
+        "source_count",
+        "source_type_counts",
+        "confidence",
+        "source_refs",
+        "updated_at"
+      ],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "title": {"type": "string", "minLength": 1},
+        "memory_type": {"type": "string", "minLength": 1},
+        "statement": {"type": "string", "minLength": 1},
+        "useful_context": {"type": "array", "items": {"type": "string"}},
+        "topics": {"type": "array", "items": {"type": "string"}},
+        "source_count": {"type": "integer", "minimum": 0},
+        "source_type_counts": {"type": "object"},
+        "confidence": {"type": "string", "minLength": 1},
+        "source_refs": {"type": "array"},
+        "updated_at": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": true
+    },
+    "distillationCandidate": {
+      "type": "object",
+      "required": [
+        "id",
+        "memory_id",
+        "trace_id",
+        "source_cluster_id",
+        "subject",
+        "memory_type",
+        "statement",
+        "useful_context",
+        "topics",
+        "facets",
+        "query_patterns",
+        "behavioral_use",
+        "guardrails",
+        "source_refs",
+        "quality_flags",
+        "updated_at"
+      ],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "memory_id": {"type": "string", "minLength": 1},
+        "trace_id": {"type": "string", "minLength": 1},
+        "source_cluster_id": {"type": "string", "minLength": 1},
+        "subject": {"type": "string", "minLength": 1},
+        "memory_type": {"type": "string", "minLength": 1},
+        "statement": {"type": "string", "minLength": 1},
+        "useful_context": {"type": "array", "items": {"type": "string"}},
+        "topics": {"type": "array", "items": {"type": "string"}},
+        "facets": {"type": "object"},
+        "query_patterns": {"type": "array", "items": {"type": "string"}},
+        "behavioral_use": {"type": "string"},
+        "guardrails": {"type": "array", "items": {"type": "string"}},
+        "source_refs": {"type": "array"},
+        "quality_flags": {"type": "array", "items": {"type": "string"}},
+        "updated_at": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": true
+    },
+    "memoryAtom": {
+      "type": "object",
+      "required": [
+        "id",
+        "subject",
+        "memory_type",
+        "statement",
+        "useful_context",
+        "topics",
+        "facets",
+        "query_patterns",
+        "behavioral_use",
+        "guardrails",
+        "provenance_refs",
+        "updated_at"
+      ],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "subject": {"type": "string", "minLength": 1},
+        "memory_type": {
+          "type": "string",
+          "enum": [
+            "identity",
+            "capability",
+            "coding_style",
+            "decision_pattern",
+            "preference",
+            "communication_style",
+            "work_history",
+            "project_context",
+            "personal_context",
+            "relationship_context",
+            "knowledge",
+            "goal",
+            "constraint",
+            "private_boundary",
+            "unknown_gap"
+          ]
+        },
+        "statement": {"type": "string", "minLength": 1},
+        "useful_context": {"type": "array", "items": {"type": "string"}},
+        "topics": {"type": "array", "items": {"type": "string"}},
+        "facets": {"type": "object"},
+        "query_patterns": {"type": "array", "items": {"type": "string"}},
+        "behavioral_use": {"type": "string"},
+        "guardrails": {"type": "array", "items": {"type": "string"}},
+        "provenance_refs": {"type": "array", "items": {"type": "string"}},
+        "updated_at": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": true
+    },
+    "contextPack": {
+      "type": "object",
+      "required": [
+        "id",
+        "intent",
+        "title",
+        "direct_answer",
+        "useful_context",
+        "behavioral_guidance",
+        "known_limits",
+        "memory_atoms",
+        "private_trace_refs",
+        "topics",
+        "updated_at"
+      ],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "intent": {"type": "string", "minLength": 1},
+        "title": {"type": "string"},
+        "direct_answer": {"type": "string"},
+        "useful_context": {"type": "array", "items": {"type": "string"}},
+        "behavioral_guidance": {"type": "array", "items": {"type": "string"}},
+        "known_limits": {"type": "array", "items": {"type": "string"}},
+        "memory_atoms": {"type": "array", "items": {"type": "string"}},
+        "private_trace_refs": {"type": "array", "items": {"type": "string"}},
+        "topics": {"type": "array", "items": {"type": "string"}},
+        "retrieval_text": {"type": "string"},
+        "updated_at": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": true
+    },
+    "provenanceLink": {
+      "type": "object",
+      "required": [
+        "id",
+        "memory_id",
+        "source_id",
+        "source_type",
+        "support_role",
+        "strength",
+        "reason",
+        "visibility",
+        "updated_at"
+      ],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "memory_id": {"type": "string", "minLength": 1},
+        "source_id": {"type": "string", "minLength": 1},
+        "source_type": {"type": "string", "minLength": 1},
+        "support_role": {"type": "string", "minLength": 1},
+        "strength": {"type": "string", "minLength": 1},
+        "reason": {"type": "string"},
+        "visibility": {"type": "string", "enum": ["internal", "public"]},
+        "updated_at": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": true
+    },
+    "memoryGraphEdge": {
+      "type": "object",
+      "required": [
+        "from_memory_id",
+        "to_memory_id",
+        "relation",
+        "weight",
+        "reason"
+      ],
+      "properties": {
+        "from_memory_id": {"type": "string", "minLength": 1},
+        "to_memory_id": {"type": "string", "minLength": 1},
+        "relation": {
+          "type": "string",
+          "enum": [
+            "supports",
+            "contrasts",
+            "refines",
+            "belongs_to_topic",
+            "co_occurs_with",
+            "supersedes",
+            "needs_more_evidence"
+          ]
+        },
+        "weight": {"type": "number"},
+        "reason": {"type": "string"}
+      },
+      "additionalProperties": true
+    },
+    "retrievalEval": {
+      "type": "object",
+      "required": [
+        "generated_at",
+        "architecture",
+        "suite_results",
+        "summary",
+        "case_results",
+        "input_fingerprints",
+        "passes"
+      ],
+      "properties": {
+        "generated_at": {"type": "string", "minLength": 1},
+        "architecture": {"type": "string", "minLength": 1},
+        "suite_results": {"type": "object"},
+        "summary": {"type": "object"},
+        "case_results": {"type": "array", "items": {"type": "object"}},
+        "input_fingerprints": {"type": "object"},
+        "passes": {"type": "boolean"},
+        "stale": {"type": "boolean"}
+      },
+      "additionalProperties": true
+    }
+  }
+}
