@@ -1,0 +1,47 @@
+{
+  "skill_name": "professional-translation",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I have a mixed Markdown and TypeScript repo with Chinese comments, Chinese README sections, and some zh-CN locale JSON files. Translate the Chinese into English, but list every affected path before editing and do not touch locale catalogs or protected agent folders.",
+      "expected_output": "The agent creates a scope inventory first, separates eligible files from protected locale and agent paths, translates one file at a time, preserves code identifiers and placeholders, reviews each file with a 100/100 quality gate, and finishes with a residue scan.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Translate these onboarding UI strings from English into French for a SaaS dashboard. Keep placeholders like {{workspaceName}} and {count}, maintain a friendly but professional tone, and flag anything that needs screen context.",
+      "expected_output": "The agent builds a brief for target locale, audience, tone, protected placeholders, and UI context; translates by screen or string group; preserves placeholders and pluralization; flags context-dependent strings; and reports LQA results.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Review this existing Spanish translation of our privacy policy against the English source. I need exact legal meaning preserved, not a nicer rewrite.",
+      "expected_output": "The agent uses exact translation mode, compares source and target, classifies issues by accuracy/completeness/terminology/style/locale/technical integrity, preserves legal force, provides corrected Spanish text, and asks before resolving ambiguous regulated terms.",
+      "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "Localize our product launch landing page from English into Japanese. Keep the claims legally safe, preserve brand terms, and make sure CTA labels and hero copy work for a Japanese audience.",
+      "expected_output": "The agent uses marketing localization mode, preserves claims without strengthening them, keeps protected brand terms, adapts idioms only when needed, checks CTA and layout-sensitive text, and reports glossary and style decisions.",
+      "files": []
+    },
+    {
+      "id": 5,
+      "prompt": "Translate a PowerPoint training deck from German to English. Preserve slide layout, speaker notes, chart labels, and table structure. Don't change formulas or IDs in embedded spreadsheet objects.",
+      "expected_output": "The agent inventories slide text, notes, tables, charts, and embedded objects; translates one slide or section at a time; preserves layout-sensitive structure and machine-readable content; then verifies formatting and residual source-language text.",
+      "files": []
+    },
+    {
+      "id": 6,
+      "prompt": "We use the term \"workspace\" in two ways across our product: one is the customer account container, and one is the local editor area. Translate the product docs into Korean, but don't guess if the term should be different by context.",
+      "expected_output": "The agent builds a glossary with context-specific term rules, detects the ambiguous term as a correctness risk, blocks the affected translation instead of guessing, asks for the missing terminology decision with concrete options and risks, and applies the approved term consistently only after the decision is available.",
+      "files": []
+    },
+    {
+      "id": 7,
+      "prompt": "Translate this Korean training subtitle file into English. Preserve timestamps, speaker labels, line order, and technical terms from our glossary.",
+      "expected_output": "The agent treats each caption block as a work unit, preserves timestamps and speaker labels exactly, applies glossary terms, translates without summarizing, and verifies subtitle structure after translation.",
+      "files": []
+    }
+  ]
+}
