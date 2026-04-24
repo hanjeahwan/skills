@@ -1,0 +1,90 @@
+{
+  "skill_name": "ui-library-to-shadcn-tailwindcss",
+  "evals": [
+    {
+      "id": "antd-steps-known-profile",
+      "prompt": "Migrate AntD Steps into this shadcn + Tailwind v4 project with 1:1 current public API and docs demo parity. Deprecated props should be identified and recorded as not migrated by default unless explicitly requested.",
+      "expected_output": "Selects profiles/antd.md, avoids unknown-library discovery, builds a compatibility contract with AntD source evidence, traces rc/shared behavior when applicable, maps style graph and docs demos, enforces Tailwind-first styling and no Ant runtime CSS leakage, and requires independent verifier evidence before completion.",
+      "assertions": [
+        {
+          "text": "Uses profiles/antd.md for AntD and records the profile decision in the contract."
+        },
+        {
+          "text": "Dispatches or requires ui_source_auditor, ui_style_graph_auditor, ui_demo_parity_auditor, ui_browser_geometry_verifier, ui_contract_closure_verifier, and ui_learning_promoter when their scopes apply."
+        },
+        {
+          "text": "Requires docs demo parity matrix rows for source demo fixtures and rejects synthetic demo parity."
+        },
+        {
+          "text": "Requires check-no-source-css with the AntD profile deny patterns and blocks target runtime ant-* or --ant-* styling."
+        },
+        {
+          "text": "Blocks Migration completed unless protected checklist rows have fresh-context independent verifier attribution."
+        }
+      ]
+    },
+    {
+      "id": "mui-autocomplete-profile-discovery",
+      "prompt": "Migrate MUI Autocomplete into this shadcn + Tailwind v4 project. The skill currently has no built-in MUI profile.",
+      "expected_output": "Does not guess MUI APIs. Runs or requires ui_profile_builder to create a temporary profile with docs/package/source evidence, API extraction path, examples path, theme/token model, slot/style API, internal primitives, legacy policy, and runtime CSS deny patterns before planning implementation.",
+      "assertions": [
+        {
+          "text": "Records no known profile match and dispatches ui_profile_builder or an equivalent generic subagent before source/API planning."
+        },
+        {
+          "text": "Creates a temporary profile in the contract and records source docs/source/package versions."
+        },
+        {
+          "text": "Requires library discovery evidence before any implementation claim."
+        },
+        {
+          "text": "Defines MUI-specific runtime CSS deny patterns from profile discovery before running no-source-css checks."
+        },
+        {
+          "text": "Marks Migration blocked if profile discovery cannot establish API, demo, theme, slot/style, primitive, or deny-pattern evidence."
+        }
+      ]
+    },
+    {
+      "id": "chakra-menu-temporary-profile",
+      "prompt": "Migrate Chakra Menu into this shadcn + Tailwind v4 project while preserving theme, slot, portal, keyboard, and focus behavior. No formal Chakra profile exists yet.",
+      "expected_output": "Builds a temporary Chakra profile first, records theme and recipe/token model, slot/style props, portal and positioning behavior, examples path, source CSS leakage deny patterns, then plans Radix/headless implementation with Tailwind-first styling and independent verifier evidence.",
+      "assertions": [
+        {
+          "text": "Dispatches ui_profile_builder and records a temporary profile with theme/token, slot/style, portal, and keyboard behavior evidence."
+        },
+        {
+          "text": "Classifies Menu as a Radix/headless behavior component only after verifying callback timing, focus order, portal, and stacking behavior."
+        },
+        {
+          "text": "Requires browser geometry verifier evidence for portal, z-index, focus, overflow, and viewer shell claims."
+        },
+        {
+          "text": "Requires source CSS leakage checks using Chakra profile deny patterns rather than AntD-specific patterns."
+        }
+      ]
+    },
+    {
+      "id": "unknown-library-no-api-guessing",
+      "prompt": "Migrate FooUI MegaSelect into this shadcn + Tailwind v4 project. I only know the library name and component name.",
+      "expected_output": "Starts with profile auto-discovery. If source docs/package/source evidence cannot be found, reports Migration blocked instead of inventing APIs, demos, tokens, selectors, or behavior. If evidence is found, creates a temporary profile and proceeds through contract, tests, implementation, independent verification, and learning/profile closure.",
+      "assertions": [
+        {
+          "text": "Does not invent public API, props, events, slots, or style hooks."
+        },
+        {
+          "text": "Runs or requires ui_profile_builder before source/API auditor work."
+        },
+        {
+          "text": "Records Library discovery evidence and Profile decision before implementation."
+        },
+        {
+          "text": "Outputs Migration blocked when discovery cannot prove required profile fields."
+        },
+        {
+          "text": "Still requires independent verifier and no-source-css gates when migration proceeds."
+        }
+      ]
+    }
+  ]
+}
