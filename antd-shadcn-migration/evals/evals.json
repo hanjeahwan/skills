@@ -13,7 +13,16 @@
           "text": "Records side-branch audit ownership for applicable source/API, style, demo, browser, contract, and learning-regression risks."
         },
         {
+          "text": "Names the required custom agents for applicable audit branches, including antd_source_auditor and antd_contract_closure_verifier."
+        },
+        {
+          "text": "Records agent dispatch mode and uses an equivalent fresh-context generic subagent when a named custom agent is unavailable in the current session."
+        },
+        {
           "text": "Rejects self-certified checklist pass rows by requiring verifier attribution and source-backed evidence."
+        },
+        {
+          "text": "Requires Tailwind-first styling ownership: static theme-owned styles use shadcn/Tailwind utilities, and retained component variables have compatibility-bridge reasons."
         }
       ]
     },
@@ -29,6 +38,12 @@
           "text": "Delegates applicable side-branch audits and merges findings into contract rows, tests, or blockers."
         },
         {
+          "text": "Requires antd_source_auditor, antd_style_graph_auditor, antd_demo_parity_auditor, antd_browser_geometry_verifier, and antd_contract_closure_verifier when their scopes apply."
+        },
+        {
+          "text": "Allows generic-subagent fallback only when custom agents are unavailable, and records fallback reason instead of accepting implementer self-review."
+        },
+        {
           "text": "Fails completion when checklist rows have implementation-only evidence or missing verifier attribution."
         }
       ]
@@ -36,10 +51,13 @@
     {
       "id": "timeline-steps-layout",
       "prompt": "Migrate an Ant Design layout component such as Timeline or Steps into this shadcn + Tailwind v4 project, preserving docs demo behavior and visual geometry without using Ant CSS.",
-      "expected_output": "Treats layout styling as behavioral source, copies docs demos as fixtures, traces delegated/shared primitives, records positioning and containing-block matrices, preserves pixel token units, asserts connector/marker/slot geometry in browser tests, isolates viewer shell CSS, and blocks completion if any applicable checklist item is missing.",
+      "expected_output": "Treats layout styling as behavioral source, copies docs demos as fixtures, traces delegated/shared primitives, records positioning and containing-block matrices, maps color defaults to user-theme-derived shadcn/Tailwind tokens, preserves pixel token units, asserts connector/marker/slot geometry in browser tests, isolates viewer shell CSS, and blocks completion if any applicable checklist item is missing.",
       "assertions": [
         {
           "text": "Requires an independent verifier subagent to falsify docs demo parity, connector endpoint, containing-block, and viewer-shell checklist passes."
+        },
+        {
+          "text": "Uses antd_style_graph_auditor for style graph evidence, antd_demo_parity_auditor for source demo parity, and antd_browser_geometry_verifier for rendered DOM/CSS falsification."
         },
         {
           "text": "Adds false-pass prevention assertions that would fail for the visible layout mismatch class being fixed."
@@ -49,6 +67,18 @@
         },
         {
           "text": "Requires a layout and visual ownership matrix covering flex/min-size, variant branch behavior, connector status source, CSS variable ownership, responsive ownership, and attached visual envelopes when applicable."
+        },
+        {
+          "text": "Requires theme inheritance assertions proving component color variables follow light/dark or user theme tokens instead of hard-coded Ant hex/rgba runtime defaults."
+        },
+        {
+          "text": "Requires a Tailwind-first styling audit that prevents recreating an Ant-style component token system for static layout, color, spacing, border, radius, or typography styles."
+        },
+        {
+          "text": "Requires emitted CSS-variable color rules and transition-settled computed-style assertions before theme or geometry checklist rows can pass."
+        },
+        {
+          "text": "Requires promoted learning backfill across sibling migrated components and records the scan scope, matches, fixes, or source-backed non-goals."
         }
       ]
     },
@@ -62,6 +92,12 @@
         },
         {
           "text": "Records side-branch audit outputs for source behavior, portal geometry, a11y, warning decisions, and contract closure."
+        },
+        {
+          "text": "Records custom agent names in verifier reports and audit logs instead of referring only to a generic reviewer."
+        },
+        {
+          "text": "If custom agents are not callable, records generic-subagent dispatch mode with equivalent verifier role prompts; if no subagent exists, reports Migration blocked instead of self-certified pass."
         },
         {
           "text": "Marks Migration blocked when verifier findings are unresolved or checklist rows lack verifier attribution."

@@ -37,8 +37,13 @@ D:/dev/github/ant-design
 ## Styling Source Rules
 
 - Migrate style from Ant token meaning and state matrices, not screenshots.
+- Treat Tailwind utilities as the default target styling surface. Use existing shadcn/Tailwind semantic utilities for static layout, typography, spacing, borders, radii, and colors before introducing component CSS variables.
+- Map Ant color tokens to target-owned semantic utilities or variables that inherit from the user's shadcn/Tailwind theme. Component defaults may use private CSS variables for runtime geometry, but static color defaults must use theme utilities or reference theme tokens instead of hard-coded Ant hex/rgba values.
+- Component CSS variables are compatibility bridge variables, not a replacement theme system. Keep them only for Ant runtime props, user overrides, semantic slot hooks, shared cross-node geometry, connector endpoints, or values Tailwind cannot know at build time. Record the reason for each retained variable in the contract.
+- In Tailwind v4 migrations, CSS-variable color ownership should be expressed in the component CSS layer or another emitted unambiguous color rule. Do not use ambiguous `text-[var(--component-token)]` for color because it can compile as a non-color utility and silently stop theme inheritance.
+- Runtime TypeScript may assign state-specific variable references, but static color defaults belong in CSS where they can inherit user theme variables. Ant hex/rgba color values are source evidence, not target runtime defaults, unless the contract records a source-backed compatibility exception.
 - Every docs demo that depends on component layout must have a migrated styling assertion.
-- Visual parity tests must include computed style checks for visible tokens that users compare by eye: font size, line height, text color, semantic colors, filled versus outlined state, icon or marker container size, border color, background color, connector color, connector width, shadows, spacing, and state opacity.
+- Visual parity tests must include computed style checks for visible tokens that users compare by eye: font size, line height, text color, semantic colors, filled versus outlined state, icon or marker container size, border color, background color, connector color, connector width, shadows, spacing, and state opacity. When the inspected surface uses transitions or animations, disable them in the test surface or wait for stable styles before reading computed values.
 - When Ant style files position semantic slots independently, test those slot geometries directly: split slots, label/control relationships, adornments, extra/actions areas, title/content pairs, baseline alignment, axis relationships, and bidirectional placement.
 - Preserve Ant pixel token units when the source token is pixel-based. Do not convert fixed source dimensions to `rem` unless the source is font-relative.
 - Connector elements are behavioral DOM, not decoration. For separators, progress tracks, underlines, selection bars, connector lines, resize handles, and similar elements, record semantic parent and assert endpoint geometry.
@@ -93,6 +98,8 @@ If no prior learnings exist, record `No prior migration learnings found`. An emp
 
 When a learning applies, convert it into a compatibility contract row, red parity test, edge-case gate action, Tailwind v4 token requirement, source inspection requirement, or source-backed non-goal.
 
+When a learning is promoted to a skill rule, scan already migrated sibling components and shared local primitives in the same target repo for the same failure class. Record the scan scope, matches, fixes, and source-backed non-goals in the contract before final acceptance.
+
 ## Cross-Project Edge Case Gate
 
 Before writing a contract or implementation, complete this gate. Mark each item as `applies`, `not applicable`, or `blocked`, and cite file/source evidence.
@@ -110,7 +117,7 @@ Before writing a contract or implementation, complete this gate. Mark each item 
 11. IME composition, keyboard navigation, focus, blur, Escape, Enter, Tab, and arrow-key behavior must be tested where interactive input is involved.
 12. Date, time, locale, timezone, parsing, and formatting are a separate compatibility surface for date/time components.
 13. Table, Form, and other infrastructure components require phased migration contracts rather than one-shot ports.
-14. Ant tokens must map to target-owned Tailwind v4 semantic CSS variables, not copied as Ant cssinjs or generated CSS.
+14. Ant tokens must map to target-owned Tailwind v4 semantic utilities or CSS variables that inherit the user's theme, not copied as Ant cssinjs, generated CSS, hard-coded Ant color literals, runtime styling defaults, or a recreated Ant-style component token system.
 15. Snapshot-only verification is insufficient; every migration needs behavior, type, accessibility, and browser assertions appropriate to the component.
 
 Deprecated APIs are not migrated by default. Identify deprecated props, warnings, and docs, then record them as `default not migrated` unless the user explicitly requests legacy API support.

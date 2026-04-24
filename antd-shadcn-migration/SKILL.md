@@ -31,6 +31,8 @@ Use the bundled scripts when applicable:
 
 ```bash
 node scripts/check-skill-structure.mjs
+node scripts/install-custom-agents.mjs --scope user
+node scripts/install-custom-agents.mjs --scope project --target <repo>
 node scripts/check-migration-contract.mjs docs/migrations/antd/<component>.md
 node scripts/check-migration-contract.mjs docs/migrations/antd/<component>.md --allow-blocked
 node scripts/check-no-ant-css.mjs src/components src/styles
@@ -108,13 +110,13 @@ Use `--allow-blocked` only for draft/blocker review. Final acceptance must run t
 4. Do not treat styling as optional. Inspect the full Ant `components/<component>/style/**` graph and translate layout, tokens, state matrices, RTL, variants, status, placement, and responsive behavior.
 5. If the component delegates to another Ant component, shared primitive, rc wrapper, utility hook, or token layer, inspect that delegated implementation and style graph too.
 6. Do not use Ant `ant-*` class names, `--ant-*` variables, generated CSS, or prefix selectors as the target styling layer. They are source evidence only.
-7. Preserve semantic DOM through target-owned `data-slot`, shadcn-style class composition, `classNames`/`styles` slot APIs, and target-owned CSS variables.
+7. Preserve semantic DOM through target-owned `data-slot`, shadcn-style class composition, `classNames`/`styles` slot APIs, and minimal target-owned CSS variables.
 8. Use shadcn/ui source ownership as the implementation model. Add copied shadcn source when useful, then adapt it directly.
 9. Use Radix primitives only when they match the behavior domain. Keep Ant prop names and callback signatures at the public boundary.
 10. Write failing parity tests before implementation for each migrated behavior group.
 11. Keep visual evidence, semantic evidence, and implementation commentary separate.
 12. Require a fresh-context independent verifier subagent before final acceptance. The implementer may prepare candidate checklist statuses, but cannot be the only party that marks browser/demo parity, layout geometry, portal behavior, viewer shell isolation, or learning-regression closure as pass.
-13. If the environment cannot spawn an independent verifier subagent, use `Migration blocked` unless the user explicitly approves a fallback reviewer path in the current migration contract.
+13. Prefer installed custom agents, but do not block only because they are not loaded in the current session. When custom agents are unavailable and subagent capability exists, the implementer must spawn fresh-context generic subagents with equivalent role prompts and record the dispatch mode.
 14. If exact compatibility conflicts with shadcn/Tailwind architecture, stop and explain the conflict before editing.
 
 ## Intake
@@ -141,43 +143,92 @@ Ask only when a missing answer changes file placement, package manager commands,
 2. Search target repo learnings and existing migration contracts before planning. Record `No prior migration learnings found` when none exist.
 3. Classify the component with [references/component-classes.md](references/component-classes.md).
 4. Create the compatibility contract from [references/contract-template.md](references/contract-template.md). The contract is incomplete until every applicable matrix has evidence and an action.
-5. Split independent side-branch audits before coding when the component has meaningful API, style graph, docs demo, portal, layout geometry, or contract-closure risk. Record owners in the contract.
+5. Split independent side-branch audits before coding when the component has meaningful API, style graph, docs demo, portal, layout geometry, or contract-closure risk. Select the agent dispatch mode and record owners in the contract.
 6. Write failing tests and browser assertions using [references/testing-and-acceptance.md](references/testing-and-acceptance.md). Assertions must be able to fail for the exact visible mismatch they protect.
 7. Implement the Ant-compatible facade over shadcn/Radix internals and Tailwind v4 styling.
 8. Run the target repo verification loop. If a browser runner creates transient directories, keep lint/test boundaries separate.
-9. Spawn a fresh-context independent verifier subagent for browser/demo parity, layout geometry, portal behavior, viewer shell, and learning-regression closure. The verifier must compare source evidence to rendered DOM/CSS and try to falsify the checklist.
+9. Spawn a fresh-context independent verifier subagent for browser/demo parity, layout geometry, portal behavior, viewer shell, and learning-regression closure. Use an installed custom agent when callable; otherwise spawn a generic subagent with the equivalent role prompt. The verifier must compare source evidence to rendered DOM/CSS and try to falsify the checklist.
 10. Capture browser evidence. In Codex desktop, use the Codex in-app browser before final acceptance when available; Playwright or agent-browser is fallback evidence, not a substitute for available in-app inspection.
-11. Record learnings and regression assertions using [references/learnings-and-benchmark.md](references/learnings-and-benchmark.md).
+11. Record learnings, regression assertions, and promoted-learning backfill scans using [references/learnings-and-benchmark.md](references/learnings-and-benchmark.md).
 12. Close the acceptance checklist. Do not say `Migration completed` while any applicable row is unimplemented, self-certified, or blocked.
 
 ## Subagent Work Distribution
 
 Use subagents for independent branches that can run without blocking the implementer. The goal is not parallelism for its own sake; the goal is to keep evidence collection and verification independent from the code path that may be biased toward passing.
 
-```text
-┌──────────────────────┐       ┌──────────────────────────┐
-│ Implementer           │       │ Independent verifier      │
-│ code + local tests    │       │ falsify checklist claims  │
-└──────────┬───────────┘       └────────────┬─────────────┘
-           │                                │
-           ▼                                ▼
-┌──────────────────────┐       ┌──────────────────────────┐
-│ Sidecar auditors      │       │ Contract closure          │
-│ API, style, demos     │       │ pass only after findings  │
-└──────────────────────┘       │ are resolved or blocked   │
-                               └──────────────────────────┘
+Install the bundled custom agent templates when the environment has not loaded them yet:
+
+```bash
+node scripts/install-custom-agents.mjs --scope user
+node scripts/install-custom-agents.mjs --scope project --target <repo>
 ```
 
-Delegate these branches when applicable:
+Installation is not proof that a custom agent is callable in the current session. Every audit branch must record one dispatch mode:
 
-- Source/API/type graph audit.
-- Ant style graph and token audit.
-- Docs demo parity and fixture audit.
-- Browser geometry, containing-block, connector, portal, and viewer-shell verification.
-- Contract/checklist closure audit.
-- Learning regression closure audit.
+- `custom-agent`: the named bundled custom agent is installed and callable now.
+- `generic-subagent`: the named custom agent is unavailable, not loaded, or not callable, so the implementer spawned a fresh-context generic subagent with the same role, scope, required evidence, and output contract as the matching `agents/*.toml` file.
+- `self-review-blocked`: no subagent capability exists. The implementer may collect provisional self-audit evidence, but protected rows stay `blocked` and final acceptance is invalid unless the user explicitly narrows scope in the contract.
 
-The implementer can run tests, but cannot be the final verifier for browser/demo parity, layout geometry, portal behavior, viewer shell isolation, or learning-regression closure. Without a fresh-context verifier subagent report, the migration is blocked unless the user explicitly approves a fallback reviewer path in the contract.
+```text
+┌────────────────────────────┐
+│ Need audit/verifier branch  │
+└──────────────┬─────────────┘
+               ▼
+┌────────────────────────────┐
+│ Named custom agent callable?│
+└───────┬────────────────────┘
+        │ yes
+        ▼
+┌────────────────────────────┐
+│ Use installed custom agent  │
+└────────────────────────────┘
+        │ no
+        ▼
+┌────────────────────────────┐
+│ Fresh-context subagent      │
+│ capability available?       │
+└───────┬────────────────────┘
+        │ yes
+        ▼
+┌────────────────────────────┐
+│ Spawn generic subagent with │
+│ equivalent role prompt      │
+└────────────────────────────┘
+        │ no
+        ▼
+┌────────────────────────────┐
+│ Self-review only; protected │
+│ rows remain blocked         │
+└────────────────────────────┘
+```
+
+Delegate these branches with the named custom agents when applicable:
+
+- `antd_source_auditor`: Source/API/type graph audit.
+- `antd_style_graph_auditor`: Ant style graph, token, layout, connector, and responsive audit.
+- `antd_demo_parity_auditor`: Docs demo parity and fixture audit.
+- `antd_browser_geometry_verifier`: Browser geometry, containing-block, connector, portal, computed-style, overflow, and viewer-shell verification.
+- `antd_contract_closure_verifier`: Contract/checklist closure and self-certification rejection.
+- `antd_learning_promoter`: Learning regression closure and skill-rule promotion.
+
+When using `generic-subagent`, use the same branch names and outputs:
+
+- `source-api-audit generic subagent`: equivalent to `antd_source_auditor`.
+- `style-graph-audit generic subagent`: equivalent to `antd_style_graph_auditor`.
+- `demo-parity-audit generic subagent`: equivalent to `antd_demo_parity_auditor`.
+- `browser-geometry-verifier generic subagent`: equivalent to `antd_browser_geometry_verifier`.
+- `contract-closure-verifier generic subagent`: equivalent to `antd_contract_closure_verifier`.
+- `learning-regression generic subagent`: equivalent to `antd_learning_promoter`.
+
+A generic subagent must be fresh-context, must not be the implementer, must use the matching custom agent template as its role prompt source, and must include the same evidence, falsification, and final verdict fields required by that template.
+
+Default schedule:
+
+1. Before implementation, run `antd_source_auditor`, `antd_style_graph_auditor`, and `antd_demo_parity_auditor` in parallel when their scopes apply.
+2. After implementation and local verification, run `antd_browser_geometry_verifier` and `antd_contract_closure_verifier`.
+3. After user feedback, verifier findings, or test failures, run `antd_learning_promoter`.
+
+The implementer can run tests, but cannot be the final verifier for browser/demo parity, layout geometry, portal behavior, viewer shell isolation, contract closure, or learning-regression closure. Evidence may come from a named custom agent or a fresh-context generic subagent using the equivalent role prompt. If no subagent capability exists, self-audit can document risk and findings, but protected checklist rows remain `blocked`.
 
 ## Implementation Architecture
 
@@ -219,7 +270,12 @@ Adapter layer:
 Styling layer:
 
 - Use `@import "tailwindcss";` and CSS-first Tailwind v4 configuration.
-- Express Ant token equivalents as target-owned semantic variables.
+- Use Tailwind utilities as the default styling layer for static layout, typography, spacing, borders, radii, and theme colors. The target project already owns the shadcn/Tailwind theme, so do not recreate a component-local Ant token system by default.
+- Express Ant token equivalents through existing shadcn/Tailwind semantic utilities such as `text-foreground`, `text-muted-foreground`, `border-border`, `bg-background`, `bg-primary`, and `text-primary-foreground` whenever the value is static.
+- Use component CSS variables only as compatibility bridge variables for Ant runtime props, user overrides, semantic slot hooks, shared cross-node geometry, connector endpoints, or values Tailwind cannot know at build time. Each component variable must have a recorded reason in the contract.
+- Bind any retained component variables to shadcn/Tailwind theme tokens such as `--primary`, `--foreground`, `--muted-foreground`, `--border`, and `--destructive`; do not freeze Ant hex/rgba defaults in runtime component code unless the contract records a source-backed compatibility requirement.
+- Emit CSS-variable color usage through the component CSS layer or another unambiguous generated color rule. Do not rely on ambiguous Tailwind v4 arbitrary value classes such as `text-[var(--component-color)]` unless browser evidence proves they compiled as color rules.
+- Keep static color defaults in CSS where they can inherit the user theme. Runtime TypeScript may assign state-specific variable names, but must not own theme color literals.
 - Preserve fixed pixel token units when Ant source tokens are pixel-based.
 - Assert computed styles for user-visible tokens: text metrics, colors, fills, borders, shadows, spacing, connector widths, marker/icon sizes, and opacity.
 
@@ -231,6 +287,9 @@ The following are blockers when applicable and unimplemented:
 
 - Docs demo parity matrix.
 - Style graph translation.
+- Tailwind-first styling ownership.
+- Theme token inheritance.
+- CSS-variable color emission.
 - Token unit preservation.
 - Positioned element ownership and containing block.
 - Connector, track, separator, underline, handle, or overlay geometry.
@@ -239,11 +298,13 @@ The following are blockers when applicable and unimplemented:
 - Ref, static member, and imperative API verification.
 - Runtime warning decision.
 - Browser visual evidence.
+- Agent execution mode decision.
 - Independent verifier completion for browser/demo parity changes.
 - Subagent side-branch audit closure.
 - False-pass prevention assertions.
 - Benchmark/viewer scope decision.
 - Learning regression assertion closure.
+- Promoted learning backfill across sibling migrated components.
 
 If any row is `blocked`, use `Migration blocked` and name the exact blocker. A screenshot is evidence, not a replacement for repeatable assertions when behavior can be measured. A passing unit test is not enough when browser geometry, computed style, containing block, portal, or demo-source parity evidence is required.
 
@@ -257,6 +318,8 @@ Use the final response template in [references/testing-and-acceptance.md](refere
 - Props and behavior coverage.
 - 15 edge-case gate coverage.
 - Deprecated API decision.
+- Tailwind-first styling summary.
+- Agent execution mode and fallback reason.
 - Browser evidence source: Codex in-app browser, Playwright fallback, or agent-browser fallback.
 - Independent verifier subagent report, rejected rows, and required fixes.
 - Verification commands.

@@ -28,6 +28,7 @@ const requiredHeadings = [
   "## Docs demo parity matrix",
   "## Positioning and containing-block matrix",
   "## CSS ownership and Ant leakage audit",
+  "## Tailwind-first styling audit",
   "## Viewer shell and global CSS audit",
   "## Refs, static members, and imperative API",
   "## Runtime warnings and developer feedback",
@@ -57,6 +58,8 @@ const checklistItems = [
   "Docs demos copied as fixtures",
   "Style graph fully translated",
   "Layout and visual ownership verified",
+  "Tailwind-first styling verified",
+  "Theme token inheritance verified",
   "Token units preserved",
   "Positioned elements traced",
   "Connectors/tracks/separators asserted",
@@ -70,6 +73,7 @@ const checklistItems = [
   "Locale/date/time behavior verified",
   "Accessibility verified",
   "Browser visual evidence captured",
+  "Agent execution mode recorded",
   "Independent verifier completed",
   "Subagent side-branch audits completed",
   "False-pass prevention assertions landed",
@@ -137,9 +141,48 @@ if (!/Benchmark\/viewer scope decided/.test(text)) {
   fail("missing benchmark/viewer scope decision");
 }
 
+const ownershipStart = text.indexOf("## Verification ownership and subagent audit log");
+if (ownershipStart >= 0) {
+  const ownershipText = text.slice(ownershipStart).split(/\r?\n##\s+/)[0];
+  if (!/\|\s*Audit branch\s*\|\s*Dispatch mode\s*\|\s*Agent or subagent role\s*\|\s*Owner\s*\|/i.test(ownershipText)) {
+    fail("verification ownership table must include Dispatch mode, Agent or subagent role, and Owner columns");
+  }
+  if (!/(custom-agent|generic-subagent|self-review-blocked)/.test(ownershipText)) {
+    fail("verification ownership table must record a dispatch mode");
+  }
+  if (!/(antd_(source_auditor|style_graph_auditor|demo_parity_auditor|browser_geometry_verifier|contract_closure_verifier|learning_promoter)|generic subagent)/.test(ownershipText)) {
+    fail("verification ownership table must name at least one bundled custom agent or equivalent generic subagent role");
+  }
+}
+
 const verifierReport = text.slice(text.indexOf("## Independent verifier report"));
 if (text.includes("## Independent verifier report")) {
   if (!/Verifier:\s*(?!<)/i.test(verifierReport)) fail("independent verifier report is missing concrete Verifier");
+  const dispatchMode = verifierReport.match(/Dispatch mode:\s*([^\r\n]+)/i)?.[1]?.trim();
+  if (!dispatchMode) fail("independent verifier report is missing Dispatch mode");
+  else if (!["custom-agent", "generic-subagent", "self-review-blocked"].includes(dispatchMode)) {
+    fail(`independent verifier report has invalid Dispatch mode: ${dispatchMode}`);
+  } else if (!allowBlocked && dispatchMode === "self-review-blocked") {
+    fail("independent verifier report cannot use self-review-blocked for final acceptance");
+  }
+  if (!/Custom agent:\s*(?!<)/i.test(verifierReport)) fail("independent verifier report is missing concrete Custom agent");
+  else if (!/(antd_browser_geometry_verifier|antd_contract_closure_verifier|not available)/i.test(verifierReport)) {
+    fail("independent verifier report must name an expected verifier custom agent or not available");
+  }
+  const fallbackReason = verifierReport.match(/Fallback reason:\s*([^\r\n]+)/i)?.[1]?.trim();
+  if (!fallbackReason) fail("independent verifier report is missing Fallback reason");
+  else if (!["none", "custom-agent-unavailable", "subagent-unavailable"].includes(fallbackReason)) {
+    fail(`independent verifier report has invalid Fallback reason: ${fallbackReason}`);
+  }
+  if (dispatchMode === "custom-agent" && fallbackReason !== "none") {
+    fail("custom-agent dispatch mode must use Fallback reason: none");
+  }
+  if (dispatchMode === "generic-subagent" && fallbackReason !== "custom-agent-unavailable") {
+    fail("generic-subagent dispatch mode must use Fallback reason: custom-agent-unavailable");
+  }
+  if (dispatchMode === "self-review-blocked" && fallbackReason !== "subagent-unavailable") {
+    fail("self-review-blocked dispatch mode must use Fallback reason: subagent-unavailable");
+  }
   if (!/Falsification attempts:\s*[\s\S]*?-\s*(?!<)/i.test(verifierReport)) {
     fail("independent verifier report is missing falsification attempts");
   }
@@ -147,6 +190,9 @@ if (text.includes("## Independent verifier report")) {
   if (!finalVerdict) fail("independent verifier report is missing Final verdict");
   else if (!allowBlocked && finalVerdict !== "verified-pass") {
     fail(`independent verifier final verdict is not verified-pass: ${finalVerdict}`);
+  }
+  if (!/Risk note:\s*(?!<)/i.test(verifierReport)) {
+    fail("independent verifier report is missing concrete Risk note");
   }
 }
 

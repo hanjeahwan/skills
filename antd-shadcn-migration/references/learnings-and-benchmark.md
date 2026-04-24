@@ -45,6 +45,9 @@ ant_source: <component path and version/commit>
 ### Regression assertion
 <one objective assertion that should be added to a test, benchmark, or review checklist>
 
+### Backfill scan
+<sibling migrated components and shared primitives scanned, matches found, fixes applied, or source-backed non-goals>
+
 ### Skill evolution
 <new rule, edge-case gate update, test assertion, source file to inspect, or migration-contract field to add next time>
 ```
@@ -56,6 +59,9 @@ ant_source: <component path and version/commit>
 - `Learnings captured and promoted` cannot be `pass` while any new learning has an unmapped regression assertion.
 - `Learning regression assertions landed` cannot be `pass` until each learning has a landed assertion or source-backed non-goal.
 - A promoted learning must set `promoted_to` to an exact `SKILL.md` section, checklist item, contract matrix, or benchmark assertion so future lookup can find the active rule.
+- When a learning is promoted, scan already migrated sibling components and shared local primitives for the same failure class before final acceptance. A promoted token, layout, verifier, or demo-parity rule is incomplete if another migrated component in the same target still violates it.
+- The backfill scan must record scope, files/components matched, fixes applied, and source-backed non-goals. A generic statement such as "checked siblings" is not sufficient evidence.
+- Theme-token and CSS-variable color learnings must backfill both runtime component code and emitted CSS rules, then verify computed colors after styles settle.
 
 Promote a learning into this skill when:
 
@@ -84,6 +90,7 @@ For real component migrations, make the benchmark/viewer scope decision explicit
 - Include assertions that Ant `style/**` branches and delegated style branches were inspected and converted into a styling behavior matrix.
 - Include visual-token assertions for semantic colors, text metrics, marker/icon size, filled versus outlined state, connector color/width, overlay shadows, and spacing tokens as applicable.
 - Include layout and visual ownership assertions for flex/min-size semantics, type/variant/mode branch behavior, connector status ownership, CSS variable containing-block ownership, responsive media ownership, and attached visual envelope geometry when applicable.
+- Include Tailwind-first styling assertions that fail when static theme-owned styles are implemented as a recreated component token map instead of Tailwind/shadcn utilities, unless each retained variable has a compatibility-bridge reason.
 - Include semantic-slot geometry assertions when Ant styles place slots independently.
 - Include token-unit assertions when source dimensions are pixel-based.
 - Include connector ownership and endpoint assertions for lines, tracks, bars, handles, separators, and underlines.
@@ -93,9 +100,10 @@ For real component migrations, make the benchmark/viewer scope decision explicit
 - Include no-Ant-CSS-leakage assertions.
 - Include contract-matrix assertions for docs demo parity and positioning ownership.
 - Include learning-regression closure assertions.
-- Include independent verifier subagent assertions that fail when output claims completion without a verifier report, verifier-attributed checklist pass decisions, and closure for rejected rows.
+- Include independent verifier assertions that fail when output claims completion without a named custom agent or equivalent fresh-context generic subagent report, verifier-attributed checklist pass decisions, dispatch mode, fallback reason, and closure for rejected rows.
 - Include side-branch audit assertions for applicable source/API, style graph, docs demo parity, browser geometry, contract closure, and learning-regression branches.
 - Include false-pass prevention assertions that fail when a checklist row is self-certified by the implementer or supported only by screenshots/snapshots.
+- Include theme inheritance, Tailwind-first ownership, CSS-variable color emission, transition-settle, and promoted-learning backfill assertions when those learning classes apply.
 - Include both `with_skill` and `without_skill` or old-skill baseline runs when evaluating the skill itself.
 - Put each run's `grading.json` beside its `outputs/` directory and use expectation objects with exact `text`, `passed`, and `evidence` fields.
 - Generate `benchmark.json`, `benchmark.md`, and static `review.html` with skill-creator tooling when available.
