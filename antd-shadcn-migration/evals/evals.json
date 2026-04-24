@@ -1,0 +1,72 @@
+{
+  "skill_name": "antd-shadcn-migration",
+  "evals": [
+    {
+      "id": "button-primitive-api",
+      "prompt": "Migrate Ant Design Button into this shadcn + Tailwind v4 project with 1:1 current public API compatibility. Deprecated props should be identified and recorded as not migrated by default.",
+      "expected_output": "Produces a source-backed compatibility contract, classifies Button as a primitive facade, preserves current props/types/events/ref/native passthrough, maps Ant style branches to target-owned Tailwind v4 tokens, writes type/render/behavior/style tests, records deprecated API decisions, and closes the acceptance checklist.",
+      "assertions": [
+        {
+          "text": "Reports Migration blocked unless a fresh-context independent verifier subagent report exists before final completion."
+        },
+        {
+          "text": "Records side-branch audit ownership for applicable source/API, style, demo, browser, contract, and learning-regression risks."
+        },
+        {
+          "text": "Rejects self-certified checklist pass rows by requiring verifier attribution and source-backed evidence."
+        }
+      ]
+    },
+    {
+      "id": "select-overlay-form-control",
+      "prompt": "Migrate Ant Design Select into this shadcn + Tailwind v4 project. Preserve API, controlled/uncontrolled behavior, semantic DOM hooks, keyboard/focus behavior, popup behavior, and docs demos.",
+      "expected_output": "Inspects Ant and rc Select sources, target shadcn/Radix constraints, ConfigProvider defaults, portal/z-index behavior, keyboard and IME behavior, classNames/styles slots, docs demo parity, no Ant CSS leakage, browser assertions, and learning regression closure.",
+      "assertions": [
+        {
+          "text": "Spawns or requires a fresh-context independent verifier subagent for popup, keyboard, portal, and demo parity claims before completion."
+        },
+        {
+          "text": "Delegates applicable side-branch audits and merges findings into contract rows, tests, or blockers."
+        },
+        {
+          "text": "Fails completion when checklist rows have implementation-only evidence or missing verifier attribution."
+        }
+      ]
+    },
+    {
+      "id": "timeline-steps-layout",
+      "prompt": "Migrate an Ant Design layout component such as Timeline or Steps into this shadcn + Tailwind v4 project, preserving docs demo behavior and visual geometry without using Ant CSS.",
+      "expected_output": "Treats layout styling as behavioral source, copies docs demos as fixtures, traces delegated/shared primitives, records positioning and containing-block matrices, preserves pixel token units, asserts connector/marker/slot geometry in browser tests, isolates viewer shell CSS, and blocks completion if any applicable checklist item is missing.",
+      "assertions": [
+        {
+          "text": "Requires an independent verifier subagent to falsify docs demo parity, connector endpoint, containing-block, and viewer-shell checklist passes."
+        },
+        {
+          "text": "Adds false-pass prevention assertions that would fail for the visible layout mismatch class being fixed."
+        },
+        {
+          "text": "Blocks completion when visual pass evidence is only screenshot or implementer-authored checklist status."
+        },
+        {
+          "text": "Requires a layout and visual ownership matrix covering flex/min-size, variant branch behavior, connector status source, CSS variable ownership, responsive ownership, and attached visual envelopes when applicable."
+        }
+      ]
+    },
+    {
+      "id": "modal-drawer-portal",
+      "prompt": "Migrate Ant Design Modal or Drawer into this shadcn + Tailwind v4 project with Ant-compatible public API, portal behavior, z-index behavior, focus management, and accessibility.",
+      "expected_output": "Classifies the component as a Radix behavior component, inspects ConfigProvider and portal/container behavior, preserves open/defaultOpen and callback timing, verifies ESC/Tab/focus order and a11y, records runtime warning decisions, checks no Ant CSS leakage, and reports browser evidence with fallback reason when needed.",
+      "assertions": [
+        {
+          "text": "Requires independent verifier subagent evidence for portal, z-index, focus, and browser-visible behavior before final acceptance."
+        },
+        {
+          "text": "Records side-branch audit outputs for source behavior, portal geometry, a11y, warning decisions, and contract closure."
+        },
+        {
+          "text": "Marks Migration blocked when verifier findings are unresolved or checklist rows lack verifier attribution."
+        }
+      ]
+    }
+  ]
+}
