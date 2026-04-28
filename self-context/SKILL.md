@@ -187,14 +187,14 @@ python scripts/query_self_context.py --ledger "<ledger-path>" --query "show proo
 Use these before considering retrieval ready:
 
 ```text
-what do you know about Hanje
-how should I code in Hanje's style
-does Hanje know React
-what would Hanje prefer for a frontend architecture decision
-what are Hanje's current work strengths
-what personal preferences do we know about Hanje
-what should an agent know before acting as Hanje
-what is unknown or unsafe to assume about Hanje
+what do you know about Example User
+how should I code in Example User's style
+does Example User know React
+what would Example User prefer for a frontend architecture decision
+what are Example User's current work strengths
+what personal preferences do we know about Example User
+what should an agent know before acting as Example User
+what is unknown or unsafe to assume about Example User
 show proof for the React claim
 ```
 

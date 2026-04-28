@@ -48,13 +48,13 @@ Evidence and provenance still matter, but only as internal machinery for trust, 
 
 The MCP should let another agent ask:
 
-- What does Hanje know?
-- How does Hanje write code?
-- What does Hanje care about in architecture, UX, quality, product, and delivery?
-- What has Hanje done before?
-- What would Hanje likely prefer in this decision?
-- What context should I know before acting on Hanje's behalf?
-- What personal, work, or knowledge material is known about Hanje?
+- What does Example User know?
+- How does Example User write code?
+- What does Example User care about in architecture, UX, quality, product, and delivery?
+- What has Example User done before?
+- What would Example User likely prefer in this decision?
+- What context should I know before acting on Example User's behalf?
+- What personal, work, or knowledge material is known about Example User?
 - What is unknown, stale, private, or unsafe to assume?
 
 The answer should be useful first. It should not look like a citation report unless the caller explicitly asks for proof.
@@ -114,9 +114,9 @@ Generated reports, resumes, profiles, and case studies are optional exports. The
 ```json
 {
   "id": "memory:code.react_next_practice",
-  "subject": "hanjeahwan",
+  "subject": "example-user",
   "memory_type": "coding_style",
-  "statement": "Hanje has React and Next.js frontend implementation practice as part of a broader product frontend profile.",
+  "statement": "Example User has React and Next.js frontend implementation practice as part of a broader product frontend profile.",
   "useful_context": [
     "Builds component-based UI with TypeScript and TSX.",
     "Uses hooks and state-oriented frontend patterns.",
@@ -132,12 +132,12 @@ Generated reports, resumes, profiles, and case studies are optional exports. The
     "freshness": "current"
   },
   "query_patterns": [
-    "does Hanje know React",
-    "how does Hanje code React",
-    "Hanje frontend coding style",
-    "Hanje Next.js practice"
+    "does Example User know React",
+    "how does Example User code React",
+    "Example User frontend coding style",
+    "Example User Next.js practice"
   ],
-  "behavioral_use": "When an agent needs to answer or act with Hanje's frontend coding context, mention practical component, state, TypeScript, product-flow, and quality patterns before naming projects.",
+  "behavioral_use": "When an agent needs to answer or act with Example User's frontend coding context, mention practical component, state, TypeScript, product-flow, and quality patterns before naming projects.",
   "guardrails": [
     "Do not answer with repository counts.",
     "Do not expose private source details unless proof is requested.",
@@ -195,7 +195,7 @@ The self model is not a biography. It is an operational model for agents that ne
   "id": "context:code.react_next_practice",
   "intent": "coding_style",
   "title": "React and Next.js practice",
-  "direct_answer": "Hanje has evidence-backed React and Next.js practice, best understood as part of a broad product frontend engineering profile.",
+  "direct_answer": "Example User has evidence-backed React and Next.js practice, best understood as part of a broad product frontend engineering profile.",
   "useful_context": [
     "He tends to connect UI implementation with product flow correctness, state behavior, auth/forms, and maintainability.",
     "For coding-style answers, lead with practical component/state/TypeScript patterns, then mention examples only if needed."
@@ -378,14 +378,14 @@ Default answers must not:
 Before shipping v2 retrieval, these queries must pass:
 
 ```text
-what do you know about Hanje
-how should I code in Hanje's style
-does Hanje know React
-what would Hanje prefer for a frontend architecture decision
-what are Hanje's current work strengths
-what personal preferences do we know about Hanje
-what should an agent know before acting as Hanje
-what is unknown or unsafe to assume about Hanje
+what do you know about Example User
+how should I code in Example User's style
+does Example User know React
+what would Example User prefer for a frontend architecture decision
+what are Example User's current work strengths
+what personal preferences do we know about Example User
+what should an agent know before acting as Example User
+what is unknown or unsafe to assume about Example User
 show proof for the React claim
 ```
 

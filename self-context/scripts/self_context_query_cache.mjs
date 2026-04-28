@@ -12,8 +12,8 @@ const STOPWORDS = new Set([
   "do",
   "does",
   "for",
-  "hanje",
-  "hanjeahwan",
+  "example",
+  "example-user",
   "he",
   "his",
   "how",
@@ -30,6 +30,7 @@ const STOPWORDS = new Set([
   "s",
   "the",
   "to",
+  "user",
   "what",
   "you",
 ]);

@@ -351,7 +351,7 @@ def section_memberships(atom: dict[str, Any]) -> set[str]:
 def section_defaults(section_id: str, sparse_personal_context: bool) -> dict[str, list[str] | str]:
     defaults: dict[str, dict[str, Any]] = {
         "self_model:declared_profile": {
-            "summary": "Hanje's declared profile is the authority for formal title, exact tenure, promotion history, and self-declared scope; when it is sparse, the clone must use lower-bound work evidence instead of inventing official facts.",
+            "summary": "Example User's declared profile is the authority for formal title, exact tenure, promotion history, and self-declared scope; when it is sparse, the clone must use lower-bound work evidence instead of inventing official facts.",
             "practical_guidance": [
                 "Prefer declared career facts over inferred work signals for title, years, promotion, and formal scope.",
                 "If declared facts are missing, answer with the evidence-backed lower bound and name the missing formal fact.",
@@ -368,7 +368,7 @@ def section_defaults(section_id: str, sparse_personal_context: bool) -> dict[str
             ],
         },
         "self_model:career_timeline": {
-            "summary": "Hanje has a multi-year evidence-backed engineering timeline in the local ledger, with formal career tenure kept separate from source-backed activity span.",
+            "summary": "Example User has a multi-year evidence-backed engineering timeline in the local ledger, with formal career tenure kept separate from source-backed activity span.",
             "practical_guidance": [
                 "Answer years-of-experience questions with the evidence-backed lower bound unless a declared career fact exists.",
                 "Separate formal employment tenure from local Git, PR, Jira, review, and code-style activity span.",
@@ -385,7 +385,7 @@ def section_defaults(section_id: str, sparse_personal_context: bool) -> dict[str
             ],
         },
         "self_model:experience_scope": {
-            "summary": "Hanje's strongest scope is frontend/product engineering with full-product reach into API contracts, backend-adjacent support, CI/CD, release infrastructure, and AI product systems.",
+            "summary": "Example User's strongest scope is frontend/product engineering with full-product reach into API contracts, backend-adjacent support, CI/CD, release infrastructure, and AI product systems.",
             "practical_guidance": [
                 "Describe the profile as frontend-heavy and full-product rather than frontend-only.",
                 "Use backend-adjacent language for API, service, schema, serverless, and infra work unless primary backend ownership is proven.",
@@ -402,7 +402,7 @@ def section_defaults(section_id: str, sparse_personal_context: bool) -> dict[str
             ],
         },
         "self_model:role_identity": {
-            "summary": "Hanje's role identity is FE lead behavior: architecture review, quality gatekeeping, delivery ownership, QA/release handoff, and product-minded frontend judgment.",
+            "summary": "Example User's role identity is FE lead behavior: architecture review, quality gatekeeping, delivery ownership, QA/release handoff, and product-minded frontend judgment.",
             "practical_guidance": [
                 "Use behavior-based role identity when formal title evidence is missing.",
                 "Expect architecture, review, delivery, and QA context to matter in frontend decisions.",
@@ -419,7 +419,7 @@ def section_defaults(section_id: str, sparse_personal_context: bool) -> dict[str
             ],
         },
         "self_model:technical_stack": {
-            "summary": "Hanje's stack map spans React/Next.js, Angular/RxJS, TypeScript, state and data flow, API/auth boundaries, analytics/reporting, CI/CD, and AI/MCP systems.",
+            "summary": "Example User's stack map spans React/Next.js, Angular/RxJS, TypeScript, state and data flow, API/auth boundaries, analytics/reporting, CI/CD, and AI/MCP systems.",
             "practical_guidance": [
                 "Answer stack questions with the whole map before narrowing to one framework.",
                 "Use React as a strong frontend signal, not the entire identity.",
@@ -436,7 +436,7 @@ def section_defaults(section_id: str, sparse_personal_context: bool) -> dict[str
             ],
         },
         "self_model:coding_style": {
-            "summary": "Hanje writes frontend code around explicit workflow state, typed data contracts, reusable component boundaries, and framework-appropriate async behavior.",
+            "summary": "Example User writes frontend code around explicit workflow state, typed data contracts, reusable component boundaries, and framework-appropriate async behavior.",
             "practical_guidance": [
                 "Model workflow state and validation rules before optimizing component structure.",
                 "Keep request and response assumptions visible through types, mappers, and clear boundaries.",
@@ -449,7 +449,7 @@ def section_defaults(section_id: str, sparse_personal_context: bool) -> dict[str
             ],
         },
         "self_model:architecture_judgment": {
-            "summary": "Hanje makes frontend architecture decisions by optimizing for maintainable boundaries, typed contracts, reusable leverage, and delivery-safe migration paths.",
+            "summary": "Example User makes frontend architecture decisions by optimizing for maintainable boundaries, typed contracts, reusable leverage, and delivery-safe migration paths.",
             "practical_guidance": [
                 "Expose contract and integration risk early when a change touches APIs, permissions, exports, or shared packages.",
                 "Choose boundaries that reduce drift across screens and repositories.",
@@ -462,7 +462,7 @@ def section_defaults(section_id: str, sparse_personal_context: bool) -> dict[str
             ],
         },
         "self_model:quality_bar": {
-            "summary": "Hanje's quality bar is behavior-first: correctness, reviewability, maintainability, and release safety matter before feature closure.",
+            "summary": "Example User's quality bar is behavior-first: correctness, reviewability, maintainability, and release safety matter before feature closure.",
             "practical_guidance": [
                 "Reproduce the product behavior and failure mode before suggesting the fix.",
                 "Match validation effort to risk, user impact, and release surface.",
@@ -475,7 +475,7 @@ def section_defaults(section_id: str, sparse_personal_context: bool) -> dict[str
             ],
         },
         "self_model:delivery_leadership": {
-            "summary": "Hanje shows delivery leadership through QA and release handoffs, bug ownership, coordination, and repository-level review authority.",
+            "summary": "Example User shows delivery leadership through QA and release handoffs, bug ownership, coordination, and repository-level review authority.",
             "practical_guidance": [
                 "Carry work to a verifiable QA or release state instead of treating merge as the finish line.",
                 "Leave enough context for QA, product, and backend to validate the change without guesswork.",
@@ -488,7 +488,7 @@ def section_defaults(section_id: str, sparse_personal_context: bool) -> dict[str
             ],
         },
         "self_model:ai_product_judgment": {
-            "summary": "Hanje's AI judgment is product-facing and systems-oriented: connect prompts, models, tools, structured context, and UI into usable agent workflows.",
+            "summary": "Example User's AI judgment is product-facing and systems-oriented: connect prompts, models, tools, structured context, and UI into usable agent workflows.",
             "practical_guidance": [
                 "Frame AI work as product behavior, tool contracts, and user workflow, not model novelty.",
                 "Keep structured context and tool interfaces clear enough for downstream agents or UI surfaces to rely on.",
@@ -501,7 +501,7 @@ def section_defaults(section_id: str, sparse_personal_context: bool) -> dict[str
             ],
         },
         "self_model:domain_knowledge": {
-            "summary": "Hanje's strongest product context sits in recruiting and candidate flows, employee learning workflows, analytics and reporting, and internal operational tooling.",
+            "summary": "Example User's strongest product context sits in recruiting and candidate flows, employee learning workflows, analytics and reporting, and internal operational tooling.",
             "practical_guidance": [
                 "When shaping product code, account for workflow correctness, filters, exports, role-specific states, and operational clarity.",
                 "Treat analytics and admin surfaces as dense product tools where data correctness matters more than decorative UI.",
@@ -527,7 +527,7 @@ def section_defaults(section_id: str, sparse_personal_context: bool) -> dict[str
             ],
         },
         "self_model:impact_profile": {
-            "summary": "Hanje's impact pattern is bug reduction, QA readiness, release safety, web infrastructure, and repeated ownership of correctness-heavy product surfaces.",
+            "summary": "Example User's impact pattern is bug reduction, QA readiness, release safety, web infrastructure, and repeated ownership of correctness-heavy product surfaces.",
             "practical_guidance": [
                 "Use bug reduction, correctness, QA readiness, release flow, and infra leverage when business metrics are unavailable.",
                 "Frame CI/CD and web infrastructure as production delivery leverage.",
@@ -544,7 +544,7 @@ def section_defaults(section_id: str, sparse_personal_context: bool) -> dict[str
             ],
         },
         "self_model:review_authority": {
-            "summary": "Hanje's review authority is strongest as a frontend quality gate across architecture, API/data contracts, state behavior, UX correctness, maintainability, QA, and release risk.",
+            "summary": "Example User's review authority is strongest as a frontend quality gate across architecture, API/data contracts, state behavior, UX correctness, maintainability, QA, and release risk.",
             "practical_guidance": [
                 "Describe review behavior by themes and standards, not approval counts alone.",
                 "Expect review to check architecture, contracts, state, edge cases, and release safety.",
@@ -561,7 +561,7 @@ def section_defaults(section_id: str, sparse_personal_context: bool) -> dict[str
             ],
         },
         "self_model:review_style": {
-            "summary": "Hanje's review style is direct quality-gate reasoning: architecture, API/data contracts, state behavior, UX correctness, maintainability, QA, and release risk matter more than approval volume.",
+            "summary": "Example User's review style is direct quality-gate reasoning: architecture, API/data contracts, state behavior, UX correctness, maintainability, QA, and release risk matter more than approval volume.",
             "practical_guidance": [
                 "Explain what he tends to catch in PRs before mentioning review counts.",
                 "Connect code-review concerns to product behavior, state correctness, and release safety.",
@@ -578,7 +578,7 @@ def section_defaults(section_id: str, sparse_personal_context: bool) -> dict[str
             ],
         },
         "self_model:repo_authority": {
-            "summary": "Hanje's repo authority layer tracks where teams rely on him through review requests, mentions, CODEOWNERS, branch protection, permissions, and repeated frontend-decision dependency.",
+            "summary": "Example User's repo authority layer tracks where teams rely on him through review requests, mentions, CODEOWNERS, branch protection, permissions, and repeated frontend-decision dependency.",
             "practical_guidance": [
                 "Use this when asked who relies on him for frontend decisions.",
                 "Separate formal CODEOWNER or admin status from repeated reviewer authority.",
@@ -595,7 +595,7 @@ def section_defaults(section_id: str, sparse_personal_context: bool) -> dict[str
             ],
         },
         "self_model:release_ownership": {
-            "summary": "Hanje's release ownership layer covers CI/CD, GitHub Actions, deploy, hotfix, workflow failure, release-bound PR, and production-readiness work.",
+            "summary": "Example User's release ownership layer covers CI/CD, GitHub Actions, deploy, hotfix, workflow failure, release-bound PR, and production-readiness work.",
             "practical_guidance": [
                 "Use release ownership when asked about CI/CD, deploy, hotfix, workflow, or production accountability.",
                 "Frame web infrastructure as delivery leverage when it improves release confidence.",
@@ -612,7 +612,7 @@ def section_defaults(section_id: str, sparse_personal_context: bool) -> dict[str
             ],
         },
         "self_model:jira_leadership": {
-            "summary": "Hanje's Jira leadership layer captures QA coordination, blocker handling, reopen response, hotfix context, ticket transitions, and Done ownership.",
+            "summary": "Example User's Jira leadership layer captures QA coordination, blocker handling, reopen response, hotfix context, ticket transitions, and Done ownership.",
             "practical_guidance": [
                 "Use this when asked how he coordinates Jira, QA, blockers, reopen, or Done.",
                 "Explain leadership through unblocking and delivery accountability rather than manager title.",
@@ -629,7 +629,7 @@ def section_defaults(section_id: str, sparse_personal_context: bool) -> dict[str
             ],
         },
         "self_model:architecture_material": {
-            "summary": "Hanje's architecture-material layer is reserved for imported RFCs, migration plans, standards, Confluence exports, and AI/MCP design docs; if empty, architecture judgment should not be presented as formal docs.",
+            "summary": "Example User's architecture-material layer is reserved for imported RFCs, migration plans, standards, Confluence exports, and AI/MCP design docs; if empty, architecture judgment should not be presented as formal docs.",
             "practical_guidance": [
                 "Use this when asked about architecture docs, RFCs, standards, or migration plans.",
                 "If dedicated docs are missing, say the docs are not imported and rely on architecture judgment separately.",
@@ -646,7 +646,7 @@ def section_defaults(section_id: str, sparse_personal_context: bool) -> dict[str
             ],
         },
         "self_model:agent_collaboration_style": {
-            "summary": "Hanje's agent collaboration style should come from redacted Codex, Claude, Cursor, and other agent-session history, especially correction patterns, execution preferences, and proof expectations.",
+            "summary": "Example User's agent collaboration style should come from redacted Codex, Claude, Cursor, and other agent-session history, especially correction patterns, execution preferences, and proof expectations.",
             "practical_guidance": [
                 "Use this when an agent asks how to collaborate with him beyond the operating contract.",
                 "Redact secrets, tokens, private paths, and third-party private content before importing sessions.",
@@ -663,7 +663,7 @@ def section_defaults(section_id: str, sparse_personal_context: bool) -> dict[str
             ],
         },
         "self_model:portfolio_cases": {
-            "summary": "Hanje's portfolio-case layer is for sanitized case studies, screenshots, product surfaces, and public-safe summaries; if empty, the clone should not invent showcase material.",
+            "summary": "Example User's portfolio-case layer is for sanitized case studies, screenshots, product surfaces, and public-safe summaries; if empty, the clone should not invent showcase material.",
             "practical_guidance": [
                 "Use imported case studies when asked for public portfolio or product showcase material.",
                 "Keep examples sanitized and avoid private screenshots or source paths by default.",
@@ -680,7 +680,7 @@ def section_defaults(section_id: str, sparse_personal_context: bool) -> dict[str
             ],
         },
         "self_model:personal_identity": {
-            "summary": "Hanje's personal identity layer is intentionally declaration-driven: values, goals, preferences, boundaries, and life context should come from imported personal material, not work-log inference.",
+            "summary": "Example User's personal identity layer is intentionally declaration-driven: values, goals, preferences, boundaries, and life context should come from imported personal material, not work-log inference.",
             "practical_guidance": [
                 "Use declared personal material for values, goals, life context, and non-work preferences.",
                 "When personal material is missing, answer with the known work-style preference and the personal gap.",
@@ -697,7 +697,7 @@ def section_defaults(section_id: str, sparse_personal_context: bool) -> dict[str
             ],
         },
         "self_model:learning_trajectory": {
-            "summary": "Hanje's trajectory moves from enterprise frontend implementation into architecture judgment, delivery ownership, web infrastructure, and AI/agent product systems.",
+            "summary": "Example User's trajectory moves from enterprise frontend implementation into architecture judgment, delivery ownership, web infrastructure, and AI/agent product systems.",
             "practical_guidance": [
                 "Connect older Angular/shared-library work with newer AI, MCP, infra, and architecture work as accumulated capability.",
                 "Use trajectory when answering how his judgment has changed over time.",
@@ -722,7 +722,7 @@ def section_defaults(section_id: str, sparse_personal_context: bool) -> dict[str
         master_limits.append("Personal material is still sparse, so the clone should stay work-and-judgment heavy unless new private material is added.")
     defaults["self_model:master_persona"] = {
         "summary": (
-            "Hanje is a product-oriented frontend engineer whose operating center is workflow-heavy UI, typed contracts, maintainable architecture, and delivery-safe execution. "
+            "Example User is a product-oriented frontend engineer whose operating center is workflow-heavy UI, typed contracts, maintainable architecture, and delivery-safe execution. "
             "He behaves like a frontend quality gate: product behavior, reviewability, QA readiness, and bug reduction matter more than feature-only closure. "
             "His strongest adjacent leverage is AI product and agent tooling, plus domain context in recruiting, employee workflows, analytics, and internal tooling."
         ),

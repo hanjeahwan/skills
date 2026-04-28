@@ -460,7 +460,7 @@ async function getAgentOperatingContextPayload(resolvedLedger, includeProvenance
         "--ledger",
         resolvedLedger,
         "--query",
-        "what should an agent know before acting as Hanje",
+        "what should an agent know before acting as Example User",
         "--intent",
         "act_as_me",
         "--top",

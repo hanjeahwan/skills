@@ -58,7 +58,7 @@ Default answers must explain coding behavior, not source counts.
 Good answer shape:
 
 ```text
-Hanje tends to write product-oriented frontend code with explicit TypeScript boundaries,
+Example User tends to write product-oriented frontend code with explicit TypeScript boundaries,
 component/state separation, and attention to data contracts and release quality.
 When coding for him, prefer clear reusable components, predictable state flow,
 lint/type safety, and production checks before clever abstractions.

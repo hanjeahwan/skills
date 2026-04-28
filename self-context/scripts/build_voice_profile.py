@@ -81,12 +81,12 @@ EVIDENCE_STYLE_STARTS = (
 )
 
 IDENTITY_STARTS = (
-    "hanje is",
-    "hanje writes",
-    "hanje makes",
-    "hanje behaves",
-    "hanje shows",
-    "hanje's ",
+    "example user is",
+    "example user writes",
+    "example user makes",
+    "example user behaves",
+    "example user shows",
+    "example user's ",
 )
 
 DOMAIN_HINTS = {
@@ -259,7 +259,7 @@ def filter_sentences(
             continue
         lowered = sentence_key(text)
         if ban_third_person and (
-            lowered.startswith(("he ", "his ", "hanje ", "hanje's "))
+            lowered.startswith(("he ", "his ", "example user ", "example user's "))
             or " for him " in f" {lowered} "
             or " his " in f" {lowered} "
             or sentence_type == "evidence"
@@ -438,7 +438,7 @@ def build_voice_style_eval(
             "hits": compact_list(duplicates, 12),
         },
         "master_persona_third_person": {
-            "passes": sentence_key(master_summary).startswith("hanje "),
+            "passes": sentence_key(master_summary).startswith("example user "),
             "summary": master_summary,
         },
         "sections_decontaminated": {

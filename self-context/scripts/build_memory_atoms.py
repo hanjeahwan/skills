@@ -114,18 +114,18 @@ SIGNAL_DEFINITIONS: dict[str, dict[str, Any]] = {
         ],
         "topics": ["frontend", "product", "delivery"],
         "guardrails": ["Do not reduce this to repository activity; describe the product engineering behavior it supports."],
-        "query_patterns": ["what does Hanje know", "Hanje frontend product engineering", "what has Hanje built"],
+        "query_patterns": ["what does Example User know", "Example User frontend product engineering", "what has Example User built"],
     },
     "react_next_typescript": {
         "memory_type": "coding_style",
-        "statement": "Raw code and commit evidence supports React/Next.js and typed TSX practice as part of Hanje's frontend engineering profile.",
+        "statement": "Raw code and commit evidence supports React/Next.js and typed TSX practice as part of Example User's frontend engineering profile.",
         "useful_context": [
             "When answering React questions, lead with component structure, hooks/state behavior, TypeScript clarity, and product-flow correctness.",
             "React should be presented as one part of a broader frontend capability profile, not as the only identity.",
         ],
         "topics": ["frontend", "react", "typescript"],
         "guardrails": ["Do not cite commit counts as the answer; use counts only as internal confidence."],
-        "query_patterns": ["does Hanje know React", "how does Hanje code React", "Hanje Next.js style"],
+        "query_patterns": ["does Example User know React", "how does Example User code React", "Example User Next.js style"],
     },
     "angular_enterprise": {
         "memory_type": "capability",
@@ -136,14 +136,14 @@ SIGNAL_DEFINITIONS: dict[str, dict[str, Any]] = {
         ],
         "topics": ["frontend", "angular", "typescript"],
         "guardrails": ["Distinguish historical Angular depth from current framework preference when answering."],
-        "query_patterns": ["Hanje Angular experience", "enterprise frontend Angular", "RxJS frontend practice"],
+        "query_patterns": ["Example User Angular experience", "enterprise frontend Angular", "RxJS frontend practice"],
     },
     "api_data_contract_alignment": {
         "memory_type": "capability",
         "statement": "Raw work evidence supports API and data-contract alignment across frontend payloads, lookups, DTOs, reports, and exports.",
         "useful_context": [
             "Keeps UI behavior aligned with backend response shapes, lookup migrations, request payloads, query parameters, and export/report correctness.",
-            "Useful when an agent needs to reason about data shape changes before writing frontend code for Hanje.",
+            "Useful when an agent needs to reason about data shape changes before writing frontend code for Example User.",
         ],
         "topics": ["frontend", "architecture", "product"],
         "guardrails": ["Call this frontend/backend contract alignment unless stronger backend ownership evidence is present."],
@@ -158,7 +158,7 @@ SIGNAL_DEFINITIONS: dict[str, dict[str, Any]] = {
         ],
         "topics": ["ai_product", "frontend", "architecture"],
         "guardrails": ["Do not claim model-training or research-science ownership from product integration evidence alone."],
-        "query_patterns": ["Hanje AI product work", "MCP agent tooling", "generative UI"],
+        "query_patterns": ["Example User AI product work", "MCP agent tooling", "generative UI"],
     },
     "security_auth_rbac": {
         "memory_type": "capability",
@@ -175,7 +175,7 @@ SIGNAL_DEFINITIONS: dict[str, dict[str, Any]] = {
         "statement": "Raw source evidence supports CI/CD and web infrastructure contribution around workflows, release automation, deploy configuration, and observability plumbing.",
         "useful_context": [
             "Includes GitHub Actions, workflow files, semantic release, build/deploy configuration, Sentry or sourcemap flows, and web-app infrastructure signals.",
-            "This context matters when an agent plans release, deploy, build, or repo automation work for Hanje.",
+            "This context matters when an agent plans release, deploy, build, or repo automation work for Example User.",
         ],
         "topics": ["ci_cd", "delivery", "architecture"],
         "guardrails": ["Do not infer production deploy ownership from workflow file evidence alone without release actor evidence."],
@@ -186,7 +186,7 @@ SIGNAL_DEFINITIONS: dict[str, dict[str, Any]] = {
         "statement": "Raw Jira, PR, and commit evidence supports production-quality debugging and reliability behavior across bugs, hotfixes, QA, and customer-visible issues.",
         "useful_context": [
             "Tends to work through customer bugs, staging issues, release-bound fixes, Sentry/error context, and behavior regressions with delivery accountability.",
-            "Use this when an agent needs to predict Hanje's bias toward concrete reproduction, correctness, and production impact.",
+            "Use this when an agent needs to predict Example User's bias toward concrete reproduction, correctness, and production impact.",
         ],
         "topics": ["quality", "delivery", "product"],
         "guardrails": ["Use proxy impact language unless explicit incident metrics or before/after support data exists."],
@@ -196,18 +196,18 @@ SIGNAL_DEFINITIONS: dict[str, dict[str, Any]] = {
         "memory_type": "decision_pattern",
         "statement": "Raw PR review and authority evidence supports frontend quality-gate behavior through review requests, approvals, comments, and repository reliance.",
         "useful_context": [
-            "When asked how Hanje leads frontend quality, emphasize review judgment, maintainability, API contract awareness, UX correctness, and delivery risk control.",
+            "When asked how Example User leads frontend quality, emphasize review judgment, maintainability, API contract awareness, UX correctness, and delivery risk control.",
             "Approval activity should be interpreted alongside review-request and authority signals, not as a shallow count.",
         ],
         "topics": ["leadership", "frontend", "quality"],
         "guardrails": ["Do not equate approvals with leadership unless review themes or authority signals support the claim."],
-        "query_patterns": ["frontend quality gate", "PR review style", "Hanje review authority"],
+        "query_patterns": ["frontend quality gate", "PR review style", "Example User review authority"],
     },
     "delivery_ownership": {
         "memory_type": "work_history",
         "statement": "Raw Jira changelog, assignment, PR, and release evidence supports delivery ownership across tickets, QA handoffs, Done transitions, and release-bound work.",
         "useful_context": [
-            "Useful when explaining ownership: Hanje appears in assigned tickets, status movement, release/fixVersion context, and merged PR delivery paths.",
+            "Useful when explaining ownership: Example User appears in assigned tickets, status movement, release/fixVersion context, and merged PR delivery paths.",
             "This supports delivery accountability more than generic task participation.",
         ],
         "topics": ["delivery", "leadership", "product"],
@@ -238,7 +238,7 @@ SIGNAL_DEFINITIONS: dict[str, dict[str, Any]] = {
         "memory_type": "capability",
         "statement": "Raw source evidence supports complex workflow UI work across forms, tables, dashboards, filters, drawers, validation, and state-heavy product flows.",
         "useful_context": [
-            "This is useful when an agent needs to write UI for Hanje: prioritize clear state boundaries, validation behavior, data loading states, and workflow correctness.",
+            "This is useful when an agent needs to write UI for Example User: prioritize clear state boundaries, validation behavior, data loading states, and workflow correctness.",
             "The pattern is operational product UI, not only static pages or visual styling.",
         ],
         "topics": ["frontend", "product", "quality"],
@@ -289,7 +289,7 @@ SIGNAL_DEFINITIONS: dict[str, dict[str, Any]] = {
         "memory_type": "decision_pattern",
         "statement": "Raw source evidence supports modernization and quality-standard work through refactors, migrations, dependency changes, linting, formatting, and cleanup.",
         "useful_context": [
-            "When acting as Hanje, prefer maintainable upgrades, type/lint cleanup, dependency alignment, and refactors that reduce future delivery drag.",
+            "When acting as Example User, prefer maintainable upgrades, type/lint cleanup, dependency alignment, and refactors that reduce future delivery drag.",
         ],
         "topics": ["quality", "architecture", "typescript"],
         "guardrails": ["Separate quality tooling evidence from measured test coverage unless coverage reports exist."],
@@ -299,7 +299,7 @@ SIGNAL_DEFINITIONS: dict[str, dict[str, Any]] = {
         "memory_type": "decision_pattern",
         "statement": "Raw source evidence supports cost, quota, caching, performance, and efficiency-aware engineering behavior.",
         "useful_context": [
-            "Useful when an agent makes architecture choices for Hanje: consider API usage, cache behavior, build/runtime cost, and maintainable performance wins.",
+            "Useful when an agent makes architecture choices for Example User: consider API usage, cache behavior, build/runtime cost, and maintainable performance wins.",
         ],
         "topics": ["performance", "architecture", "quality"],
         "guardrails": ["Do not claim dollar impact unless explicit company metrics are supplied."],
@@ -471,15 +471,15 @@ def memory_type_for(heading: str, claim: str, topics: list[str]) -> str:
 def query_patterns_for(heading: str, topics: list[str], memory_type: str) -> list[str]:
     base = [
         heading,
-        f"what does Hanje know about {heading}",
-        f"how does Hanje think about {heading}",
+        f"what does Example User know about {heading}",
+        f"how does Example User think about {heading}",
     ]
     if memory_type == "coding_style":
-        base.append(f"how should I code in Hanje's {heading} style")
+        base.append(f"how should I code in Example User's {heading} style")
     if "react" in topics:
-        base.extend(["does Hanje know React", "Hanje React practice", "Hanje Next.js practice"])
+        base.extend(["does Example User know React", "Example User React practice", "Example User Next.js practice"])
     if "leadership" in topics:
-        base.extend(["Hanje leadership style", "how Hanje reviews work"])
+        base.extend(["Example User leadership style", "how Example User reviews work"])
     return sorted(set(clean_text(item) for item in base if clean_text(item)))
 
 
@@ -694,7 +694,7 @@ def build_source_native_atoms(ledger: Path, generated_at: str) -> tuple[list[dic
         atoms.append(
             {
                 "id": memory_id,
-                "subject": "hanjeahwan",
+                "subject": "example-user",
                 "memory_type": memory_type,
                 "statement": definition["statement"],
                 "useful_context": definition["useful_context"],
@@ -754,7 +754,7 @@ def build_profile_atoms(ledger: Path, generated_at: str) -> tuple[list[dict[str,
         atoms.append(
             {
                 "id": memory_id,
-                "subject": "hanjeahwan",
+                "subject": "example-user",
                 "memory_type": memory_type,
                 "statement": claim,
                 "useful_context": useful_context[:8],
@@ -823,7 +823,7 @@ def build_manual_atoms(ledger: Path, generated_at: str) -> tuple[list[dict[str, 
         atoms.append(
             {
                 "id": memory_id,
-                "subject": "hanjeahwan",
+                "subject": "example-user",
                 "memory_type": memory_type,
                 "statement": title,
                 "useful_context": context[:8],
@@ -870,7 +870,7 @@ def build_candidate_atoms(candidates: list[dict[str, Any]], generated_at: str) -
         atoms.append(
             {
                 "id": memory_id,
-                "subject": str(candidate.get("subject", "hanjeahwan")),
+                "subject": str(candidate.get("subject", "example-user")),
                 "memory_type": str(candidate.get("memory_type", "knowledge")),
                 "statement": str(candidate.get("statement", "")),
                 "useful_context": [str(item) for item in candidate.get("useful_context", [])],
@@ -1027,7 +1027,7 @@ def build_self_model(
 
     return (
         {
-            "subject": "hanjeahwan",
+            "subject": "example-user",
             "generated_at": generated_at,
             "architecture": "self-context-v2.8",
             "source_counts": source_counts,

@@ -113,7 +113,7 @@ def seed_ledger(ledger: Path) -> None:
                 "pull_request",
                 f"pr-{index}",
                 "fix(api): align lookup payload and report export response",
-                {"repo": "example/product-web", "author": "hanjeahwan", "merged_at": "2026-01-02T00:00:00Z"},
+                {"repo": "example/product-web", "author": "example-user", "merged_at": "2026-01-02T00:00:00Z"},
                 ["github", "pull_request"],
             )
             for index in range(4)
@@ -139,7 +139,7 @@ def seed_ledger(ledger: Path) -> None:
                 "github_review_request",
                 f"request-{index}",
                 "GitHub review requested for frontend architecture decision",
-                {"repo": "example/product-web", "event": "review_requested", "requested_reviewer": "hanjeahwan"},
+                {"repo": "example/product-web", "event": "review_requested", "requested_reviewer": "example-user"},
                 ["github", "review_request"],
             )
             for index in range(3)
@@ -305,7 +305,9 @@ def evaluate_style_contract(style_contract: str, direct_answer: str) -> tuple[bo
         passed = is_first_person_or_directive(direct_answer)
         return passed, "direct_answer must be first-person or directive"
     if style_contract == "third_person_identity":
-        passed = not is_first_person_or_directive(direct_answer) and any(token in lowered for token in ["hanje ", "hanje is", "hanje's", "he ", "his "])
+        passed = not is_first_person_or_directive(direct_answer) and any(
+            token in lowered for token in ["example user ", "example user is", "example user's", "he ", "his "]
+        )
         return passed, "direct_answer must stay in third-person identity form"
     passed = not any(phrase in lowered for phrase in LEGACY_PHRASES) and not any(phrase in lowered for phrase in VOICE_BANNED_PHRASES)
     return passed, "direct_answer must stay free of evidence-style or banned phrasing"

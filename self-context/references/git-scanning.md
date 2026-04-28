@@ -75,7 +75,7 @@ The coverage report is written next to the output as `<name>.coverage.json` unle
 Recommended first full import:
 
 ```bash
-python scripts/export_github_history.py --author "<github-login>" --org "Pulsifi" --user "<github-login>" --since "2016-01-01" --replace --out "<ledger-path>/sources/git.jsonl"
+python scripts/export_github_history.py --author "<github-login>" --org "Example Org" --user "<github-login>" --since "2016-01-01" --replace --out "<ledger-path>/sources/git.jsonl"
 ```
 
 ## Reruns and Deduplication

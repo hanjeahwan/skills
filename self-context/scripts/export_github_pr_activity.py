@@ -366,7 +366,7 @@ def main() -> None:
     parser.add_argument("--out", help="Output JSONL path. Defaults to <ledger>/sources/github_pr_activity.jsonl.")
     parser.add_argument("--coverage-out", help="Coverage JSON path. Defaults to <out>.coverage.json.")
     parser.add_argument("--from-scan-json", help="Convert a prior github-pr-review-leadership-scan JSON report without network calls.")
-    parser.add_argument("--github-user", default="hanjeahwan", help="GitHub login to match for authored PRs and comments.")
+    parser.add_argument("--github-user", default="example-user", help="GitHub login to match for authored PRs and comments.")
     parser.add_argument("--repo", action="append", help="Repository owner/name to scan. Can be repeated.")
     parser.add_argument("--repos-from-git-source", action="store_true", help="Scan repositories already present in sources/git.jsonl.")
     parser.add_argument("--since", help="Only fetch PR/comment activity updated after this ISO timestamp.")

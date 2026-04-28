@@ -9,13 +9,13 @@
     },
     {
       "id": 2,
-      "prompt": "What do you know about Hanje?",
+      "prompt": "What do you know about Example User?",
       "expected_output": "Returns useful self-context summaries from context packs without dumping source ids or evidence chains.",
       "files": []
     },
     {
       "id": 3,
-      "prompt": "How should I code in Hanje's style?",
+      "prompt": "How should I code in Example User's style?",
       "expected_output": "Returns coding-style context, preferences, behavioral guidance, and known limits rather than commit counts.",
       "files": []
     },

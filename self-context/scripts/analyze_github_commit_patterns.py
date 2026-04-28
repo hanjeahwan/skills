@@ -43,7 +43,7 @@ PATTERN_RULES: list[tuple[str, re.Pattern[str]]] = [
     ("service_layer", re.compile(r"/services?/|\.service\.ts\b|Service\b|service:" )),
     ("api_http_contract", re.compile(r"/http/|HttpService|HttpClient|axios|fetch\s*\(|api[_-]?client|request<")),
     ("state_store", re.compile(r"/store/|/stores/|Store\b|selectors?|reducers?|actions?|effects?")),
-    ("shared_library", re.compile(r"@pulsifi/ngx-pulsifi|@pulsifi/lookup|/shared/|shared-library|libs?/")),
+    ("shared_library", re.compile(r"@example-org/(?:shared-ui|lookup)|/shared/|shared-library|libs?/")),
     ("rbac_auth", re.compile(r"Auth0|Cognito|RBAC|ACLService|permission|role|Token|Jwt|JWT")),
     ("feature_flag_analytics", re.compile(r"Unleash|Userpilot|Sentry|GTM|GA4|dataLayer|productFruits|feature[_-]?flag")),
     ("i18n_locale", re.compile(r"i18n|translate|Locale|locale|language|ngx-translate")),

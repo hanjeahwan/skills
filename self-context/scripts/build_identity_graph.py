@@ -352,7 +352,7 @@ def build_identity_facts(ledger: Path, atoms: list[dict[str, Any]], generated_at
     facts = {
         "generated_at": generated_at,
         "architecture": "self-context-v2.8",
-        "subject": "hanjeahwan",
+        "subject": "example-user",
         "source_family_coverage": source_family_coverage,
         "declared_profile": {
             "formal_title": formal_title_declared,
@@ -537,7 +537,7 @@ def build_identity_graph(facts: dict[str, Any], generated_at: str) -> dict[str, 
     return {
         "generated_at": generated_at,
         "architecture": "self-context-v2.8",
-        "subject": "hanjeahwan",
+        "subject": "example-user",
         "nodes": nodes,
         "edges": [{**edge, "updated_at": generated_at} for edge in edges],
         "source_sections": [
@@ -588,7 +588,7 @@ def atom(
     latest = parse_dt(facts.get("career_timeline", {}).get("engineering_activity_end"))
     row = {
         "id": memory_id,
-        "subject": "hanjeahwan",
+        "subject": "example-user",
         "memory_type": memory_type,
         "statement": statement,
         "useful_context": useful_context,
@@ -638,14 +638,14 @@ def build_identity_atoms(facts: dict[str, Any], refs: dict[str, list[dict[str, s
         atom(
             "career_timeline",
             "evidence_backed_engineering_years",
-            f"Hanje's local work history spans {start_label} through {end_label}, supporting {year_phrase} of evidence-backed engineering activity.",
+            f"Example User's local work history spans {start_label} through {end_label}, supporting {year_phrase} of evidence-backed engineering activity.",
             [
                 f"Use {years} years as the local-ledger activity span, not as a formal employment-tenure claim.",
                 "If asked for total professional years, answer with the evidence-backed lower bound unless a declared career fact is available.",
                 "For full-stack questions, combine this timeline with the experience-scope boundary instead of inflating backend tenure.",
             ],
             ["career_timeline", "experience", "work_history", "identity"],
-            ["Hanje years experience", "how many years exp", "Hanje work history", "Hanje 工作多久", "Hanje 几年经验"],
+            ["Example User years experience", "how many years exp", "Example User work history", "Example User 工作多久", "Example User 几年经验"],
             "Use this when answering career duration, years of experience, or work-history timeline questions.",
             [
                 "Do not present evidence-backed activity years as formal employment tenure.",
@@ -658,15 +658,15 @@ def build_identity_atoms(facts: dict[str, Any], refs: dict[str, list[dict[str, s
         atom(
             "experience_scope",
             "frontend_heavy_full_product_scope",
-            "Hanje's strongest proven scope is frontend/product engineering with backend-adjacent API, service, schema, serverless, CI/CD, release, and AI-product work.",
+            "Example User's strongest proven scope is frontend/product engineering with backend-adjacent API, service, schema, serverless, CI/CD, release, and AI-product work.",
             [
                 "Describe him as frontend-heavy and full-product rather than purely frontend-only.",
                 "He can reason across API contracts, auth boundaries, release pipelines, and agent tooling when delivery requires it.",
                 "Full-stack wording should be scoped: strong backend-adjacent and infra evidence, but formal full-stack tenure remains unproven without manual career facts.",
             ],
             ["experience_scope", "frontend", "backend", "api_contract", "ci_cd", "ai_product", "full_stack"],
-            ["Hanje full stack experience", "Hanje frontend backend scope", "Hanje strengths", "Hanje 强项", "Hanje 全栈经验"],
-            "Use this to answer what kind of engineering scope Hanje can cover.",
+            ["Example User full stack experience", "Example User frontend backend scope", "Example User strengths", "Example User 强项", "Example User 全栈经验"],
+            "Use this to answer what kind of engineering scope Example User can cover.",
             ["Do not flatten the profile into backend-only or frontend-only language."],
             facts,
             refs.get("experience_scope", []),
@@ -675,14 +675,14 @@ def build_identity_atoms(facts: dict[str, Any], refs: dict[str, list[dict[str, s
         atom(
             "role_identity",
             "frontend_lead_quality_gate",
-            "Hanje behaves like a FE lead quality gate: architecture review, API-contract awareness, QA/release handoff, bug ownership, and delivery accountability show up repeatedly.",
+            "Example User behaves like a FE lead quality gate: architecture review, API-contract awareness, QA/release handoff, bug ownership, and delivery accountability show up repeatedly.",
             [
                 "Use role identity as behavior first: reviewer, architecture checker, quality gate, and delivery owner.",
                 "Formal people-management should stay unknown unless a declared source provides reporting-line evidence.",
                 "When acting as him, bias toward frontend ownership that includes release and cross-team handoff responsibilities.",
             ],
             ["role_identity", "frontend_lead", "review", "delivery", "quality", "leadership"],
-            ["what kind of engineer is Hanje", "Hanje role identity", "Hanje FE lead", "Hanje 是什么类型的工程师"],
+            ["what kind of engineer is Example User", "Example User role identity", "Example User FE lead", "Example User 是什么类型的工程师"],
             "Use this to answer identity, role, and authority questions.",
             ["Do not claim formal manager scope without declared evidence."],
             facts,
@@ -692,14 +692,14 @@ def build_identity_atoms(facts: dict[str, Any], refs: dict[str, list[dict[str, s
         atom(
             "technical_stack",
             "frontend_api_infra_ai_stack",
-            "Hanje's technical map spans React/Next.js, Angular/RxJS, TypeScript, state/data flow, API/auth boundaries, analytics/reporting, CI/CD, and AI/MCP systems.",
+            "Example User's technical map spans React/Next.js, Angular/RxJS, TypeScript, state/data flow, API/auth boundaries, analytics/reporting, CI/CD, and AI/MCP systems.",
             [
                 "Use this as the broad stack map before narrowing to one framework.",
                 "React should be framed as one strong frontend signal, not the whole identity.",
                 "Angular/RxJS and older enterprise frontend work remain part of the long-term trajectory.",
             ],
             ["technical_stack", "react", "nextjs", "angular", "rxjs", "typescript", "api_contract", "ci_cd", "mcp"],
-            ["Hanje tech stack", "Hanje React Angular TypeScript", "what technologies does Hanje know", "Hanje 技术栈"],
+            ["Example User tech stack", "Example User React Angular TypeScript", "what technologies does Example User know", "Example User 技术栈"],
             "Use this when answering stack, framework, or code-practice capability questions.",
             ["Do not over-index on one framework when a broader stack map is more accurate."],
             facts,
@@ -709,14 +709,14 @@ def build_identity_atoms(facts: dict[str, Any], refs: dict[str, list[dict[str, s
         atom(
             "impact_profile",
             "bug_reduction_release_infra_impact",
-            "Hanje's impact pattern is visible in bug reduction, QA readiness, release flow, CI/CD/web infra, and repeated ownership of product correctness.",
+            "Example User's impact pattern is visible in bug reduction, QA readiness, release flow, CI/CD/web infra, and repeated ownership of product correctness.",
             [
                 "If business metrics are unavailable, phrase impact as bug reduction, delivery safety, QA/release readiness, and correctness improvements.",
                 "CI/CD and web infra work should be treated as production delivery leverage, not side maintenance.",
                 "Impact claims should stay tied to repeated work patterns unless exact company metrics are provided.",
             ],
             ["impact", "bug_reduction", "qa", "release", "ci_cd", "web_infra", "delivery"],
-            ["Hanje impact", "Hanje bug reduction", "Hanje production leadership", "Hanje 影响力"],
+            ["Example User impact", "Example User bug reduction", "Example User production leadership", "Example User 影响力"],
             "Use this to answer impact, outcomes, and production-delivery questions without inventing business metrics.",
             ["Do not invent revenue, conversion, or business metric improvements."],
             facts,
@@ -726,14 +726,14 @@ def build_identity_atoms(facts: dict[str, Any], refs: dict[str, list[dict[str, s
         atom(
             "review_authority",
             "pr_quality_gate_authority",
-            "Hanje's PR-review profile supports quality-gate authority: reviewers and repos repeatedly rely on him for frontend architecture, contracts, maintainability, and release-sensitive approval.",
+            "Example User's PR-review profile supports quality-gate authority: reviewers and repos repeatedly rely on him for frontend architecture, contracts, maintainability, and release-sensitive approval.",
             [
                 "Review authority should be described by topics and behavior, not approval count alone.",
                 "Useful review themes include architecture, API/data contract, state behavior, UX correctness, maintainability, QA, and release risk.",
                 "This is a strong lead-level signal when combined with delivery and ownership context.",
             ],
             ["review_authority", "review", "architecture", "api_contract", "quality", "maintainability", "delivery"],
-            ["how does Hanje review PRs", "Hanje review authority", "Hanje quality gate", "Hanje review PR 关注什么"],
+            ["how does Example User review PRs", "Example User review authority", "Example User quality gate", "Example User review PR 关注什么"],
             "Use this when answering review, mentorship, or authority questions.",
             ["Do not reduce review authority to approval counts only."],
             facts,
@@ -743,14 +743,14 @@ def build_identity_atoms(facts: dict[str, Any], refs: dict[str, list[dict[str, s
         atom(
             "learning_trajectory",
             "implementation_to_lead_ai_infra_growth",
-            "Hanje's growth trajectory moves from enterprise frontend implementation into architecture, delivery ownership, web infrastructure, and AI/agent product systems.",
+            "Example User's growth trajectory moves from enterprise frontend implementation into architecture, delivery ownership, web infrastructure, and AI/agent product systems.",
             [
                 "Use the trajectory to answer what has improved over time: scope, judgment, delivery accountability, and agent-native product thinking.",
                 "Older Angular/shared-library work and newer AI/MCP/infra work should be connected as accumulated capability, not separate fragments.",
                 "This supports clone behavior that considers history and accumulated judgment, not just current stack popularity.",
             ],
             ["learning_trajectory", "growth", "architecture", "delivery", "ai_product", "web_infra"],
-            ["what has Hanje improved over time", "Hanje learning trajectory", "Hanje growth", "Hanje 这些年成长"],
+            ["what has Example User improved over time", "Example User learning trajectory", "Example User growth", "Example User 这些年成长"],
             "Use this to answer growth, trajectory, and accumulated knowledge questions.",
             ["Do not assume personal-life growth from work-only sources."],
             facts,
@@ -761,9 +761,9 @@ def build_identity_atoms(facts: dict[str, Any], refs: dict[str, list[dict[str, s
             "declared_profile",
             "formal_role_and_scope",
             (
-                "Hanje's declared profile should be the first source for formal title, years, promotion, and self-declared scope."
+                "Example User's declared profile should be the first source for formal title, years, promotion, and self-declared scope."
                 if has_family_material("declared_profile")
-                else f"Hanje's declared profile is incomplete: {section_gap('declared_profile')}"
+                else f"Example User's declared profile is incomplete: {section_gap('declared_profile')}"
             ),
             [
                 "Use declared career facts before inferring role, title, tenure, or promotion from work activity.",
@@ -783,9 +783,9 @@ def build_identity_atoms(facts: dict[str, Any], refs: dict[str, list[dict[str, s
             "review_style",
             "pr_reasoning_and_quality_themes",
             (
-                "Hanje's PR-review style centers on architecture, API/data contracts, state behavior, maintainability, UX correctness, QA readiness, and release risk."
+                "Example User's PR-review style centers on architecture, API/data contracts, state behavior, maintainability, UX correctness, QA readiness, and release risk."
                 if has_family_material("review_style")
-                else f"Hanje's PR-review style has an import gap: {section_gap('review_style')}"
+                else f"Example User's PR-review style has an import gap: {section_gap('review_style')}"
             ),
             [
                 "Describe review style by what he checks, not by approval counts alone.",
@@ -793,7 +793,7 @@ def build_identity_atoms(facts: dict[str, Any], refs: dict[str, list[dict[str, s
                 "Use PR review material as the main source for how he thinks during code review.",
             ],
             ["review_style", "review", "architecture", "api_contract", "quality", "maintainability"],
-            ["how does Hanje review PRs", "review style", "PR 关注什么", "代码审查"],
+            ["how does Example User review PRs", "review style", "PR 关注什么", "代码审查"],
             "Use this for PR review behavior, quality-gate, and reviewer-personality questions.",
             ["Do not present low-information approvals as meaningful review reasoning."],
             facts,
@@ -805,9 +805,9 @@ def build_identity_atoms(facts: dict[str, Any], refs: dict[str, list[dict[str, s
             "repo_authority",
             "frontend_decision_dependency",
             (
-                "Repository authority signals show where teams rely on Hanje for frontend decisions, review requests, governance, and approval paths."
+                "Repository authority signals show where teams rely on Example User for frontend decisions, review requests, governance, and approval paths."
                 if has_family_material("repo_authority")
-                else f"Hanje's repository authority map is incomplete: {section_gap('repo_authority')}"
+                else f"Example User's repository authority map is incomplete: {section_gap('repo_authority')}"
             ),
             [
                 "Use repo authority for who relies on him, which repositories depend on him, and where his approval is structurally important.",
@@ -815,7 +815,7 @@ def build_identity_atoms(facts: dict[str, Any], refs: dict[str, list[dict[str, s
                 "Separate formal repo permissions from inferred repeated-review authority.",
             ],
             ["repo_authority", "review_request", "codeowners", "frontend_lead", "relationship_authority"],
-            ["who relies on Hanje", "frontend decisions", "repo authority", "谁依赖 Hanje"],
+            ["who relies on Example User", "frontend decisions", "repo authority", "谁依赖 Example User"],
             "Use this when answering repo authority, default reviewer, or decision-dependency questions.",
             ["Do not claim formal CODEOWNER or admin status unless the source family contains that specific signal."],
             facts,
@@ -827,9 +827,9 @@ def build_identity_atoms(facts: dict[str, Any], refs: dict[str, list[dict[str, s
             "release_ownership",
             "ci_cd_hotfix_release_accountability",
             (
-                "Hanje's release ownership appears through CI/CD, web infrastructure, deploy, hotfix, workflow, and release-sensitive correctness work."
+                "Example User's release ownership appears through CI/CD, web infrastructure, deploy, hotfix, workflow, and release-sensitive correctness work."
                 if has_family_material("release_ownership")
-                else f"Hanje's release ownership has an import gap: {section_gap('release_ownership')}"
+                else f"Example User's release ownership has an import gap: {section_gap('release_ownership')}"
             ),
             [
                 "Use release ownership for CI/CD, deploy, hotfix, workflow-run, release-bound PR, and production-readiness questions.",
@@ -849,9 +849,9 @@ def build_identity_atoms(facts: dict[str, Any], refs: dict[str, list[dict[str, s
             "jira_leadership",
             "qa_blocker_done_coordination",
             (
-                "Hanje's Jira leadership centers on moving work through QA, blockers, reopen, hotfix, review, release, and Done states with explicit coordination."
+                "Example User's Jira leadership centers on moving work through QA, blockers, reopen, hotfix, review, release, and Done states with explicit coordination."
                 if has_family_material("jira_leadership")
-                else f"Hanje's Jira leadership map is incomplete: {section_gap('jira_leadership')}"
+                else f"Example User's Jira leadership map is incomplete: {section_gap('jira_leadership')}"
             ),
             [
                 "Use Jira leadership for QA handoff, blocker handling, reopen response, ticket transition, and Done-accountability questions.",
@@ -871,9 +871,9 @@ def build_identity_atoms(facts: dict[str, Any], refs: dict[str, list[dict[str, s
             "architecture_material",
             "docs_rfc_standards_gap",
             (
-                "Hanje's architecture material includes imported docs, RFCs, migration plans, standards, or AI/MCP design material."
+                "Example User's architecture material includes imported docs, RFCs, migration plans, standards, or AI/MCP design material."
                 if has_family_material("architecture_material")
-                else f"Hanje's dedicated architecture-doc corpus is missing: {section_gap('architecture_material')}"
+                else f"Example User's dedicated architecture-doc corpus is missing: {section_gap('architecture_material')}"
             ),
             [
                 "Use this section for architecture-doc, RFC, standards, migration-plan, and Confluence-export questions.",
@@ -893,9 +893,9 @@ def build_identity_atoms(facts: dict[str, Any], refs: dict[str, list[dict[str, s
             "agent_collaboration_style",
             "agent_session_correction_patterns",
             (
-                "Hanje's agent collaboration style should be distilled from Codex, Claude, Cursor, and agent-session correction patterns."
+                "Example User's agent collaboration style should be distilled from Codex, Claude, Cursor, and agent-session correction patterns."
                 if has_family_material("agent_collaboration_style")
-                else f"Hanje's agent-session corpus is missing: {section_gap('agent_collaboration_style')}"
+                else f"Example User's agent-session corpus is missing: {section_gap('agent_collaboration_style')}"
             ),
             [
                 "Use agent sessions to learn how he corrects agents, scopes tasks, demands proof, and prefers execution flow.",
@@ -903,7 +903,7 @@ def build_identity_atoms(facts: dict[str, Any], refs: dict[str, list[dict[str, s
                 "Until sessions are imported, rely on agent operating context and explicit manual preferences.",
             ],
             ["agent_collaboration", "agent", "codex", "claude", "cursor", "work_style"],
-            ["how should an agent work with Hanje", "agent collaboration", "agent 该怎么和 Hanje 一起工作"],
+            ["how should an agent work with Example User", "agent collaboration", "agent 该怎么和 Example User 一起工作"],
             "Use this when an agent needs collaboration style beyond the general operating contract.",
             ["Do not infer life voice or private preferences from code-only evidence."],
             facts,
@@ -915,9 +915,9 @@ def build_identity_atoms(facts: dict[str, Any], refs: dict[str, list[dict[str, s
             "portfolio_cases",
             "public_safe_product_showcase",
             (
-                "Hanje's portfolio cases should contain sanitized case studies, screenshots, product surfaces, and public-safe summaries."
+                "Example User's portfolio cases should contain sanitized case studies, screenshots, product surfaces, and public-safe summaries."
                 if has_family_material("portfolio_cases")
-                else f"Hanje's portfolio layer is not imported: {section_gap('portfolio_cases')}"
+                else f"Example User's portfolio layer is not imported: {section_gap('portfolio_cases')}"
             ),
             [
                 "Use portfolio cases only when public-safe summaries or screenshots have been imported.",
@@ -937,9 +937,9 @@ def build_identity_atoms(facts: dict[str, Any], refs: dict[str, list[dict[str, s
             "personal_identity",
             "values_preferences_boundaries",
             (
-                "Hanje's personal identity layer should store declared values, goals, preferences, boundaries, and life context."
+                "Example User's personal identity layer should store declared values, goals, preferences, boundaries, and life context."
                 if has_family_material("personal_identity")
-                else f"Hanje's personal material layer is sparse: {section_gap('personal_identity')}"
+                else f"Example User's personal material layer is sparse: {section_gap('personal_identity')}"
             ),
             [
                 "Use personal material only when the user has explicitly imported or declared it.",

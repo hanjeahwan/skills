@@ -30,8 +30,8 @@ STOPWORDS = {
     "do",
     "does",
     "for",
-    "hanje",
-    "hanjeahwan",
+    "example",
+    "example-user",
     "he",
     "his",
     "how",
@@ -48,6 +48,7 @@ STOPWORDS = {
     "s",
     "the",
     "to",
+    "user",
     "what",
     "you",
 }

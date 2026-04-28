@@ -2,3 +2,33 @@ node_modules/
 *.log
 __pycache__/
 *.pyc
+
+# Local/private runtime material. Keep all user evidence outside the public repo.
+.env
+.env.*
+!.env.example
+.codex-runtime/
+.self-context/
+ledger/
+sources/
+events/
+derived/
+exports/
+profiles/
+reports/
+
+# Generated local indexes and caches.
+*.sqlite
+*.sqlite3
+*.db
+*.npz
+*.coverage.json
+*.cache
+
+# Browser/dev artifacts.
+playwright-report/
+test-results/
+*.png
+*.jpg
+*.jpeg
+*.webp
