@@ -205,7 +205,7 @@ CLUSTER_DEFINITIONS: list[dict[str, Any]] = [
         ["delivery", "quality", "qa", "release", "leadership"],
         ["Example User release ownership", "QA handoff style", "delivery accountability"],
         ["code review", "qa testing", "released to stage", "ready to go live", "released to production", "done", "testing", "approved", "stage", "production"],
-        source_types=["jira_changelog", "jira_ticket", "jira_comment", "pull_request"],
+        source_types=["jira_changelog", "jira_ticket", "jira_comment", "jira_leadership_signal", "pull_request"],
         min_source_count=12,
     ),
     cluster_definition(
@@ -225,7 +225,7 @@ CLUSTER_DEFINITIONS: list[dict[str, Any]] = [
         ["bug", "hotfix", "fix", "wrong", "error", "sentry", "regression", "staging", "production", "qa", "customer", "failed", "failure"],
         path=["sentry", "error", "bug", "fix", "test"],
         patterns=["lint_format_quality", "unit_testing", "e2e_testing"],
-        source_types=["git_commit", "pull_request", "jira_ticket", "jira_comment", "jira_changelog"],
+        source_types=["git_commit", "pull_request", "jira_ticket", "jira_comment", "jira_changelog", "jira_leadership_signal"],
         min_source_count=12,
     ),
     cluster_definition(
@@ -439,7 +439,7 @@ CLUSTER_DEFINITIONS: list[dict[str, Any]] = [
         ["preference", "quality", "architecture", "delivery"],
         ["what would Example User prefer", "Example User engineering bar", "correct solution preference"],
         ["quality", "correct", "maintainable", "review", "bug", "refactor", "standard", "qa", "release", "production", "architecture"],
-        source_types=["git_commit", "pull_request_review", "pull_request_review_comment", "jira_changelog", "jira_ticket", "code_style_signal"],
+        source_types=["git_commit", "pull_request_review", "pull_request_review_comment", "jira_changelog", "jira_ticket", "jira_leadership_signal", "code_style_signal"],
         min_source_count=12,
     ),
     cluster_definition(
@@ -457,7 +457,7 @@ CLUSTER_DEFINITIONS: list[dict[str, Any]] = [
         ["communication", "qa", "delivery", "leadership", "product"],
         ["Example User communication style", "QA handoff wording", "how Example User unblocks teammates"],
         ["please", "testing", "tester", "done", "assign", "move", "required", "team", "why", "explain", "unblock", "ready", "verification", "qa"],
-        source_types=["jira_comment", "pull_request_review_comment", "github_mention"],
+        source_types=["jira_comment", "jira_leadership_signal", "pull_request_review_comment", "github_mention"],
         min_source_count=5,
     ),
     cluster_definition(
@@ -554,7 +554,7 @@ CLUSTER_DEFINITIONS: list[dict[str, Any]] = [
         ["missing", "empty", "wrong", "disabled", "required", "validation", "visible", "visibility", "permission", "role", "state", "status", "error", "cannot"],
         path=["validation", "permission", "state", "status", "error"],
         patterns=["forms_validation", "rbac_auth", "unit_testing"],
-        source_types=["git_commit", "pull_request_review_comment", "jira_ticket", "jira_comment"],
+        source_types=["git_commit", "pull_request_review_comment", "jira_ticket", "jira_comment", "jira_leadership_signal"],
         min_source_count=8,
     ),
     cluster_definition(
@@ -574,7 +574,7 @@ CLUSTER_DEFINITIONS: list[dict[str, Any]] = [
         ["test", "testing", "unit", "e2e", "spec", "lint", "format", "qa", "verify", "verification", "check"],
         path=["test", "spec", "e2e", "eslint", "lint"],
         patterns=["unit_testing", "e2e_testing", "lint_format_quality"],
-        source_types=["git_commit", "pull_request", "jira_changelog", "code_style_signal"],
+        source_types=["git_commit", "pull_request", "jira_changelog", "jira_leadership_signal", "code_style_signal"],
         min_source_count=6,
     ),
     cluster_definition(

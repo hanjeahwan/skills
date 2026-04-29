@@ -78,6 +78,7 @@ CREATE TABLE IF NOT EXISTS context_packs (
   intent TEXT NOT NULL,
   title TEXT NOT NULL,
   direct_answer TEXT NOT NULL,
+  answer_material_json TEXT NOT NULL,
   useful_context_json TEXT NOT NULL,
   behavioral_guidance_json TEXT NOT NULL,
   known_limits_json TEXT NOT NULL,
@@ -132,4 +133,4 @@ CREATE VIRTUAL TABLE IF NOT EXISTS memory_atoms_fts
 USING fts5(id UNINDEXED, statement, useful_context_json, topics_json, query_patterns_json, behavioral_use);
 
 CREATE VIRTUAL TABLE IF NOT EXISTS context_packs_fts
-USING fts5(id UNINDEXED, title, direct_answer, useful_context_json, behavioral_guidance_json, known_limits_json, topics_json, retrieval_text);
+USING fts5(id UNINDEXED, title, direct_answer, answer_material_json, useful_context_json, behavioral_guidance_json, known_limits_json, topics_json, retrieval_text);

@@ -64,7 +64,7 @@ const INTENT_HINTS = {
     "trajectory",
   ],
   personal_context: ["personal", "life", "habit", "like", "goal"],
-  proof: ["proof", "evidence", "source", "commit", "citation"],
+  proof: ["proof", "source id", "source", "sources", "commit", "citation", "provenance", "audit", "trace"],
   gap: ["unknown", "gap", "missing", "unsafe", "assume", "uncertain"],
 };
 
@@ -73,7 +73,7 @@ const CHINESE_INTENT_HINTS = {
   act_as_me: ["偏好", "决定", "选择", "代表", "替我", "review", "评审"],
   work_context: ["工作", "能力", "做过", "实力", "领导", "几年", "经验", "多久", "全栈", "强项", "擅长", "影响力"],
   personal_context: ["个人", "生活", "习惯", "目标"],
-  proof: ["证明", "证据", "来源"],
+  proof: ["证明", "来源", "提交", "溯源", "审计"],
   gap: ["不知道", "缺少", "不确定", "不能假设"],
 };
 
@@ -90,6 +90,21 @@ const STRENGTH_HINTS = new Set(["strong", "strength", "strengths"]);
 const REVIEW_HINTS = new Set(["review", "reviews", "pr", "prs"]);
 const LEARNING_HINTS = new Set(["improved", "improve", "growth", "trajectory", "learned", "changed"]);
 const DOMAIN_HINTS = new Set(["domain", "product", "business", "recruiting", "candidate", "employee", "analytics"]);
+const AI_PRODUCT_HINTS = new Set([
+  "ai",
+  "mcp",
+  "rag",
+  "llm",
+  "openai",
+  "gpt",
+  "generative",
+  "generation",
+  "agentic",
+  "agent engineering",
+  "agent product",
+  "tool",
+  "tools",
+]);
 const CHINESE_EXPERIENCE_HINTS = ["几年", "经验", "工作多久", "多久", "全栈"];
 const CHINESE_ROLE_HINTS = ["什么类型", "什么工程师", "角色", "定位"];
 const CHINESE_STACK_HINTS = ["技术栈", "会什么技术", "react", "angular", "typescript"];
@@ -98,6 +113,7 @@ const CHINESE_STRENGTH_HINTS = ["强项", "擅长"];
 const CHINESE_REVIEW_HINTS = ["review", "评审", "PR", "代码审查"];
 const CHINESE_LEARNING_HINTS = ["成长", "进步", "这些年", "变化"];
 const CHINESE_DOMAIN_HINTS = ["业务领域", "产品领域", "领域", "懂哪些业务"];
+const CHINESE_AI_PRODUCT_HINTS = ["智能体", "大模型", "生成式", "工具调用"];
 const OFFICIAL_PROFILE_HINTS = new Set(["official", "formal", "title", "role", "promotion", "declared", "tenure"]);
 const AUTHORITY_HINTS = new Set(["authority", "relies", "rely", "depends", "dependency", "codeowners", "owner", "permission", "reviewer", "mentions"]);
 const RELEASE_HINTS = new Set(["release", "hotfix", "deploy", "deployment", "ci", "cd", "cicd", "workflow", "github", "actions", "pipeline"]);
@@ -153,6 +169,7 @@ function inferIntent(query) {
   }
   if (hasAnyHint(query, [...terms], OFFICIAL_PROFILE_HINTS, CHINESE_OFFICIAL_PROFILE_HINTS)) return "work_context";
   if (hasAnyHint(query, [...terms], AUTHORITY_HINTS, CHINESE_AUTHORITY_HINTS)) return "relationship_context";
+  if (hasAnyHint(query, [...terms], AI_PRODUCT_HINTS, CHINESE_AI_PRODUCT_HINTS)) return "act_as_me";
   if (hasAnyHint(query, [...terms], AGENT_COLLAB_HINTS, CHINESE_AGENT_COLLAB_HINTS)) return "act_as_me";
   if (hasAnyHint(query, [...terms], PORTFOLIO_HINTS, CHINESE_PORTFOLIO_HINTS)) return "project_context";
   if (hasAnyHint(query, [...terms], PERSONAL_HINTS, CHINESE_PERSONAL_HINTS)) return "personal_context";
@@ -226,6 +243,7 @@ function rowViews(row) {
     title: asText(row.title),
     topics: asText(row.topics),
     directAnswer: asText(row.direct_answer),
+    answerMaterial: asText(row.answer_material),
     usefulContext: asText(row.useful_context),
     behavioralGuidance: asText(row.behavioral_guidance),
     knownLimits: asText(row.known_limits),
@@ -266,6 +284,7 @@ function sanitizePack(row, includeProvenance) {
     intent: row.intent,
     title: row.title,
     direct_answer: row.direct_answer,
+    answer_material: row.answer_material || {},
     useful_context: row.useful_context || [],
     behavioral_guidance: row.behavioral_guidance || [],
     known_limits: row.known_limits || [],
@@ -411,6 +430,7 @@ export async function querySelfContextFast(input) {
     hasAnyHint(input.query, terms, RELEASE_HINTS, CHINESE_RELEASE_HINTS) ||
     hasAnyHint(input.query, terms, JIRA_LEADERSHIP_HINTS, CHINESE_JIRA_LEADERSHIP_HINTS) ||
     hasAnyHint(input.query, terms, ARCHITECTURE_MATERIAL_HINTS, CHINESE_ARCHITECTURE_MATERIAL_HINTS) ||
+    hasAnyHint(input.query, terms, AI_PRODUCT_HINTS, CHINESE_AI_PRODUCT_HINTS) ||
     hasAnyHint(input.query, terms, AGENT_COLLAB_HINTS, CHINESE_AGENT_COLLAB_HINTS) ||
     hasAnyHint(input.query, terms, PORTFOLIO_HINTS, CHINESE_PORTFOLIO_HINTS) ||
     hasAnyHint(input.query, terms, PERSONAL_HINTS, CHINESE_PERSONAL_HINTS) ||
@@ -514,6 +534,22 @@ export async function querySelfContextFast(input) {
     ]);
     for (const pack of cache.packs) {
       if (pack.intent !== "work_context" && !String(pack.id || "").startsWith("context:self_model.")) continue;
+      const score = (broadOrder.get(pack.id) || 0) + (pack.memory_atoms?.length || 0);
+      results.push({ ...pack, _score: score, _matched_terms: terms.slice(0, 25) });
+    }
+  } else if (intent !== "proof" && hasAnyHint(input.query, terms, AI_PRODUCT_HINTS, CHINESE_AI_PRODUCT_HINTS)) {
+    const broadOrder = new Map([
+      ["context:self_model.ai_product_judgment", 124],
+      ["context:self_model.technical_stack", 106],
+      ["context:capability.ai_agent_product_systems", 104],
+      ["context:self_model.experience_scope", 100],
+      ["context:self_model.architecture_judgment", 94],
+      ["context:self_model.agent_operating_context", 88],
+      ["context:self_model.agent_collaboration_style", 58],
+    ]);
+    for (const pack of cache.packs) {
+      const id = String(pack.id || "");
+      if (!id.startsWith("context:self_model.") && id !== "context:capability.ai_agent_product_systems") continue;
       const score = (broadOrder.get(pack.id) || 0) + (pack.memory_atoms?.length || 0);
       results.push({ ...pack, _score: score, _matched_terms: terms.slice(0, 25) });
     }

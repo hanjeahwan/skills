@@ -49,6 +49,7 @@ CONTEXT_PACK_REQUIRED = {
     "intent",
     "title",
     "direct_answer",
+    "answer_material",
     "useful_context",
     "behavioral_guidance",
     "known_limits",
@@ -56,6 +57,26 @@ CONTEXT_PACK_REQUIRED = {
     "private_trace_refs",
     "topics",
     "updated_at",
+}
+
+ANSWER_MATERIAL_REQUIRED = {
+    "headline",
+    "talking_points",
+    "evidence_summary",
+    "caveats",
+    "suggested_followups",
+}
+
+PRODUCT_ANSWER_BANNED_PHRASES = {
+    "use this topic pack",
+    "common implementation surfaces",
+    "raw source evidence",
+    "declared profile should",
+    "release ownership layer",
+    "my release ownership layer",
+    "he likely",
+    "context pack",
+    "private_trace_refs",
 }
 
 PROVENANCE_REQUIRED = {
@@ -389,6 +410,46 @@ def validate_memory_atom_content(path: Path) -> list[str]:
     return errors
 
 
+def validate_context_pack_content(path: Path) -> list[str]:
+    if not path.exists():
+        return [f"missing file: {path}"]
+    errors: list[str] = []
+    for index, line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
+        if not line.strip():
+            continue
+        row = json.loads(line)
+        material = row.get("answer_material") if isinstance(row.get("answer_material"), dict) else {}
+        missing = sorted(ANSWER_MATERIAL_REQUIRED - set(material))
+        if missing:
+            errors.append(f"{path}:{index}: answer_material missing fields: {', '.join(missing)}")
+            continue
+        text_fields = [str(material.get("headline", ""))]
+        for field in ["talking_points", "evidence_summary", "caveats", "suggested_followups"]:
+            value = material.get(field, [])
+            if not isinstance(value, list):
+                errors.append(f"{path}:{index}: answer_material.{field} must be a list")
+                continue
+            text_fields.extend(str(item) for item in value)
+        if not str(material.get("headline", "")).strip():
+            errors.append(f"{path}:{index}: answer_material.headline must be non-empty")
+        if not material.get("talking_points"):
+            errors.append(f"{path}:{index}: answer_material.talking_points must be non-empty")
+        if not material.get("evidence_summary"):
+            errors.append(f"{path}:{index}: answer_material.evidence_summary must be non-empty")
+        lowered = " ".join(text_fields).lower()
+        if (
+            any(phrase in lowered for phrase in PRODUCT_ANSWER_BANNED_PHRASES)
+            or any(phrase in lowered for phrase in LEGACY_PHRASES)
+            or any(phrase in lowered for phrase in VOICE_BANNED_PHRASES)
+        ):
+            errors.append(f"{path}:{index}: answer_material contains internal or evidence-style phrasing")
+        for pattern in SOURCE_ID_PATTERNS:
+            if pattern.findall(" ".join(text_fields)):
+                errors.append(f"{path}:{index}: source identifier leaked into answer_material")
+                break
+    return errors
+
+
 def validate_self_model(path: Path) -> list[str]:
     if not path.exists():
         return [f"missing file: {path}"]
@@ -702,6 +763,7 @@ def main() -> None:
         if path.exists():
             errors.extend(validate_jsonl(path, required))
     errors.extend(validate_memory_atom_content(ledger / "derived" / "memory_atoms.jsonl"))
+    errors.extend(validate_context_pack_content(ledger / "derived" / "context_packs.jsonl"))
     errors.extend(validate_self_model(ledger / "derived" / "self_model.json"))
     errors.extend(validate_persona_eval(ledger / "derived" / "persona_synthesis_eval.json"))
     errors.extend(validate_identity_facts(ledger / "derived" / "identity_facts.json"))

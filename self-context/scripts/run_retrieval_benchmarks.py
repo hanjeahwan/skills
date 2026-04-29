@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -18,6 +19,10 @@ from build_persona_sections import LEGACY_PHRASES, SOURCE_ID_PATTERNS
 from build_voice_profile import VOICE_BANNED_PHRASES, is_first_person_or_directive
 from ledger_paths import resolve_ledger_path
 from query_engine import query_self_context
+
+THIRD_PERSON_SUBJECT_PATTERN = re.compile(
+    r"\b[A-Z][A-Za-z]+(?:\s+[A-Z][A-Za-z]+)?(?:'s|\s+(?:is|has|functions|works|operates))\b"
+)
 from retrieval_benchmark_support import (
     benchmark_cases_for_suite,
     load_benchmark_spec,
@@ -306,7 +311,12 @@ def evaluate_style_contract(style_contract: str, direct_answer: str) -> tuple[bo
         return passed, "direct_answer must be first-person or directive"
     if style_contract == "third_person_identity":
         passed = not is_first_person_or_directive(direct_answer) and any(
-            token in lowered for token in ["example user ", "example user is", "example user's", "he ", "his "]
+            token in lowered
+            for token in ["example user ", "example user is", "example user's", "the engineer ", "he ", "his "]
+        )
+        passed = passed or (
+            not is_first_person_or_directive(direct_answer)
+            and bool(THIRD_PERSON_SUBJECT_PATTERN.search(direct_answer))
         )
         return passed, "direct_answer must stay in third-person identity form"
     passed = not any(phrase in lowered for phrase in LEGACY_PHRASES) and not any(phrase in lowered for phrase in VOICE_BANNED_PHRASES)
@@ -317,11 +327,17 @@ def has_source_leak(text: str) -> bool:
     return any(pattern.search(text) for pattern in SOURCE_ID_PATTERNS)
 
 
+def answer_material_text(context: dict[str, Any]) -> str:
+    material = context.get("answer_material") if isinstance(context.get("answer_material"), dict) else {}
+    return json.dumps(material, ensure_ascii=False).lower()
+
+
 def run_case(ledger: Path, case: dict[str, Any]) -> dict[str, Any]:
     result = query_self_context(ledger, case["query"], top=3)
     answer_contexts = result.get("answer_contexts", [])
     first = answer_contexts[0] if answer_contexts else {}
     first_text = json.dumps(first, ensure_ascii=False).lower()
+    material_text = answer_material_text(first)
     serialized = json.dumps(result, ensure_ascii=False).lower()
     direct_answer = str(first.get("direct_answer", ""))
     checks: list[dict[str, Any]] = []
@@ -330,6 +346,7 @@ def run_case(ledger: Path, case: dict[str, Any]) -> dict[str, Any]:
         checks.append({"name": name, "passed": bool(passed), "details": details})
 
     add_check("has_answer_context", bool(answer_contexts), "query must return at least one context")
+    add_check("has_answer_material", bool(material_text), "first context must include answer_material")
     add_check("intent", result.get("intent") == case["expected_intent"], f"expected intent {case['expected_intent']}, got {result.get('intent')}")
     add_check(
         "first_context",
@@ -340,10 +357,26 @@ def run_case(ledger: Path, case: dict[str, Any]) -> dict[str, Any]:
     style_passed, style_details = evaluate_style_contract(str(case["style_contract"]), direct_answer)
     add_check("style_contract", style_passed, style_details)
 
-    evidence_phrase_leak = any(phrase in first_text for phrase in LEGACY_PHRASES) or any(phrase in first_text for phrase in VOICE_BANNED_PHRASES)
+    evidence_phrase_leak = (
+        any(phrase in first_text for phrase in LEGACY_PHRASES)
+        or any(phrase in first_text for phrase in VOICE_BANNED_PHRASES)
+        or any(
+            phrase in first_text
+            for phrase in [
+                "use this topic pack",
+                "common implementation surfaces",
+                "declared profile should",
+                "release ownership layer",
+                "my release ownership layer",
+                "he likely",
+                "private_trace_refs",
+            ]
+        )
+    )
 
     if case["provenance_policy"] == "hidden_by_default":
         add_check("no_evidence_style", not evidence_phrase_leak, "first context must not include legacy evidence phrasing")
+        add_check("answer_material_clean", "context pack" not in material_text and not has_source_leak(material_text), "answer_material must be answer-ready and source-id-free")
         add_check("provenance_hidden", "provenance" not in result, "default query must not return provenance")
         add_check(
             "trace_hidden",

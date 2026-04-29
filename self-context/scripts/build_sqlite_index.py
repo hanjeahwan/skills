@@ -253,9 +253,9 @@ def insert_context_packs(connection: sqlite3.Connection, rows: list[dict[str, An
     connection.executemany(
         """
         INSERT OR REPLACE INTO context_packs
-        (id, intent, title, direct_answer, useful_context_json, behavioral_guidance_json,
+        (id, intent, title, direct_answer, answer_material_json, useful_context_json, behavioral_guidance_json,
          known_limits_json, memory_atoms_json, private_trace_refs_json, topics_json, retrieval_text, updated_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
         [
             (
@@ -263,6 +263,7 @@ def insert_context_packs(connection: sqlite3.Connection, rows: list[dict[str, An
                 row.get("intent", ""),
                 row.get("title", ""),
                 row.get("direct_answer", ""),
+                json_text(row.get("answer_material")),
                 json_text(row.get("useful_context")),
                 json_text(row.get("behavioral_guidance")),
                 json_text(row.get("known_limits")),
@@ -278,14 +279,15 @@ def insert_context_packs(connection: sqlite3.Connection, rows: list[dict[str, An
     connection.executemany(
         """
         INSERT INTO context_packs_fts
-        (id, title, direct_answer, useful_context_json, behavioral_guidance_json, known_limits_json, topics_json, retrieval_text)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        (id, title, direct_answer, answer_material_json, useful_context_json, behavioral_guidance_json, known_limits_json, topics_json, retrieval_text)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
         [
             (
                 row["id"],
                 row.get("title", ""),
                 row.get("direct_answer", ""),
+                json_text(row.get("answer_material")),
                 json_text(row.get("useful_context")),
                 json_text(row.get("behavioral_guidance")),
                 json_text(row.get("known_limits")),

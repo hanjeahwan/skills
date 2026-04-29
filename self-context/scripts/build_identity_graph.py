@@ -761,7 +761,7 @@ def build_identity_atoms(facts: dict[str, Any], refs: dict[str, list[dict[str, s
             "declared_profile",
             "formal_role_and_scope",
             (
-                "Example User's declared profile should be the first source for formal title, years, promotion, and self-declared scope."
+                "Example User's declared profile is the first source for formal title, years, promotion, and self-declared scope."
                 if has_family_material("declared_profile")
                 else f"Example User's declared profile is incomplete: {section_gap('declared_profile')}"
             ),

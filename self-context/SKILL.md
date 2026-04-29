@@ -114,6 +114,7 @@ Read `references/distilled-search-context-architecture.md` before changing retri
 - `scripts/export_github_history.py`: import long-range GitHub history with date slicing.
 - `scripts/export_github_pr_activity.py`: import PRs, PR comments, review comments, review requests, authority signals, CODEOWNERS, and workflow signals.
 - `scripts/export_jira_issues.py`: import Jira tickets, comments, and changelog records.
+- `scripts/build_jira_leadership_signals.py`: distill Jira tickets, authored comments, mentions, and changelogs into `sources/jira_leadership_signals.jsonl` for QA, blocker, release, and Done ownership context.
 - `scripts/scan_code_style.py`: scan local repositories into `sources/code_style.jsonl`.
 - `scripts/analyze_github_commit_patterns.py`: distill GitHub commit patches into code-style signals.
 - `scripts/build_source_clusters.py`: build deterministic raw-source theme clusters and candidate memories before final atom generation.

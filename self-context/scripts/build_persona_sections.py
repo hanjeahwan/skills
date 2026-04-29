@@ -595,7 +595,7 @@ def section_defaults(section_id: str, sparse_personal_context: bool) -> dict[str
             ],
         },
         "self_model:release_ownership": {
-            "summary": "Example User's release ownership layer covers CI/CD, GitHub Actions, deploy, hotfix, workflow failure, release-bound PR, and production-readiness work.",
+            "summary": "Example User shows release-sensitive ownership across CI/CD, GitHub Actions, deploy, hotfix, workflow failure, release-bound PR, and production-readiness work.",
             "practical_guidance": [
                 "Use release ownership when asked about CI/CD, deploy, hotfix, workflow, or production accountability.",
                 "Frame web infrastructure as delivery leverage when it improves release confidence.",

@@ -577,6 +577,10 @@ def signal_names_for_row(row: dict[str, Any]) -> set[str]:
         signals.add("performance_cost_optimization")
     if source_type in {"pull_request_review", "github_review_request"} or "review_requested" in text or "approved" in text:
         signals.add("frontend_quality_gate")
+    if source_type == "jira_leadership_signal":
+        signals.add("delivery_ownership")
+        signals.add("quality_reliability_debugging")
+        signals.add("communication_coordination")
     if source_type in {"jira_ticket", "jira_changelog"} or any(word in text for word in ["done", "release", "fixversions", "code review", "in progress"]):
         signals.add("delivery_ownership")
     if source_type == "jira_comment" and (raw.get("authored_by_user") or raw.get("mentions_user")):

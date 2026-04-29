@@ -13,7 +13,7 @@ const config = {
   requestTimeout: 120_000,
   connectionTimeout: 10_000,
   keepAliveTimeout: 72_000,
-  maxSessions: 8,
+  maxSessions: 2,
   sessionTtlMs: 50,
   sessionSweepIntervalMs: 10,
   contextCacheTtlMs: 0,
@@ -71,12 +71,18 @@ try {
   await sleep(config.sessionTtlMs + 100);
   const afterTtl = await metrics();
 
+  await initializeSession();
+  await initializeSession();
+  await initializeSession();
+  const afterCapacityPressure = await metrics();
+
   console.log(
     JSON.stringify(
       {
         sessionTtlMs: config.sessionTtlMs,
         activeSessionsAfterInitialize: afterInitialize.activeSessions,
         activeSessionsAfterTtlWithoutMcpTraffic: afterTtl.activeSessions,
+        activeSessionsAfterCapacityPressure: afterCapacityPressure.activeSessions,
       },
       null,
       2,
@@ -87,6 +93,11 @@ try {
     afterTtl.activeSessions,
     0,
     "expired MCP sessions should be reclaimed without requiring another /mcp request",
+  );
+  assert.equal(
+    afterCapacityPressure.activeSessions,
+    config.maxSessions,
+    "inactive MCP sessions should be evicted instead of rejecting a new initialize request when capacity is full",
   );
 } finally {
   await app.close();

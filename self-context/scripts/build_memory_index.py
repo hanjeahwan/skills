@@ -163,6 +163,7 @@ def build_records(derived: Path) -> list[dict[str, Any]]:
                         f"Intent: {pack.get('intent', '')}",
                         f"Title: {pack.get('title', '')}",
                         f"Direct answer: {pack.get('direct_answer', '')}",
+                        as_text(pack.get("answer_material")),
                         as_text(pack.get("useful_context")),
                         as_text(pack.get("behavioral_guidance")),
                         as_text(pack.get("known_limits")),

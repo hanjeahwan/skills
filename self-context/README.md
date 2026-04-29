@@ -58,6 +58,7 @@ The private ledger should contain:
 - Git commit exports
 - PR and review activity
 - Jira issues, comments, and changelogs
+- Jira leadership signals distilled from authored comments, mentions, transitions, QA, blockers, release, and Done movement
 - code-style scans
 - architecture notes
 - agent session summaries

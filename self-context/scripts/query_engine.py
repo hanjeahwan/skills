@@ -54,7 +54,7 @@ STOPWORDS = {
 }
 
 INTENT_HINTS = {
-    "proof": ["proof", "evidence", "source", "commit", "citation", "trace"],
+    "proof": ["proof", "source id", "source", "sources", "commit", "citation", "provenance", "audit", "trace"],
     "coding_style": ["code", "coding", "react", "next", "typescript", "style", "pattern", "component"],
     "act_as_me": ["prefer", "preference", "decision", "choose", "act", "behalf", "would", "should", "review", "reviews"],
     "work_context": [
@@ -88,7 +88,7 @@ INTENT_HINTS = {
 }
 
 CHINESE_INTENT_HINTS = {
-    "proof": ["证明", "证据", "来源"],
+    "proof": ["证明", "来源", "提交", "溯源", "审计"],
     "coding_style": ["代码", "编程", "风格", "规范", "组件", "前端"],
     "act_as_me": ["偏好", "决定", "选择", "代表", "替我", "review", "评审"],
     "work_context": ["工作", "能力", "做过", "实力", "领导", "ownership", "几年", "经验", "多久", "全栈", "强项", "擅长", "影响力"],
@@ -108,6 +108,21 @@ STRENGTH_HINTS = {"strong", "strength", "strengths"}
 REVIEW_HINTS = {"review", "reviews", "pr", "prs"}
 LEARNING_HINTS = {"improved", "improve", "growth", "trajectory", "learned", "changed"}
 DOMAIN_HINTS = {"domain", "product", "business", "recruiting", "candidate", "employee", "analytics"}
+AI_PRODUCT_HINTS = {
+    "ai",
+    "mcp",
+    "rag",
+    "llm",
+    "openai",
+    "gpt",
+    "generative",
+    "generation",
+    "agentic",
+    "agent engineering",
+    "agent product",
+    "tool",
+    "tools",
+}
 CHINESE_EXPERIENCE_HINTS = ["几年", "经验", "工作多久", "多久", "全栈"]
 CHINESE_ROLE_HINTS = ["什么类型", "什么工程师", "角色", "定位"]
 CHINESE_STACK_HINTS = ["技术栈", "会什么技术", "react", "angular", "typescript"]
@@ -116,6 +131,7 @@ CHINESE_STRENGTH_HINTS = ["强项", "擅长"]
 CHINESE_REVIEW_HINTS = ["review", "评审", "PR", "代码审查"]
 CHINESE_LEARNING_HINTS = ["成长", "进步", "这些年", "变化"]
 CHINESE_DOMAIN_HINTS = ["业务领域", "产品领域", "领域", "懂哪些业务"]
+CHINESE_AI_PRODUCT_HINTS = ["智能体", "大模型", "生成式", "工具调用"]
 OFFICIAL_PROFILE_HINTS = {"official", "formal", "title", "role", "promotion", "declared", "tenure"}
 AUTHORITY_HINTS = {"authority", "relies", "rely", "depends", "dependency", "codeowners", "owner", "permission", "reviewer", "mentions"}
 RELEASE_HINTS = {"release", "hotfix", "deploy", "deployment", "ci", "cd", "cicd", "workflow", "github", "actions", "pipeline"}
@@ -123,7 +139,33 @@ JIRA_LEADERSHIP_HINTS = {"jira", "qa", "blocked", "blocker", "reopen", "done", "
 ARCHITECTURE_MATERIAL_HINTS = {"doc", "docs", "document", "documentation", "rfc", "confluence", "standard", "standards", "migration"}
 AGENT_COLLAB_HINTS = {"agent", "codex", "claude", "cursor", "collaborate", "collaboration", "session", "sessions"}
 PORTFOLIO_HINTS = {"portfolio", "case", "cases", "case-study", "case studies", "showcase", "screenshot", "screenshots", "public"}
-PERSONAL_HINTS = {"personal", "value", "values", "life", "preference", "preferences", "goal", "goals", "boundary", "boundaries"}
+PERSONAL_HINTS = {
+    "personal",
+    "value",
+    "values",
+    "life",
+    "preference",
+    "preferences",
+    "goal",
+    "goals",
+    "boundary",
+    "boundaries",
+    "privacy",
+    "private",
+    "policy",
+    "local-first",
+    "local",
+}
+PRIVACY_POLICY_HINTS = {
+    "privacy",
+    "private",
+    "proof policy",
+    "provenance policy",
+    "source policy",
+    "local-first",
+    "local first",
+    "trace policy",
+}
 CHINESE_OFFICIAL_PROFILE_HINTS = ["正式", "职位", "头衔", "年限", "晋升"]
 CHINESE_AUTHORITY_HINTS = ["依赖", "前端决定", "权限", "负责人", "默认 reviewer", "谁依赖"]
 CHINESE_RELEASE_HINTS = ["release", "发布", "部署", "hotfix", "CI", "CD", "CI/CD", "流水线"]
@@ -131,7 +173,8 @@ CHINESE_JIRA_LEADERSHIP_HINTS = ["jira", "qa", "阻塞", "blocked", "done", "协
 CHINESE_ARCHITECTURE_MATERIAL_HINTS = ["架构文档", "文档", "rfc", "标准", "迁移计划"]
 CHINESE_AGENT_COLLAB_HINTS = ["agent", "代理", "协作", "一起工作", "会话"]
 CHINESE_PORTFOLIO_HINTS = ["作品", "案例", "作品案例", "展示", "截图"]
-CHINESE_PERSONAL_HINTS = ["个人", "偏好", "价值观", "目标", "边界", "生活"]
+CHINESE_PERSONAL_HINTS = ["个人", "偏好", "价值观", "目标", "边界", "生活", "隐私", "证明策略", "本地优先"]
+CHINESE_PRIVACY_POLICY_HINTS = ["隐私", "证明策略", "来源策略", "本地优先", "证据策略"]
 
 BROAD_SELF_ORDER = {
     "context:self_model.master_persona": 155,
@@ -277,6 +320,13 @@ BROAD_PERSONAL_ORDER = {
     "context:self_model.master_persona": 110,
 }
 
+BROAD_PRIVACY_POLICY_ORDER = {
+    "context:personal_material.privacy_and_proof_policy": 176,
+    "context:private_boundary.constraint.private_source_boundary": 158,
+    "context:self_model.boundaries_unknowns": 146,
+    "context:self_model.personal_identity": 132,
+}
+
 BROAD_LEARNING_ORDER = {
     "context:self_model.learning_trajectory": 158,
     "context:self_model.career_timeline": 142,
@@ -291,6 +341,16 @@ BROAD_DOMAIN_ORDER = {
     "context:topic.recruiting": 126,
     "context:topic.employee": 122,
     "context:topic.analytics": 118,
+}
+
+BROAD_AI_PRODUCT_ORDER = {
+    "context:self_model.ai_product_judgment": 170,
+    "context:self_model.technical_stack": 146,
+    "context:capability.ai_agent_product_systems": 142,
+    "context:self_model.experience_scope": 134,
+    "context:self_model.architecture_judgment": 124,
+    "context:self_model.agent_operating_context": 116,
+    "context:self_model.agent_collaboration_style": 96,
 }
 
 BROAD_CODING_ORDER = {
@@ -348,6 +408,11 @@ def has_any_hint(query: str, terms: set[str], english_hints: set[str], chinese_h
     if any(hint in lowered for hint in english_hints if len(hint) > 2):
         return True
     return any(hint in query for hint in chinese_hints)
+
+
+def has_project_name_token(terms: set[str]) -> bool:
+    project_markers = {"app", "web", "foundation", "console", "infra", "talent", "admin"}
+    return any("-" in term and any(marker in term for marker in project_markers) for term in terms)
 
 
 def is_architecture_query(query: str, terms: set[str]) -> bool:
@@ -411,7 +476,11 @@ def search_terms(query: str) -> list[str]:
 def infer_intent(query: str) -> str:
     terms = set(tokenize(query))
     lowered = query.lower()
-    if any(hint_matches(hint, terms, lowered) for hint in INTENT_HINTS["proof"]) or any(hint in query for hint in CHINESE_INTENT_HINTS["proof"]):
+    asks_about_proof_policy = has_any_hint(query, terms, PRIVACY_POLICY_HINTS, CHINESE_PRIVACY_POLICY_HINTS)
+    if not asks_about_proof_policy and (
+        any(hint_matches(hint, terms, lowered) for hint in INTENT_HINTS["proof"])
+        or any(hint in query for hint in CHINESE_INTENT_HINTS["proof"])
+    ):
         return "proof"
     if any(hint in lowered for hint in BOOTSTRAP_HINTS) or any(hint in query for hint in CHINESE_BOOTSTRAP_HINTS):
         return "act_as_me"
@@ -450,11 +519,13 @@ def fts_query(terms: list[str]) -> str:
 
 
 def context_pack_from_sql(row: sqlite3.Row) -> dict[str, Any]:
+    keys = set(row.keys())
     return {
         "id": row["id"],
         "intent": row["intent"],
         "title": row["title"],
         "direct_answer": row["direct_answer"],
+        "answer_material": parse_json(row["answer_material_json"], {}) if "answer_material_json" in keys else {},
         "useful_context": parse_json(row["useful_context_json"], []),
         "behavioral_guidance": parse_json(row["behavioral_guidance_json"], []),
         "known_limits": parse_json(row["known_limits_json"], []),
@@ -599,6 +670,7 @@ def lexical_fallback_candidates(query: str, terms: list[str], packs: list[dict[s
             [
                 str(pack.get("title", "")),
                 str(pack.get("direct_answer", "")),
+                json.dumps(pack.get("answer_material", {}), ensure_ascii=False),
                 " ".join(str(item) for item in pack.get("topics", [])),
                 " ".join(str(item) for item in pack.get("useful_context", [])),
                 str(pack.get("retrieval_text", "")),
@@ -648,8 +720,14 @@ def broad_candidates(query: str, intent: str, terms: list[str], packs: list[dict
         order = BROAD_AUTHORITY_ORDER
     elif has_any_hint(query, term_set, PORTFOLIO_HINTS, CHINESE_PORTFOLIO_HINTS):
         order = BROAD_PORTFOLIO_ORDER
+    elif has_any_hint(query, term_set, PRIVACY_POLICY_HINTS, CHINESE_PRIVACY_POLICY_HINTS) and intent != "proof":
+        order = BROAD_PRIVACY_POLICY_ORDER
     elif has_any_hint(query, term_set, PERSONAL_HINTS, CHINESE_PERSONAL_HINTS) and intent != "proof":
         order = BROAD_PERSONAL_ORDER
+    elif intent == "coding_style":
+        order = BROAD_CODING_ORDER
+    elif intent != "proof" and has_any_hint(query, term_set, AI_PRODUCT_HINTS, CHINESE_AI_PRODUCT_HINTS):
+        order = BROAD_AI_PRODUCT_ORDER
     elif has_any_hint(query, term_set, AGENT_COLLAB_HINTS, CHINESE_AGENT_COLLAB_HINTS) and not is_bootstrap_query(query, intent, term_set):
         order = BROAD_AGENT_COLLAB_ORDER
     elif has_any_hint(query, term_set, EXPERIENCE_HINTS, CHINESE_EXPERIENCE_HINTS):
@@ -668,8 +746,6 @@ def broad_candidates(query: str, intent: str, terms: list[str], packs: list[dict
         order = BROAD_IMPACT_ORDER
     elif has_any_hint(query, term_set, DOMAIN_HINTS, CHINESE_DOMAIN_HINTS):
         order = BROAD_DOMAIN_ORDER
-    elif intent == "coding_style" and (not terms or set(terms).issubset({"code", "coding", "style", "pattern", "patterns"})):
-        order = BROAD_CODING_ORDER
     elif not terms:
         order = BROAD_SELF_ORDER
     elif is_bootstrap_query(query, intent, term_set):
@@ -692,6 +768,8 @@ def preferred_context_id(query: str, intent: str, terms: list[str]) -> str:
         return ""
     if is_bootstrap_query(query, intent, term_set):
         return "context:self_model.agent_operating_context"
+    if intent in {"project_context", "work_context", "coding_style"} and has_project_name_token(term_set):
+        return ""
     if has_any_hint(query, term_set, ARCHITECTURE_MATERIAL_HINTS, CHINESE_ARCHITECTURE_MATERIAL_HINTS):
         return "context:self_model.architecture_material"
     if has_any_hint(query, term_set, OFFICIAL_PROFILE_HINTS, CHINESE_OFFICIAL_PROFILE_HINTS):
@@ -704,12 +782,20 @@ def preferred_context_id(query: str, intent: str, terms: list[str]) -> str:
         return "context:self_model.repo_authority"
     if has_any_hint(query, term_set, PORTFOLIO_HINTS, CHINESE_PORTFOLIO_HINTS):
         return "context:self_model.portfolio_cases"
+    if intent == "project_context":
+        return ""
+    if has_any_hint(query, term_set, PRIVACY_POLICY_HINTS, CHINESE_PRIVACY_POLICY_HINTS):
+        return "context:personal_material.privacy_and_proof_policy"
     if has_any_hint(query, term_set, PERSONAL_HINTS, CHINESE_PERSONAL_HINTS):
         return "context:self_model.personal_identity"
+    if has_any_hint(query, term_set, AI_PRODUCT_HINTS, CHINESE_AI_PRODUCT_HINTS):
+        return "context:self_model.ai_product_judgment"
     if has_any_hint(query, term_set, AGENT_COLLAB_HINTS, CHINESE_AGENT_COLLAB_HINTS):
         return "context:self_model.agent_collaboration_style"
     if has_any_hint(query, term_set, REVIEW_HINTS, CHINESE_REVIEW_HINTS):
         return "context:self_model.review_style"
+    if intent == "coding_style":
+        return "context:self_model.coding_style"
     if intent == "act_as_me" and is_architecture_query(query, term_set):
         return "context:self_model.architecture_judgment"
     if has_any_hint(query, term_set, EXPERIENCE_HINTS, CHINESE_EXPERIENCE_HINTS):
@@ -726,8 +812,6 @@ def preferred_context_id(query: str, intent: str, terms: list[str]) -> str:
         return "context:self_model.impact_profile"
     if has_any_hint(query, term_set, DOMAIN_HINTS, CHINESE_DOMAIN_HINTS):
         return "context:self_model.domain_knowledge"
-    if intent == "coding_style":
-        return "context:self_model.coding_style"
     if not terms:
         return "context:self_model.master_persona"
     return ""
@@ -790,6 +874,8 @@ def deterministic_rerank(pack: dict[str, Any], query: str, terms: list[str], int
         score += BROAD_AGENT_COLLAB_ORDER.get(pack_id, 0) / 1000
         if pack_id == "context:self_model.agent_collaboration_style":
             score += 34.0
+        if pack_id == "context:agent_sessions.collaboration_patterns":
+            score += 30.0
     if has_any_hint(query, set(terms), PORTFOLIO_HINTS, CHINESE_PORTFOLIO_HINTS):
         score += BROAD_PORTFOLIO_ORDER.get(pack_id, 0) / 1000
         if pack_id == "context:self_model.portfolio_cases":
@@ -800,6 +886,13 @@ def deterministic_rerank(pack: dict[str, Any], query: str, terms: list[str], int
         score += BROAD_PERSONAL_ORDER.get(pack_id, 0) / 1000
         if pack_id == "context:self_model.personal_identity":
             score += 36.0
+        if pack_id.startswith("context:personal_material."):
+            score += 28.0
+    if has_any_hint(query, set(terms), PRIVACY_POLICY_HINTS, CHINESE_PRIVACY_POLICY_HINTS) and intent != "proof":
+        if pack_id == "context:personal_material.privacy_and_proof_policy":
+            score += 160.0
+        if pack_id in {"context:private_boundary.constraint.private_source_boundary", "context:self_model.boundaries_unknowns"}:
+            score += 45.0
     if has_any_hint(query, set(terms), EXPERIENCE_HINTS, CHINESE_EXPERIENCE_HINTS):
         score += BROAD_EXPERIENCE_ORDER.get(pack_id, 0) / 1000
         if pack_id == "context:self_model.career_timeline":
@@ -850,6 +943,14 @@ def deterministic_rerank(pack: dict[str, Any], query: str, terms: list[str], int
             score += 55.0
         if pack_id == "context:self_model.review_authority":
             score -= 12.0
+    if intent != "proof" and has_any_hint(query, set(terms), AI_PRODUCT_HINTS, CHINESE_AI_PRODUCT_HINTS):
+        score += BROAD_AI_PRODUCT_ORDER.get(pack_id, 0) / 1000
+        if pack_id == "context:self_model.ai_product_judgment":
+            score += 65.0
+        if pack_id == "context:self_model.agent_collaboration_style":
+            score -= 45.0
+        if pack_id == "context:self_model.architecture_material":
+            score -= 12.0
     if intent == "coding_style":
         score += BROAD_CODING_ORDER.get(pack_id, 0) / 1000
         if pack_id == "context:self_model.coding_style":
@@ -896,26 +997,80 @@ def deterministic_rerank(pack: dict[str, Any], query: str, terms: list[str], int
                 score -= 7.0
     if intent == "proof":
         if "react" in terms and "react" in pack_id:
-            score += 12.0
+            score += 18.0
         if pack_id == "context:topic.react":
-            score += 14.0
+            score += 80.0
         if pack_id.startswith("context:coding_style."):
-            score += 6.0
+            score += 10.0
         if pack_id == "context:topic.frontend":
             score -= 2.0
         if pack_id.startswith("context:self_model."):
-            score -= 8.0
+            score -= 30.0
         if pack_id == "context:self_model.agent_operating_context":
             score -= 4.0
     haystack = " ".join(
         [
             str(pack.get("title", "")),
             str(pack.get("direct_answer", "")),
+            json.dumps(pack.get("answer_material", {}), ensure_ascii=False),
             " ".join(str(item) for item in pack.get("topics", [])),
             str(pack.get("retrieval_text", "")),
         ]
     ).lower()
-    score += sum(0.015 for term in terms if term in haystack)
+    term_hits = sum(1 for term in terms if term in haystack)
+    score += term_hits * 0.015
+    if pack_id.startswith("context:project.") and term_hits:
+        project_name_hits = sum(1 for term in terms if ("-" in term or "__" in term) and term in haystack)
+        if project_name_hits:
+            score += 220.0
+        score += 8.0 + min(term_hits, 8) * 2.0
+        if intent == "project_context":
+            score += 6.0
+        if pack_id.startswith("context:project.project_symbol_graph.") and (
+            "symbol" in terms or "symbols" in terms or "graph" in terms
+        ):
+            score += 180.0
+        if pack_id.startswith("context:project.project_feature_surface.") and (
+            "feature" in terms or "features" in terms or "surface" in terms or "surfaces" in terms
+        ):
+            score += 180.0
+        if pack_id.startswith("context:project.project_dependency_graph.") and (
+            "dependency" in terms or "dependencies" in terms or "import" in terms or "imports" in terms or "graph" in terms
+        ):
+            score += 180.0
+        if pack_id.startswith("context:project.project_api_contract_surface.") and (
+            "api" in terms or "contract" in terms or "contracts" in terms or "service" in terms or "interface" in terms
+        ):
+            score += 180.0
+        if pack_id.startswith("context:project.project_quality_surface.") and (
+            "quality" in terms or "test" in terms or "tests" in terms or "testing" in terms or "validation" in terms
+        ):
+            score += 180.0
+        if pack_id.startswith("context:project.project_documentation_surface.") and (
+            "doc" in terms
+            or "docs" in terms
+            or "documentation" in terms
+            or "readme" in terms
+            or "guideline" in terms
+            or "guidelines" in terms
+            or "standard" in terms
+            or "standards" in terms
+            or "convention" in terms
+            or "conventions" in terms
+        ):
+            score += 180.0
+        if pack_id.startswith("context:project.project_route_navigation.") and (
+            "route" in terms
+            or "routes" in terms
+            or "routing" in terms
+            or "navigation" in terms
+            or "page" in terms
+            or "pages" in terms
+            or "guard" in terms
+            or "guards" in terms
+            or "menu" in terms
+        ):
+            score += 180.0
     if intent == "proof" and pack.get("private_trace_refs"):
         score += 0.04
     return score
@@ -939,6 +1094,7 @@ def sanitize_pack(row: dict[str, Any], include_trace_refs: bool) -> dict[str, An
         "intent": row.get("intent"),
         "title": row.get("title"),
         "direct_answer": row.get("direct_answer"),
+        "answer_material": row.get("answer_material", {}),
         "useful_context": row.get("useful_context", []),
         "behavioral_guidance": row.get("behavioral_guidance", []),
         "known_limits": row.get("known_limits", []),

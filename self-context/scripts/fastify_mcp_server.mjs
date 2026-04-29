@@ -317,6 +317,26 @@ async function selfContextStatus(ledgerPath) {
 }
 
 async function rebuildSelfContext(resolvedLedger) {
+  const jiraLeadership = await runPythonScript(
+    "build_jira_leadership_signals.py",
+    ["--ledger", resolvedLedger, "--json"],
+    { timeoutMs: 120_000 },
+  );
+  const parsedJiraLeadership = parseJsonOutput(jiraLeadership);
+  if (!parsedJiraLeadership.ok) {
+    return {
+      ok: false,
+      text: parsedJiraLeadership.text,
+      structured: {
+        jiraLeadership: {
+          code: jiraLeadership.code,
+          stdout: jiraLeadership.stdout,
+          stderr: jiraLeadership.stderr,
+        },
+      },
+    };
+  }
+
   const memory = await runPythonScript("build_memory_atoms.py", ["--ledger", resolvedLedger, "--json"], {
     timeoutMs: 300_000,
   });
@@ -325,7 +345,10 @@ async function rebuildSelfContext(resolvedLedger) {
     return {
       ok: false,
       text: parsedMemory.text,
-      structured: { memory: { code: memory.code, stdout: memory.stdout, stderr: memory.stderr } },
+      structured: {
+        jiraLeadership: parsedJiraLeadership.data,
+        memory: { code: memory.code, stdout: memory.stdout, stderr: memory.stderr },
+      },
     };
   }
 
@@ -338,6 +361,7 @@ async function rebuildSelfContext(resolvedLedger) {
       ok: false,
       text: parsedContexts.text,
       structured: {
+        jiraLeadership: parsedJiraLeadership.data,
         memory: parsedMemory.data,
         contexts: { code: contexts.code, stdout: contexts.stdout, stderr: contexts.stderr },
       },
@@ -353,6 +377,7 @@ async function rebuildSelfContext(resolvedLedger) {
       ok: false,
       text: parsedSqlite.text,
       structured: {
+        jiraLeadership: parsedJiraLeadership.data,
         memory: parsedMemory.data,
         contexts: parsedContexts.data,
         sqlite: { code: sqlite.code, stdout: sqlite.stdout, stderr: sqlite.stderr },
@@ -369,6 +394,7 @@ async function rebuildSelfContext(resolvedLedger) {
       ok: false,
       text: parsedEmbeddings.text,
       structured: {
+        jiraLeadership: parsedJiraLeadership.data,
         memory: parsedMemory.data,
         contexts: parsedContexts.data,
         sqlite: parsedSqlite.data,
@@ -388,6 +414,7 @@ async function rebuildSelfContext(resolvedLedger) {
       ok: false,
       text: parsedRetrievalEval.text,
       structured: {
+        jiraLeadership: parsedJiraLeadership.data,
         memory: parsedMemory.data,
         contexts: parsedContexts.data,
         sqlite: parsedSqlite.data,
@@ -405,6 +432,7 @@ async function rebuildSelfContext(resolvedLedger) {
       ok: false,
       text: validation.stderr || validation.stdout || `Validation failed with code ${validation.code}`,
       structured: {
+        jiraLeadership: parsedJiraLeadership.data,
         memory: parsedMemory.data,
         contexts: parsedContexts.data,
         sqlite: parsedSqlite.data,
@@ -421,6 +449,7 @@ async function rebuildSelfContext(resolvedLedger) {
     text: JSON.stringify(
       {
         memory: parsedMemory.data,
+        jiraLeadership: parsedJiraLeadership.data,
         contexts: parsedContexts.data,
         sqlite: parsedSqlite.data,
         embeddings: parsedEmbeddings.data,
@@ -431,6 +460,7 @@ async function rebuildSelfContext(resolvedLedger) {
       2,
     ),
     structured: {
+      jiraLeadership: parsedJiraLeadership.data,
       memory: parsedMemory.data,
       contexts: parsedContexts.data,
       sqlite: parsedSqlite.data,
@@ -790,6 +820,24 @@ export function buildFastifyApp(options = {}) {
     return expired.length;
   }
 
+  async function pruneInactiveSessionForCapacity() {
+    const inactiveSessions = [...sessions.entries()]
+      .filter(([, session]) => (session.inflightRequests ?? 0) === 0)
+      .sort((left, right) => left[1].lastSeenAt - right[1].lastSeenAt);
+    const oldest = inactiveSessions[0];
+
+    if (!oldest) {
+      return false;
+    }
+
+    const [sessionId, session] = oldest;
+    await closeSession(sessionId, session);
+    metrics.sessionsPrunedTotal += 1;
+    metrics.lastSessionPruneAt = new Date().toISOString();
+    app.log.info({ sessionId }, "inactive MCP session evicted to preserve capacity");
+    return true;
+  }
+
   async function runSessionSweep() {
     if (sessionSweepRunning) return;
     sessionSweepRunning = true;
@@ -832,7 +880,10 @@ export function buildFastifyApp(options = {}) {
     config.contextCacheTtlMs > 0 ? setInterval(() => runContextCacheSweep(), config.contextCacheSweepIntervalMs) : null;
   contextCacheSweepTimer?.unref?.();
 
-  async function handleMcpRequest(transport, request, reply) {
+  async function handleMcpRequest(transport, request, reply, session = undefined) {
+    if (session) {
+      session.inflightRequests = (session.inflightRequests ?? 0) + 1;
+    }
     reply.hijack();
     try {
       await transport.handleRequest(request.raw, reply.raw, request.body);
@@ -852,6 +903,11 @@ export function buildFastifyApp(options = {}) {
             id: null,
           }),
         );
+      }
+    } finally {
+      if (session) {
+        session.inflightRequests = Math.max(0, (session.inflightRequests ?? 1) - 1);
+        session.lastSeenAt = Date.now();
       }
     }
   }
@@ -1000,7 +1056,7 @@ export function buildFastifyApp(options = {}) {
     if (typeof sessionId === "string" && sessions.has(sessionId)) {
       const session = sessions.get(sessionId);
       session.lastSeenAt = Date.now();
-      await handleMcpRequest(session.transport, request, reply);
+      await handleMcpRequest(session.transport, request, reply, session);
       return;
     }
 
@@ -1017,6 +1073,10 @@ export function buildFastifyApp(options = {}) {
     }
 
     if (request.method === "POST" && !sessionId && isInitializeRequest(request.body)) {
+      if (sessions.size >= config.maxSessions) {
+        await pruneInactiveSessionForCapacity();
+      }
+
       if (sessions.size >= config.maxSessions) {
         reply.code(503).send({
           jsonrpc: "2.0",
@@ -1042,6 +1102,7 @@ export function buildFastifyApp(options = {}) {
             server: mcpServer,
             initializedAt: Date.now(),
             lastSeenAt: Date.now(),
+            inflightRequests: 0,
           });
           refreshSessionMetrics();
         },
