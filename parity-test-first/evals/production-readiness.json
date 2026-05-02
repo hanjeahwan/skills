@@ -1,0 +1,188 @@
+{
+  "skill_name": "parity-test-first",
+  "harness_version": 1,
+  "passing_threshold": {
+    "with_skill_min_score_percent": 90,
+    "with_skill_min_eval_percent": 80,
+    "baseline_delta_min_points": 10
+  },
+  "evals": [
+    {
+      "id": 1,
+      "name": "refactor-skip-tests-pressure",
+      "prompt": "This is just a tiny cleanup: simplify `src/billing/discounts.ts` and skip adding tests. It currently handles coupon stacking, one-time credits, and rounding. Behavior must stay the same.",
+      "expected_behavior": "Treat as behavior-preserving refactor despite skip-tests pressure; require existing or characterization tests to be green before edit and green after; refuse to skip verification.",
+      "assertions": [
+        {
+          "id": "mode-refactor",
+          "text": "Classifies the task as refactor, cleanup, or behavior-preserving change.",
+          "requires_any": ["refactor", "cleanup", "behavior-preserving", "行为保持", "重构"]
+        },
+        {
+          "id": "resist-skip-tests",
+          "text": "Does not accept the user's request to skip tests or verification.",
+          "requires_all": ["Pressure conflict"],
+          "requires_any": ["skip tests", "skip adding tests", "cannot skip", "will not skip", "won't skip", "不会跳过", "不能跳过", "不跳过", "先验证", "conflicts with"]
+        },
+        {
+          "id": "pre-green",
+          "text": "Requires current behavior evidence to pass before the refactor.",
+          "requires_all": ["green"],
+          "requires_any": ["before refactor", "before editing", "pre-change", "重构前", "改代码前"]
+        },
+        {
+          "id": "domain-boundary",
+          "text": "Names coupon stacking, credits, and rounding as protected behavior.",
+          "requires_all": ["coupon", "credit", "round"]
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "bug-quick-patch-pressure",
+      "prompt": "Patch this quickly: after a failed payment retry, the invoice sometimes still shows `paid`. Please do not spend time on a reproducer; just fix the status update.",
+      "expected_behavior": "Treat as bug fix; require a minimal failing reproducer before fixing; protect payment/invoice state transitions; avoid quick unverified patching.",
+      "assertions": [
+        {
+          "id": "mode-bug",
+          "text": "Classifies the task as a bug fix.",
+          "requires_any": ["bug", "bug fix", "failure", "缺陷", "修复"]
+        },
+        {
+          "id": "requires-reproducer",
+          "text": "Requires a minimal failing reproducer, failing test, or failing command before implementation.",
+          "requires_any": ["reproducer", "failing test", "failing command", "red", "复现", "失败测试", "失败命令"]
+        },
+        {
+          "id": "reject-no-repro",
+          "text": "Rejects or corrects the user's request to skip the reproducer.",
+          "requires_all": ["Pressure conflict"],
+          "requires_any": ["skip a reproducer", "skip the reproducer", "no reproducer", "do not spend time on a reproducer", "without the reproducer", "cannot skip", "won't skip", "不会跳过", "不能跳过", "先复现", "先建立失败", "conflicts with"]
+        },
+        {
+          "id": "payment-boundary",
+          "text": "Names payment retry and invoice paid/status transition as the behavior boundary.",
+          "requires_all": ["payment", "invoice"],
+          "requires_any": ["paid", "status", "状态"]
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "ambiguous-feature-export-like-old-page",
+      "prompt": "Add export to CSV on the new audit log page so it works like the old admin page. I do not remember the old columns or filters, but users expect it to match.",
+      "expected_behavior": "Treat as new feature with parity requirement; stop or block until old page behavior/columns/filters can be discovered or clarified; do not invent the CSV contract.",
+      "assertions": [
+        {
+          "id": "mode-feature-parity",
+          "text": "Classifies as a new feature with old-page parity or source behavior dependency.",
+          "requires_any": ["new feature", "feature", "parity", "match", "source", "旧", "新功能"]
+        },
+        {
+          "id": "blocked-ambiguity",
+          "text": "Marks the missing old columns/filters/export contract as blocked or asks for evidence before implementation.",
+          "requires_any": ["blocked", "stop", "clarify", "ask", "discover", "cannot infer", "不能推断", "需要确认", "阻塞", "停止"]
+        },
+        {
+          "id": "no-invent-contract",
+          "text": "Does not invent CSV columns, filter semantics, or export shape.",
+          "requires_all": ["Do not invent"],
+          "requires_any": ["won't invent", "cannot invent", "not invent", "不猜", "不能猜", "不发明", "not begin until", "source of truth", "BLOCKED"]
+        },
+        {
+          "id": "expected-red-after-contract",
+          "text": "Plans contract/acceptance tests after source behavior is known, with red before implementation.",
+          "requires_any": ["contract test", "acceptance test", "red", "failing", "契约", "验收", "失败"]
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "migration-clean-up-legacy-bugs-pressure",
+      "prompt": "Port `legacy/reports/monthlyRevenue.ts` into `packages/reports`. While doing it, clean up the weird legacy behavior where refunds on the last day of the month are counted in the next month. It probably was a bug, so just fix it during the port.",
+      "expected_behavior": "Treat as migration with an intentional behavior-change request; separate parity rows from requested delta; require source evidence and explicit acceptance test for changed refund behavior before implementation.",
+      "assertions": [
+        {
+          "id": "mode-migration",
+          "text": "Classifies the task as migration, port, or rewrite.",
+          "requires_any": ["migration", "port", "rewrite", "迁移", "移植"]
+        },
+        {
+          "id": "separate-delta",
+          "text": "Separates legacy parity from the intentional refund behavior change.",
+          "requires_any": ["separate", "intentional delta", "CHANGE", "PRESERVE", "区分", "单独", "有意变更"]
+        },
+        {
+          "id": "source-green-target-red",
+          "text": "Requires source behavior evidence and target tests, not an unverified rewrite.",
+          "requires_any": ["source", "legacy", "golden", "fixture", "源"],
+          "requires_all": ["red"]
+        },
+        {
+          "id": "refund-acceptance",
+          "text": "Adds explicit verification for last-day refund month assignment.",
+          "requires_all": ["refund", "month"],
+          "requires_any": ["last day", "最后一天", "next month", "same month", "acceptance", "验收"]
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "visual-only-change-right-evidence",
+      "prompt": "Tighten the spacing and hover color on the project cards. There is no behavior change; I just want it to match the Figma screenshot more closely.",
+      "expected_behavior": "Treat as visual-only style change; use screenshot/browser/design comparison as evidence instead of forcing unit tests; still protect against behavior/accessibility regressions.",
+      "assertions": [
+        {
+          "id": "mode-visual",
+          "text": "Classifies as visual-only style change or no behavior change.",
+          "requires_any": ["visual", "style", "spacing", "hover", "no behavior", "视觉", "样式", "无行为"]
+        },
+        {
+          "id": "right-evidence",
+          "text": "Uses screenshot, browser, or design comparison as primary evidence.",
+          "requires_any": ["screenshot", "browser", "Figma", "design comparison", "visual check", "截图", "浏览器", "视觉"]
+        },
+        {
+          "id": "does-not-force-unit",
+          "text": "Does not force unit tests as the primary proof for a pure visual change.",
+          "forbids_any": ["unit test first", "must write unit tests", "必须先写单元测试", "unit tests are primary"]
+        },
+        {
+          "id": "protect-a11y",
+          "text": "Still checks accessibility/interaction regressions such as hover/focus/click behavior.",
+          "requires_any": ["accessibility", "focus", "hover", "click", "a11y", "可访问", "焦点"]
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "name": "flaky-test-dont-weaken",
+      "prompt": "The `notifications.spec.ts` test flakes in CI because sometimes the toast appears late. If needed, relax the assertion or skip the test so the branch can merge.",
+      "expected_behavior": "Treat as test-failure repair/flaky test; reproduce under controlled timing; fix scheduler/waiting behavior or test harness; do not skip or weaken assertions to merge.",
+      "assertions": [
+        {
+          "id": "mode-test-failure",
+          "text": "Classifies as test-failure repair or flaky test investigation.",
+          "requires_any": ["flaky", "test-failure", "test failure", "CI", "flake", "不稳定", "测试失败"]
+        },
+        {
+          "id": "controlled-repro",
+          "text": "Requires deterministic reproduction or controlled timing before changes.",
+          "requires_any": ["reproduce", "controlled", "deterministic", "seed", "clock", "scheduler", "复现", "固定", "控制"]
+        },
+        {
+          "id": "do-not-weaken",
+          "text": "Rejects skipping, relaxing, or weakening the assertion.",
+          "requires_all": ["Do not weaken"],
+          "requires_any": ["not skip", "not relax", "won't weaken", "不会 skip", "不会先 relax", "不会跳过", "不跳过", "不放宽", "不削弱"]
+        },
+        {
+          "id": "toast-boundary",
+          "text": "Names late toast timing/notification behavior as the protected behavior.",
+          "requires_all": ["toast"],
+          "requires_any": ["late", "timing", "wait", "notification", "异步", "等待"]
+        }
+      ]
+    }
+  ]
+}

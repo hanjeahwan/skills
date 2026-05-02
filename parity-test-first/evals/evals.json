@@ -1,0 +1,33 @@
+{
+  "skill_name": "parity-test-first",
+  "evals": [
+    {
+      "id": 1,
+      "name": "behavior-preserving-refactor",
+      "prompt": "Refactor the pricing calculation in `src/orders/pricing.ts` to make it easier to read. It currently handles discounts, tax exemption, and rounding. Keep behavior exactly the same.",
+      "expected_output": "The agent classifies this as a refactor, finds or creates characterization tests before editing, expects those tests to pass before the refactor, makes a narrow implementation change, reruns focused tests, and reports pre/post parity evidence without changing public behavior.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "name": "bug-fix-red-first",
+      "prompt": "Fix the bug where deleting the last saved address leaves the checkout page showing stale shipping totals instead of recalculating to zero.",
+      "expected_output": "The agent treats this as a bug fix, locates the checkout/address code path, writes or runs a minimal failing repro for the stale totals behavior before implementation, explains the root cause from code evidence, implements the smallest fix only after the failure is observed, and verifies the reproducer turns green.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "name": "new-feature-contract-first",
+      "prompt": "Add a 'resend invite' action to the team members page. It should call the existing invite endpoint, show loading while pending, show success on 200, and surface API validation errors inline.",
+      "expected_output": "The agent classifies this as a new feature, reads existing team-member UI/API patterns, writes focused acceptance or component tests for the loading/success/error contract before implementation, observes the expected red state, implements according to project conventions, and reports the focused test plus any typecheck/lint results.",
+      "files": []
+    },
+    {
+      "id": 4,
+      "name": "migration-source-target-parity",
+      "prompt": "Port the legacy CSV import parser from `legacy/importer/parseCsv.ts` into the new `packages/import` module. The parsed rows, validation errors, and duplicate handling must match the legacy behavior.",
+      "expected_output": "The agent treats this as a migration, extracts source fixtures or golden cases from the legacy parser, builds a parity matrix for rows/errors/duplicates, creates target parity tests that fail before the port, implements the new module without inventing behavior, and verifies source-to-target parity.",
+      "files": []
+    }
+  ]
+}
