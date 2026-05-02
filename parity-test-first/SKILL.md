@@ -1,6 +1,6 @@
 ---
 name: parity-test-first
-description: Use this skill whenever a coding task might change observable behavior, including refactors, bug fixes, new features, migrations, rewrites, dependency upgrades, performance changes, API changes, test-failure repairs, and behavior-preserving cleanup. It enforces a parity-test-first workflow: define the behavior boundary, capture current or expected behavior with focused tests or equivalent evidence before implementation, verify the pre-change red/green state that matches the task type, implement the smallest safe change, and prove parity before reporting completion.
+description: "Use this skill whenever a coding task might change observable behavior, including refactors, bug fixes, new features, migrations, rewrites, dependency upgrades, performance changes, API changes, test-failure repairs, and behavior-preserving cleanup. It enforces a parity-test-first workflow: define the behavior boundary, capture current or expected behavior with focused tests or equivalent evidence before implementation, verify the pre-change red/green state that matches the task type, implement the smallest safe change, and prove parity before reporting completion."
 argument-hint: "[task description, affected files, or behavior boundary]"
 user-invocable: true
 ---
