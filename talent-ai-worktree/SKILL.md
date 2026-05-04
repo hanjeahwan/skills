@@ -224,28 +224,43 @@ Hard discovery rule:
 ┌─ Slot A ───────────────────────────────────────────────────────────────┐
 │ FE worktree: <talent_worktrees_root>/<feature_slug>                  │
 │ BE worktree: <backoffice_worktrees_root>/<feature_slug>              │
-│ FE origin : http://localhost:3001                                    │
+│ FE origin : http://localhost:3011                                    │
+│ FE Vite   : http://localhost:9877                                    │
 │ BE origin : http://localhost:8081                                    │
+│ FE env    : PORT=3011 APP_URL=http://localhost:3011                  │
+│ FE env    : VITE_DEV_PORT=9877                                      │
+│ FE env    : APPS_WEB_UI_BASE_URL=http://localhost:3011               │
 │ FE env    : AI_BACKEND_URL=http://localhost:8081                     │
-│ Redirects : http://localhost:3001/auth/callback                      │
+│ Redirects : sign-in/out URLs on http://localhost:3011                │
+│ SPA Vite  : http://localhost:9877 must belong to this FE worktree    │
 └───────────────────────────────────────────────────────────────────────┘
 
 ┌─ Slot B ───────────────────────────────────────────────────────────────┐
 │ FE worktree: <talent_worktrees_root>/<feature_slug>                  │
 │ BE worktree: <backoffice_worktrees_root>/<feature_slug>              │
-│ FE origin : http://localhost:3002                                    │
+│ FE origin : http://localhost:3012                                    │
+│ FE Vite   : http://localhost:9878                                    │
 │ BE origin : http://localhost:8082                                    │
+│ FE env    : PORT=3012 APP_URL=http://localhost:3012                  │
+│ FE env    : VITE_DEV_PORT=9878                                      │
+│ FE env    : APPS_WEB_UI_BASE_URL=http://localhost:3012               │
 │ FE env    : AI_BACKEND_URL=http://localhost:8082                     │
-│ Redirects : http://localhost:3002/auth/callback                      │
+│ Redirects : sign-in/out URLs on http://localhost:3012                │
+│ SPA Vite  : http://localhost:9878 must belong to this FE worktree    │
 └───────────────────────────────────────────────────────────────────────┘
 
 ┌─ Slot C ───────────────────────────────────────────────────────────────┐
 │ FE worktree: <talent_worktrees_root>/<feature_slug>                  │
 │ BE worktree: <backoffice_worktrees_root>/<feature_slug>              │
-│ FE origin : http://localhost:3003                                    │
+│ FE origin : http://localhost:3013                                    │
+│ FE Vite   : http://localhost:9879                                    │
 │ BE origin : http://localhost:8083                                    │
+│ FE env    : PORT=3013 APP_URL=http://localhost:3013                  │
+│ FE env    : VITE_DEV_PORT=9879                                      │
+│ FE env    : APPS_WEB_UI_BASE_URL=http://localhost:3013               │
 │ FE env    : AI_BACKEND_URL=http://localhost:8083                     │
-│ Redirects : http://localhost:3003/auth/callback                      │
+│ Redirects : sign-in/out URLs on http://localhost:3013                │
+│ SPA Vite  : http://localhost:9879 must belong to this FE worktree    │
 └───────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -302,7 +317,7 @@ Hard naming rule:
 ├─ 3. Create FE worktree from FE base branch                            │
 ├─ 4. Create BE worktree from BE base branch                            │
 ├─ 5. Copy env files into each worktree                                 │
-├─ 6. Rewrite FE env to point at the chosen BE slot                     │
+├─ 6. Rewrite FE env for the chosen FE/BE slot and scan stale ports     │
 ├─ 7. Install deps inside each worktree only                            │
 ├─ 8. Boot BE and verify /health                                        │
 ├─ 9. Boot FE and verify local response                                 │
@@ -329,13 +344,15 @@ Classify the requested change before doing anything else:
 
 Before taking a slot, test the ports required by the active scope.
 
-- Slot A: `3001` and `8081`
-- Slot B: `3002` and `8082`
-- Slot C: `3003` and `8083`
+- Main checkout default: `3010` and `9876`
+- Slot A: `3011`, `9877`, and `8081`
+- Slot B: `3012`, `9878`, and `8082`
+- Slot C: `3013`, `9879`, and `8083`
 
 Rules:
 
-- for `FE+BE`, only take a slot when both ports are free
+- for `FE+BE`, only take a slot when the Next.js port, Vite port, and backend
+  port are all free
 - for `BE-only`, only test `8081`, `8082`, or `8083` and ignore frontend port
   occupancy because no frontend slot is being reserved
 
@@ -354,7 +371,8 @@ Hard slot rule:
 - choose the slot only from actual current port availability or explicit user
   instruction
 - for `FE+BE`, a slot is not "free" just because a path or branch does not
-  exist; it is free only when both slot ports are available
+  exist; it is free only when the Next.js port, Vite port, and backend port are
+  all available
 - for `BE-only`, a backend slot is free only when the backend port is available;
   frontend port occupancy is irrelevant
 - existing repo-local `.worktrees` contents are irrelevant to slot selection for
@@ -413,6 +431,11 @@ Frontend worktree for `FE+BE`:
 - prefer copying `.env.local`
 - fallback to `.env.example`
 - rewrite:
+  - `PORT`
+  - `APP_URL`
+  - `VITE_DEV_PORT`
+  - `VITE_DEV_ORIGIN` if it exists in the copied env file
+  - `APPS_WEB_UI_BASE_URL`
   - `AI_BACKEND_URL`
   - `NEXT_PUBLIC_AUTH_OAUTH_REDIRECT_SIGN_IN`
   - `NEXT_PUBLIC_AUTH_OAUTH_REDIRECT_SIGN_OUT`
@@ -425,6 +448,38 @@ Backend worktree for `BE-only` or `FE+BE`:
 For `BE-only`, do not create or rewrite any frontend env file.
 
 Do not share one live env file across active worktrees.
+
+Frontend env hard rule:
+
+- set `PORT`, `APP_URL`, `APPS_WEB_UI_BASE_URL`, and both Cognito redirect URLs
+  to the same chosen frontend origin
+- set `VITE_DEV_PORT` to the slot's Vite port. If `VITE_DEV_ORIGIN` is present,
+  set it to `http://localhost:<vite_port>` for the same slot
+- do not only pass `--port <frontend_port>` to Next.js; the auth middleware
+  builds redirects from `APP_URL`, and the UI validation harness reads
+  `APPS_WEB_UI_BASE_URL`
+- do not leave Vite on `9876` for every worktree; that makes Next.js load the
+  wrong SPA bundle when multiple worktrees run together
+- do not make a worktree safe by editing tracked `package.json` scripts to
+  hardcode that worktree's slot ports. Keep scripts stable and route
+  `dev:next` / `dev:spa` through tiny env-loading wrappers such as
+  `tsx scripts/devNext.mts` and `tsx scripts/devVite.mts`; those wrappers read
+  `PORT`, `VITE_DEV_PORT`, and `VITE_PORT` from the worktree-local env file
+- keep `AI_BACKEND_URL` pointed at the paired backend slot
+- after rewriting, scan the frontend worktree for stale runtime references to
+  the default main-checkout origin:
+
+```text
+rg -n "localhost:3010|localhost:9876|APP_URL=http://localhost:3010|NEXT_PUBLIC_AUTH_OAUTH_REDIRECT_SIGN_IN=http://localhost:3010|APPS_WEB_UI_BASE_URL=http://localhost:3010|VITE_DEV_PORT=9876|VITE_DEV_ORIGIN=http://localhost:9876" <talent_worktrees_root>/<feature_slug>
+```
+
+Scan interpretation:
+
+- fix stale matches in live env files and local agent instructions
+- do not rewrite test fixtures, docs, or default fallbacks unless they affect
+  the active worktree boot path
+- if a local app instruction hardcodes `http://localhost:3010`, update it to
+  read `APP_URL` / `PORT` from the worktree-local env file
 
 ### 4. Install dependencies inside each worktree
 
@@ -488,8 +543,8 @@ Notes:
 Frontend target for `FE+BE`:
 
 ```text
-# run from <talent_worktrees_root>/<feature_slug>
-pnpm exec next dev --hostname 127.0.0.1 --port <frontend_port>
+# run from <talent_worktrees_root>/<feature_slug>/apps/web
+pnpm run dev
 ```
 
 Pass condition:
@@ -497,6 +552,37 @@ Pass condition:
 - `http://127.0.0.1:<frontend_port>` responds
 - there is no boot-time missing dependency error
 - there is no invalid project-root failure
+- the Vite SPA bundle on `http://localhost:<vite_port>` is served from the same
+  frontend worktree, not from the main checkout or another worktree
+- unauthenticated protected-route redirects stay on the selected frontend
+  origin or use a relative `/signin?...` URL; they must not point back to
+  `http://localhost:3010`
+- browser verification with the worktree-local auth state reaches the target
+  protected page and does not land on home
+
+Important frontend boot detail:
+
+- `talent-platform-vibe` is a SPA-inside-Next.js app in local development:
+  Next.js serves the app shell on the selected frontend port while Vite serves
+  the SPA bundle on the selected Vite port
+- main checkout owns the default pair `3010/9876`; worktrees should use
+  `3011/9877`, `3012/9878`, or `3013/9879`
+- if the selected worktree points at another checkout's Vite port, the selected
+  worktree can still
+  return `200` from Next.js while loading the wrong router bundle; this can
+  make new worktree routes redirect to home or disappear
+- before accepting frontend boot, inspect the process command line for the
+  selected Vite listener and verify it points at
+  `<talent_worktrees_root>/<feature_slug>/apps/web`
+- a direct module probe is a useful sanity check for route work:
+
+```text
+curl http://localhost:<vite_port>/src/routes/%28main%29/<route>/index.tsx
+```
+
+The returned module path should resolve to files inside the selected frontend
+worktree. If it resolves to another checkout, stop the wrong Vite process and
+restart `pnpm run dev` from the worktree.
 
 ### 6. Clean up created worktrees
 
@@ -588,6 +674,14 @@ When you finish, report:
 - whether install passed in each created worktree
 - whether backend boot verification passed
 - whether frontend boot verification passed, or that it was not run
+- whether frontend `APP_URL`, `PORT`, OAuth redirect URLs, and
+  `APPS_WEB_UI_BASE_URL` were rewritten to the selected frontend slot
+- whether `VITE_DEV_PORT` / `VITE_DEV_ORIGIN` were rewritten to the selected
+  Vite slot
+- whether the selected Vite SPA listener belonged to the selected frontend
+  worktree
+- whether browser verification on a protected route stayed on the selected
+  frontend origin
 - whether cleanup was completed, skipped, or blocked
 - whether each created branch was deleted by default, kept intentionally, or was
   protected because it was attached
@@ -603,6 +697,11 @@ When you finish, report:
 - If all slots are occupied, stop and tell the user no slot is available.
 - If frontend boot fails because of worktree-local dependency shape, fix the
   bootstrap in the worktree before touching app code.
+- If a frontend route returns `200` from Next.js but lands on home, inspect
+  `APP_URL` and the selected Vite port process before changing route code. A
+  stale `APP_URL` can redirect auth back to the main checkout, and a stale
+  Vite process can load another checkout's SPA router instead of the
+  worktree's router.
 - If backend boot fails with a missing workspace-member dependency, rerun the
   documented backend bootstrap with `uv sync --frozen --all-packages` before
   touching app code.
@@ -620,4 +719,17 @@ These commands were verified in this workspace on 2026-04-10:
 - `pnpm install --frozen-lockfile`
 - `uv sync --frozen --all-packages`
 - `uv run uvicorn de_backoffice.swe_chat.core:app --host 127.0.0.1 --port 8081 --reload`
-- `pnpm exec next dev --hostname 127.0.0.1 --port 3001`
+- `pnpm run dev` from `apps/web` with `PORT=3011` and `VITE_DEV_PORT=9877`
+
+Additional frontend worktree boot checks verified on 2026-05-04:
+
+- `pnpm run dev` from `apps/web` after the worktree-local env sets `PORT`,
+  `APP_URL`, `VITE_DEV_PORT`, `APPS_WEB_UI_BASE_URL`, and Cognito redirect
+  URLs to the selected frontend origin and Vite origin
+- `dev:next` / `dev:spa` package scripts kept port-neutral by using env-loading
+  wrappers instead of hardcoded `next dev -p 3010` or `vite --port 9876`
+- `curl` against a Vite route module on the selected Vite port to confirm the
+  SPA bundle belongs to the selected frontend worktree
+- `agent-browser` login and protected-route open against the selected
+  frontend origin to confirm the route stays on that origin and does not land
+  on home
