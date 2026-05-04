@@ -60,6 +60,47 @@ Classify the task before editing code. The first verification state depends on t
 
 For bug investigations, capture the failure first. If active project or user instructions require human confirmation before fixing, stop after presenting the failure evidence and root cause.
 
+## Characterization Tests
+
+Characterization tests capture the current observable behavior of existing code. Use them when the task promises behavior preservation, especially when the implementation is hard to understand, under-tested, legacy, or about to be refactored.
+
+Do not treat characterization tests as the default for every task. They answer "what does this already do?" not "what should the new behavior be?"
+
+```text
+┌──────────────────────┐
+│ Existing behavior     │
+└──────────┬───────────┘
+           ▼
+┌──────────────────────┐
+│ Characterization test │
+│ green before change   │
+└──────────┬───────────┘
+           ▼
+┌──────────────────────┐
+│ Refactor / migrate    │
+└──────────┬───────────┘
+           ▼
+┌──────────────────────┐
+│ Same behavior proven  │
+│ green after change    │
+└──────────────────────┘
+```
+
+Use characterization tests this way:
+
+- **Refactor / cleanup:** make characterization tests the default first evidence when existing tests do not already protect the behavior boundary. They must be green before edits and green again after.
+- **Migration / rewrite:** characterize the source implementation with fixtures, golden outputs, or source-path tests; then write target parity tests. Source evidence should be green while target tests are red until implementation.
+- **Bug fix:** start with a minimal failing reproducer for the bug, not a characterization test for the broken behavior. Add characterization tests for adjacent behavior that must stay unchanged.
+- **New feature:** start with acceptance or contract tests for the new behavior. Characterize existing behavior only where the feature must integrate with or preserve an existing flow.
+- **Visual-only change:** prefer screenshot, browser, Figma, and accessibility/interaction checks. Do not force characterization tests unless the visual change touches behavior.
+
+Good characterization tests:
+
+- Assert public outputs, state transitions, side effects, errors, serialization, or user-visible UI behavior.
+- Use realistic fixtures from current callers, factories, production-shaped data, or source examples.
+- Preserve current behavior without blessing it as correct. If behavior looks suspicious, label it `current behavior` and ask before changing it.
+- Avoid coupling to private helper structure, branch shape, or incidental implementation details.
+
 ## Pressure Handling
 
 Users often ask for the exact shortcut that would make a parity-first workflow unsafe: "skip tests", "no reproducer", "just patch it", "relax the assertion", "fix the legacy bug during the port", or "make it like the old page" without naming the old contract.
