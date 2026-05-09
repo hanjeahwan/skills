@@ -1,0 +1,89 @@
+{
+  "skill_name": "code-design-patterns",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "We have a TypeScript checkout service with repeated if/else blocks for Stripe, Adyen, and internal invoice payments. Each provider has different client setup, webhook verification, refund rules, and reconciliation exports. Recommend the design pattern and write the implementation boundary we should introduce without changing checkout behavior.",
+      "expected_output": "A context-first recommendation, likely Abstract Factory or Factory plus Strategy split by provider/product family and algorithm variation, with rejected alternatives, migration steps, and tests for provider contract behavior.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Review this proposed architecture: all app configuration, database connections, HTTP clients, and feature flags are exposed through a global Singleton called AppContext. The team says it will make every service easier to access. What are the enterprise risks and the smallest safer direction?",
+      "expected_output": "Findings-first review explaining hidden dependency, lifecycle, tenancy, concurrency, and test risks; recommends composition-root dependency injection or narrower registries instead of a blanket Singleton.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Our document editor needs copy, cut, paste, undo, redo, and a future remote execution queue for collaborative sessions. Explain the recommended pattern using a real user scenario, then specify what tests prove it works.",
+      "expected_output": "Command-centered explanation with optional Memento for undo snapshots, user scenario first, mechanism second, tests for execution, undo, redo, serialization/idempotency, and queue behavior.",
+      "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "A legacy Java reporting module builds HTML, CSV, and PDF exports with a huge switch on format in five places. New formats are added quarterly. Propose a refactor plan that preserves behavior while making format additions safer.",
+      "expected_output": "Behavior-preserving refactor plan using Strategy or Factory Method at the export boundary, characterization tests first, migration in small steps, and verification that a new format can be added without changing orchestration.",
+      "files": []
+    },
+    {
+      "id": 5,
+      "prompt": "I am writing an ADR for wrapping a third-party shipping SDK. Domain code currently imports the vendor client everywhere, and the SDK has unstable error classes. Produce the ADR recommendation and consequences.",
+      "expected_output": "ADR-style output recommending Adapter and possibly Facade at a domain-owned shipping boundary, with forces, rejected alternatives, contract/error normalization, tests, rollout, and residual risk.",
+      "files": []
+    },
+    {
+      "id": 6,
+      "prompt": "Give me a TypeScript implementation sketch for refactoring our export module away from a switch(format) block. It needs HTML, CSV, and PDF renderers now, more formats later, shared contract tests, and a migration plan that does not change existing behavior.",
+      "expected_output": "Uses the code reference and refactor playbook to produce a Strategy or Factory-backed renderer interface, concrete renderer skeletons, registry/wiring boundary, shared contract-test template, and caller-by-caller migration plan.",
+      "files": []
+    },
+    {
+      "id": 7,
+      "prompt": "We already have an Adapter around a vendor shipping SDK, but developers keep importing the SDK directly in domain services. Show the code boundary and tests you would add to make the Adapter pattern enforceable.",
+      "expected_output": "Provides a domain-owned ShippingGateway contract, adapter skeleton, error normalization boundary, contract tests or import guard strategy, and a migration path that removes vendor imports from domain code.",
+      "files": []
+    },
+    {
+      "id": 8,
+      "prompt": "Our team keeps saying 'use a design pattern' for a small pricing function that only has two formulas today. Use SOLID and the basic design principles to decide whether Strategy is justified yet.",
+      "expected_output": "Grounds the answer in variation encapsulation, program-to-interface, composition over inheritance, SRP/OCP/LSP pressure tests, and recommends the smallest boundary rather than pattern ceremony if the variation is not real yet.",
+      "files": []
+    },
+    {
+      "id": 9,
+      "prompt": "Explain Bridge versus Strategy for a SaaS notification system where message type and delivery provider both vary. I need roles, applicability, implementation steps, costs, related patterns, and tests.",
+      "expected_output": "Uses the pattern anatomy structure, distinguishes two-axis Bridge from interchangeable algorithm Strategy, maps roles to notification domain names, includes implementation steps, costs, related patterns, and verification.",
+      "files": []
+    },
+    {
+      "id": 10,
+      "prompt": "Audit this skill against Dive Into Design Patterns. Tell me what source areas are covered, what is intentionally excluded, and what checks should run after future edits.",
+      "expected_output": "Uses source-alignment coverage: OOP, relations, design principles, SOLID, 22 GoF patterns, pattern chapter elements, intentional exclusions, and re-audit checklist.",
+      "files": []
+    },
+    {
+      "id": 11,
+      "prompt": "Give me a compact TypeScript code sketch for Visitor over a stable document tree, and explain when I should not use Visitor because new node types are still changing.",
+      "expected_output": "Uses pattern-code-sketches and pattern-anatomy to provide DocumentNode/DocumentVisitor-style code, applicability, anti-fit warning for changing element types, and tests covering every element visitor pair.",
+      "files": []
+    },
+    {
+      "id": 12,
+      "prompt": "Show how Composite and Iterator would work together for a nested product bundle API. I need basic code refs plus what tests prove clients do not know the tree shape.",
+      "expected_output": "Uses Composite and Iterator code sketch guidance, maps roles to product bundle domain names, includes traversal hiding, and proposes tests for nested bundles and client independence from tree representation.",
+      "files": []
+    },
+    {
+      "id": 13,
+      "prompt": "Using the code-design-patterns skill, audit the skill itself against its source PDF. The source PDF path may be provided in the conversation or as an input file. Run whatever deterministic verification is available and include the command result.",
+      "expected_output": "Runs scripts/verify_skill.py when available, includes --pdf when the source PDF path is available, uses --skip-evals only if evals are explicitly forbidden, reports the verification command and pass/fail result, and says whether PDF-specific checks ran.",
+      "files": []
+    },
+    {
+      "id": 14,
+      "prompt": "Give a Visitor code sketch for a stable document tree. Do not cite internal skill reference file paths; include concrete contract tests.",
+      "expected_output": "Provides user-facing Visitor code without leaking skill reference paths and includes concrete contract tests for every node visitor pair and the anti-fit condition when node types change frequently.",
+      "files": []
+    }
+  ]
+}
