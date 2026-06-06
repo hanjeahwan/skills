@@ -1,0 +1,4 @@
+interface:
+  display_name: "通用开发协作流程"
+  short_description: "通用工程协作流程"
+  default_prompt: "使用 $development-workflow 按通用工程协作流程规划、实现、审查并验证这次任务。"
