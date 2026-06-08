@@ -1,0 +1,65 @@
+{
+  "skill_name": "development-workflow",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "这个仓库里登录后刷新页面会丢 session。帮我排查并修掉，别大改架构，最后告诉我跑了什么验证。",
+      "expected_output": "Agent reads repo context, diagnoses from actual code paths, applies a narrow fix, avoids speculative root cause, and reports targeted verification plus any unverified gaps.",
+      "files": [],
+      "assertions": [
+        "Collects relevant repo context before proposing or editing the fix.",
+        "Explains the concrete failure mode and affected workflow.",
+        "Keeps the implementation scope narrow and avoids unrelated architecture changes.",
+        "Runs or clearly reports targeted verification instead of only claiming the fix is done."
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "review 当前 diff，重点看有没有行为回归和缺测试。先不要改代码。",
+      "expected_output": "Agent enters review-only mode, lists findings first with file/line references and severity, avoids editing files, and mentions test gaps or residual risk if no issues are found.",
+      "files": [],
+      "assertions": [
+        "Does not modify files during the review-only request.",
+        "Presents findings before summary and orders them by severity.",
+        "Each finding includes file or line evidence plus a concrete failure mode.",
+        "Mentions missing tests or residual risk when relevant."
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "这个 checkout flow 现在塞了很多 boolean flags。帮我重构成更清楚的状态流，但不要改变现有行为。",
+      "expected_output": "Agent maps current states, transitions, terminal states, and side effects before refactoring; shares a scoped plan for a refactor that affects state flow and user-visible behavior; preserves existing behavior; verifies with targeted checks.",
+      "files": [],
+      "assertions": [
+        "Identifies current workflow boundaries, states, terminal states, and side effects before implementation.",
+        "States what behavior must remain unchanged.",
+        "Keeps refactor scope bounded to the relevant workflow.",
+        "Uses an independent review or explicitly performs a second local review when no parallel reviewer is available."
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "用 TDD 给这个 pricing utility 加一个边界条件：折扣后价格不能低于 0。按 red-green-refactor 来。",
+      "expected_output": "Agent enters TDD mode, writes one focused failing test first, implements the minimal change to pass, refactors only after green, and reports the test command.",
+      "files": [],
+      "assertions": [
+        "Starts with a single focused test for the requested observable behavior.",
+        "Describes or demonstrates the RED state before implementation.",
+        "Implements the minimal change needed for GREEN.",
+        "Does not write a broad batch of tests before implementation."
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "更新 docs 里的 API 使用说明，让它跟现在的 routes 和 schema 对齐。不要发明字段。",
+      "expected_output": "Agent finds authoritative routes and schemas, updates docs to match existing behavior, avoids invented API fields, and validates paths, commands, examples, or links as appropriate.",
+      "files": [],
+      "assertions": [
+        "Uses current routes, schemas, types, or call sites as authoritative evidence.",
+        "Avoids inventing fields, statuses, permission rules, or configuration objects not present in the repo.",
+        "Updates only the relevant documentation scope.",
+        "Verifies documentation examples, paths, commands, or links against the repo."
+      ]
+    }
+  ]
+}
