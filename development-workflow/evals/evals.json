@@ -28,13 +28,14 @@
     {
       "id": 3,
       "prompt": "这个 checkout flow 现在塞了很多 boolean flags。帮我重构成更清楚的状态流，但不要改变现有行为。",
-      "expected_output": "Agent maps current states, transitions, terminal states, and side effects before refactoring; shares a scoped plan for a refactor that affects state flow and user-visible behavior; preserves existing behavior; verifies with targeted checks.",
+      "expected_output": "Agent treats the high-risk refactor request as plan-first unless the user explicitly asks for modified files, maps current states, transitions, terminal states, and side effects, states behavior-preservation boundaries, and does not edit files before confirmation.",
       "files": [],
       "assertions": [
+        "Treats the refactor request as plan-first unless the requested deliverable is modified files or fixed behavior.",
         "Identifies current workflow boundaries, states, terminal states, and side effects before implementation.",
         "States what behavior must remain unchanged.",
         "Keeps refactor scope bounded to the relevant workflow.",
-        "Uses an independent review or explicitly performs a second local review when no parallel reviewer is available."
+        "States what confirmation would move the task into implementation mode."
       ]
     },
     {
@@ -51,14 +52,54 @@
     },
     {
       "id": 5,
-      "prompt": "更新 docs 里的 API 使用说明，让它跟现在的 routes 和 schema 对齐。不要发明字段。",
-      "expected_output": "Agent finds authoritative routes and schemas, updates docs to match existing behavior, avoids invented API fields, and validates paths, commands, examples, or links as appropriate.",
+      "prompt": "更新 self-context/README.md 里的 MCP Tools/API 使用说明，让它跟 self-context/scripts/fastify_mcp_server.mjs 的 routes 和 tool schemas 对齐。只根据代码里真实存在的 route、tool name 和 Zod schema 写，不要发明字段。",
+      "expected_output": "Agent reads fastify_mcp_server.mjs and README.md from workspace root, updates only the relevant README API/MCP section, avoids invented API fields, and reports documentation verification.",
+      "files": [
+        "self-context/README.md",
+        "self-context/scripts/fastify_mcp_server.mjs"
+      ],
+      "assertions": [
+        "Reads the route and schema source from self-context/scripts/fastify_mcp_server.mjs.",
+        "Updates self-context/README.md rather than reporting that no docs target exists.",
+        "Does not invent route names, tool names, request fields, statuses, or permission rules.",
+        "Does not treat self-context/assets/self-context.schema.json as the HTTP/MCP request schema unless the code references it for that API.",
+        "Reports doc verification by checking updated examples, commands, paths, or tool names against the source code."
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "流程里“默认推进实现”感觉会误判，怎么优化？先不写入。",
+      "expected_output": "Agent treats the request as analysis-only, explains the decision-rule problem, proposes concrete wording or policy changes, and does not edit files.",
       "files": [],
       "assertions": [
-        "Uses current routes, schemas, types, or call sites as authoritative evidence.",
-        "Avoids inventing fields, statuses, permission rules, or configuration objects not present in the repo.",
-        "Updates only the relevant documentation scope.",
-        "Verifies documentation examples, paths, commands, or links against the repo."
+        "Does not modify files when the prompt asks for optimization advice and says not to write.",
+        "Identifies the difference between analysis mode and implementation mode.",
+        "Proposes a concrete deliverable-based write gate or equivalent decision rule.",
+        "Explains when implementation should resume after an explicit user confirmation."
+      ]
+    },
+    {
+      "id": 7,
+      "prompt": "我要支持导出 CSV 功能，先看下会影响哪些地方。",
+      "expected_output": "Agent treats the request as analysis mode because it expresses a product goal without write authorization, maps likely impact areas, proposes an implementation approach, and does not edit files.",
+      "files": [],
+      "assertions": [
+        "Does not modify files for a goal-only request without explicit implementation authorization.",
+        "Explains that the request expresses a target capability rather than a write command.",
+        "Identifies likely affected areas or contracts before proposing implementation.",
+        "States what explicit confirmation would move the task into implementation mode."
+      ]
+    },
+    {
+      "id": 8,
+      "prompt": "我已经确认重构方案了，直接把 checkout flow 改成状态流，并告诉我验证结果。",
+      "expected_output": "Agent treats the request as implementation mode because the deliverable is modified files and verified behavior; if the repo lacks checkout source code, it reports the missing target context instead of falling back to generic analysis.",
+      "files": [],
+      "assertions": [
+        "Treats explicit confirmation plus direct file-change delivery as implementation mode.",
+        "Does not stay in analysis mode merely because the work is a high-risk refactor.",
+        "Collects relevant repo context before editing or reporting a blocker.",
+        "Reports targeted validation or the specific missing validation context."
       ]
     }
   ]
