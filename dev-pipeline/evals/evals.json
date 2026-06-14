@@ -1,0 +1,106 @@
+{
+  "skill_name": "dev-pipeline",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "这个仓库里登录后刷新页面会丢 session。帮我排查并修掉，别大改架构，最后告诉我跑了什么验证。",
+      "expected_output": "Agent reads repo context, diagnoses from actual code paths, applies a narrow fix, avoids speculative root cause, and reports targeted verification plus any unverified gaps.",
+      "files": [],
+      "assertions": [
+        "Collects relevant repo context before proposing or editing the fix.",
+        "Explains the concrete failure mode and affected workflow.",
+        "Keeps the implementation scope narrow and avoids unrelated architecture changes.",
+        "Runs or clearly reports targeted verification instead of only claiming the fix is done."
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "review 当前 diff，重点看有没有行为回归和缺测试。先不要改代码。",
+      "expected_output": "Agent enters review-only mode, lists findings first with file/line references and severity, avoids editing files, and mentions test gaps or residual risk if no issues are found.",
+      "files": [],
+      "assertions": [
+        "Does not modify files during the review-only request.",
+        "Presents findings before summary and orders them by severity.",
+        "Each finding includes file or line evidence plus a concrete failure mode.",
+        "Mentions missing tests or residual risk when relevant."
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "这个 checkout flow 现在塞了很多 boolean flags。帮我重构成更清楚的状态流，但不要改变现有行为。",
+      "expected_output": "Agent treats the high-risk refactor request as plan-first unless the user explicitly asks for modified files, maps current states, transitions, terminal states, and side effects, states behavior-preservation boundaries, and does not edit files before confirmation.",
+      "files": [],
+      "assertions": [
+        "Treats the refactor request as plan-first unless the requested deliverable is modified files or fixed behavior.",
+        "Identifies current workflow boundaries, states, terminal states, and side effects before implementation.",
+        "States what behavior must remain unchanged.",
+        "Keeps refactor scope bounded to the relevant workflow.",
+        "States what confirmation would move the task into implementation mode."
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "用 TDD 给这个 pricing utility 加一个边界条件：折扣后价格不能低于 0。按 red-green-refactor 来。",
+      "expected_output": "Agent enters TDD mode, writes one focused failing test first, implements the minimal change to pass, refactors only after green, and reports the test command.",
+      "files": [],
+      "assertions": [
+        "Starts with a single focused test for the requested observable behavior.",
+        "Describes or demonstrates the RED state before implementation.",
+        "Implements the minimal change needed for GREEN.",
+        "Does not write a broad batch of tests before implementation."
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "更新 self-context/README.md 里的 MCP Tools/API 使用说明，让它跟 self-context/scripts/fastify_mcp_server.mjs 的 routes 和 tool schemas 对齐。只根据代码里真实存在的 route、tool name 和 Zod schema 写，不要发明字段。",
+      "expected_output": "Agent reads fastify_mcp_server.mjs and README.md from workspace root, updates only the relevant README API/MCP section, avoids invented API fields, and reports documentation verification.",
+      "files": [
+        "self-context/README.md",
+        "self-context/scripts/fastify_mcp_server.mjs"
+      ],
+      "assertions": [
+        "Reads the route and schema source from self-context/scripts/fastify_mcp_server.mjs.",
+        "Updates self-context/README.md rather than reporting that no docs target exists.",
+        "Does not invent route names, tool names, request fields, statuses, or permission rules.",
+        "Does not treat self-context/assets/self-context.schema.json as the HTTP/MCP request schema unless the code references it for that API.",
+        "Reports doc verification by checking updated examples, commands, paths, or tool names against the source code."
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "流程里“默认推进实现”感觉会误判，怎么优化？先不写入。",
+      "expected_output": "Agent treats the request as analysis-only, explains the decision-rule problem, proposes concrete wording or policy changes, and does not edit files.",
+      "files": [],
+      "assertions": [
+        "Does not modify files when the prompt asks for optimization advice and says not to write.",
+        "Identifies the difference between analysis mode and implementation mode.",
+        "Proposes a concrete deliverable-based write gate or equivalent decision rule.",
+        "Explains when implementation should resume after an explicit user confirmation."
+      ]
+    },
+    {
+      "id": 7,
+      "prompt": "我要支持导出 CSV 功能，先看下会影响哪些地方。",
+      "expected_output": "Agent treats the request as analysis mode because it expresses a product goal without write authorization, maps likely impact areas, proposes an implementation approach, and does not edit files.",
+      "files": [],
+      "assertions": [
+        "Does not modify files for a goal-only request without explicit implementation authorization.",
+        "Explains that the request expresses a target capability rather than a write command.",
+        "Identifies likely affected areas or contracts before proposing implementation.",
+        "States what explicit confirmation would move the task into implementation mode."
+      ]
+    },
+    {
+      "id": 8,
+      "prompt": "我已经确认重构方案了，直接把 checkout flow 改成状态流，并告诉我验证结果。",
+      "expected_output": "Agent treats the request as implementation mode because the deliverable is modified files and verified behavior; if the repo lacks checkout source code, it reports the missing target context instead of falling back to generic analysis.",
+      "files": [],
+      "assertions": [
+        "Treats explicit confirmation plus direct file-change delivery as implementation mode.",
+        "Does not stay in analysis mode merely because the work is a high-risk refactor.",
+        "Collects relevant repo context before editing or reporting a blocker.",
+        "Reports targeted validation or the specific missing validation context."
+      ]
+    }
+  ]
+}

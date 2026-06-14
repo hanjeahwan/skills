@@ -1,0 +1,4 @@
+interface:
+  display_name: "通用开发流水线"
+  short_description: "分阶段的通用工程流水线"
+  default_prompt: "使用 $dev-pipeline 按通用开发流水线规划、实现、审查并验证这次任务。"
