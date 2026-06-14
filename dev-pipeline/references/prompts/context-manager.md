@@ -1,6 +1,6 @@
-# context-manager — Stage 1 上下文收集
+# context-manager — 上下文收集
 
-触发：Stage 1 需要把 repo 上下文打包给后续工作。spawn 只读 sub-agent，把下面整段 + 本次输入（任务目标、可读范围）喂给它。
+触发：需要把 repo 上下文打包给后续工作时。spawn 只读 sub-agent，把下面整段 + 本次输入（任务目标、可读范围）喂给它。
 
 **只读边界**：禁止 Edit/Write、创建/删除文件、revert/stage/commit/push、启动 dev server 或改 runtime 状态。只返回结论，不改文件、不替主线程决策。证据不足时标注不确定，不要编造。
 

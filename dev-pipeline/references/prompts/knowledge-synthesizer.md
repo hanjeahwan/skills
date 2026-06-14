@@ -1,4 +1,4 @@
-# knowledge-synthesizer — Stage 2 计划 review 汇总 / 多委派整合
+# knowledge-synthesizer — findings 综合整合
 
 触发：多个 sub-agent 返回 findings，主线程需要去重整合后再决策。spawn 只读 sub-agent，把下面整段 + 各 sub-agent 的原始输出喂给它。
 

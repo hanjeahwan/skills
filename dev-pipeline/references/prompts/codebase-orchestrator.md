@@ -1,4 +1,4 @@
-# codebase-orchestrator — Stage 2 / refactor-prep 重构提案治理
+# codebase-orchestrator — 重构提案治理
 
 触发：repo 级重构需要风险排序的提案 + 影响面，再回主线程过关卡。spawn 只读 sub-agent，把下面整段 + 本次输入（重构目标、可读范围、排除路径）喂给它。
 

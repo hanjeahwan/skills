@@ -1,4 +1,4 @@
-# error-coordinator — debugging 分支错误分组
+# error-coordinator — 错误分组分派
 
 触发：多个错误/症状需要分组、定位 primary fault、排出排查顺序。spawn 只读 sub-agent，把下面整段 + 本次输入（错误列表、时间线、近期改动面）喂给它。
 
