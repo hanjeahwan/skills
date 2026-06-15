@@ -36,6 +36,18 @@
       "prompt": "精简这份 SKILL.md：每一句要么指导动作，要么删掉。改完再扫一遍确认干净。",
       "expected_output": "按审查—改写循环执行：扫描、逐条改写成可执行指令、改写后重新整扫，直到一次完整扫描零命中，并报告重扫结果。",
       "files": []
+    },
+    {
+      "id": 7,
+      "prompt": "审一下这份中文操作手册，里面有『先做 quick check，再安排 follow up』『owner 每周更新 risk level』这种中英文混写；GDPR、Salesforce、NPS 这些专名和指标不要误报。",
+      "expected_output": "识别语言混用反模式，只报告可本地化的说明性正文，建议改成『快速检查』『后续跟进』『负责人』『风险等级』；不误报法规名、产品名、指标名、字段、状态枚举、路径、命令、JSON/YAML key、role 名和 API/库名。",
+      "files": []
+    },
+    {
+      "id": 8,
+      "prompt": "审一下这个中文 skill，里面有『启动 source gate』『创建 scratch pad』『main agent triage findings』这种中英文混写；状态枚举和路径不要误报。",
+      "expected_output": "识别语言混用反模式，把可本地化的说明性正文改成『来源关卡』『任务记录』『主线程分诊发现项』；不误报状态枚举、路径、命令、配置 key、role 名和 API/库名。",
+      "files": []
     }
   ]
 }
