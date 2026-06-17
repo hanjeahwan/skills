@@ -5,14 +5,14 @@
 
 ## 执行体类型
 
-- **blocking gate**：挡住某个状态转移；返回前不能越过等待点。高约束实现默认使用这类执行体。
-- **non_blocking sidecar**：旁路探索；主线程可以继续，但必须声明最大影响范围，返回后只在影响范围内决定是否回流。
+- **阻塞式关卡**：挡住某个状态转移；返回前不能越过等待点。高约束实现默认使用这类执行体。
+- **`non_blocking` 旁路执行体**：旁路探索；主线程可以继续，但必须声明最大影响范围，返回后只在影响范围内决定是否回流。
 
-回来慢不是降级理由。只有子代理工具不可用、平台规则不允许调用，或安全边界冲突时，blocking gate 才能进入本地替代审查降级。
+回来慢不是降级理由。只有子代理工具不可用、平台规则不允许调用，或安全边界冲突时，阻塞式关卡才能进入本地替代审查降级。
 
 ## 启动条件
 
-命中任一高风险守卫条件，且存在边界清楚的只读审查、上下文打包或独立验证时，默认启动 blocking gate；工具不可用、平台规则不允许调用或安全边界冲突时，进入本地替代审查降级：
+命中任一高风险守卫条件，且存在边界清楚的只读审查、上下文打包或独立验证时，默认启动阻塞式关卡；工具不可用、平台规则不允许调用或安全边界冲突时，进入本地替代审查降级：
 
 - 多模块或跨边界改动。
 - 状态流、权限/数据流、副作用、外部 contract 或用户可见行为变化。
@@ -56,7 +56,7 @@ prompt_basis: <匹配的 触发：行摘要；fallback 时写 no matching templa
 ```
 
 - `purpose`：为什么启动。没有明确目的不启动。
-- `join_point`：它挡哪个门。blocking gate 没有等待点不启动。
+- `join_point`：它挡哪个门。阻塞式关卡没有等待点不启动。
 - `max_impact`：它最多能让主线程回流到哪里，避免晚到结果无限推翻。
 - `blocking`：是否阻塞状态转移。
 - `wait_policy`：等待到返回、仅不可执行时降级，或作为旁路任务继续。
@@ -69,13 +69,13 @@ prompt_basis: <匹配的 触发：行摘要；fallback 时写 no matching templa
 - `artifact_ref`：正在审的 `plan.md` revision、diff snapshot、verification record 或证据包版本。
 - `evidence`：相关文件、diff、contract、schema、测试入口或任务台账路径；只给与本次目的相关的范围。
 - `forbidden_actions`：只读边界、禁止写入、禁止 stage/commit/push、禁止运行未授权高成本命令或改变 runtime 状态。
-- `expected_output`：期望返回 findings、pass 条件、残余风险和需要回流的状态。
+- `expected_output`：期望返回发现项、通过条件、残余风险和需要回流的状态。
 
 等待点语义：
 
 - `before_plan`：上下文关卡。`ContextGather` 返回证据包前不能进入 `Plan`；只允许工具不可用、平台禁止或安全边界冲突时本地替代。
-- `before_implement`：方案审查关卡。`PlanReview` 返回无 findings，或 findings 经 `UpdatePlan` 处理并满足守卫条件前，不能进入 `PlanApproval`；用户批准当前计划版本前，不能进入 `Implement`。
-- `before_verify`：实现审查关卡。`Review` 返回无 findings，或 findings 经 `FixFindings` 修复并重审前，不能进入 `Verify`。
+- `before_implement`：方案审查关卡。`PlanReview` 返回无发现项，或发现项经 `UpdatePlan` 处理并满足守卫条件前，不能进入 `PlanApproval`；用户批准当前计划版本前，不能进入 `Implement`。
+- `before_verify`：实现审查关卡。`Review` 返回无发现项，或发现项经 `FixFindings` 修复并重审前，不能进入 `Verify`。
 - `non_blocking`：旁路探索。主线程可以继续，但必须记录 `max_impact`；返回后只在影响范围内决定是否回流。
 
 兼容旧阶段名时可把 `before_stage_3` 理解为 `before_implement`，把 `before_stage_5` 理解为 `before_verify`；新记录优先使用新等待点。
@@ -95,7 +95,7 @@ prompt_basis: <匹配的 触发：行摘要；fallback 时写 no matching templa
 
 ## 方案审查关卡
 
-`Plan` 命中高风险守卫条件时，启动 `plan-review` blocking gate。它审查计划是否可信，不授权写代码。
+`Plan` 命中高风险守卫条件时，启动 `plan-review` 阻塞式关卡。它审查计划是否可信，不授权写代码。
 
 计划审查输入至少包含：
 
@@ -110,16 +110,16 @@ prompt_basis: <匹配的 触发：行摘要；fallback 时写 no matching templa
 - contract 与边界。
 - 验证充分性。
 
-返回 findings 时进入 `UpdatePlan`：
+返回发现项时进入 `UpdatePlan`：
 
-- 改变目标行为、contract、状态流、副作用归属、验证策略或实现边界的 finding 是 material change，必须更新方案并重过 `PlanReview`。
-- 不改变这些边界的 finding 才能作为 minor scoped note，记录采纳/不采纳理由后进入 `PlanApproval`。
+- 改变目标行为、contract、状态流、副作用归属、验证策略或实现边界的发现项是 material change，必须更新方案并重过 `PlanReview`。
+- 不改变这些边界的发现项才能作为 minor scoped note，记录采纳/不采纳理由后进入 `PlanApproval`。
 
 `PlanReview` 通过后只能进入 `PlanApproval`。只有用户明确批准当前 `plan.md` 版本，且任务台账满足 `approved_plan_revision == current_plan_revision`，才能进入 `Implement`。用户在初始请求里说“完整流程执行”不算批准后续生成的执行计划。
 
 ## 实现审查关卡
 
-`Implement` 完成后启动 `diff-review`、`verification` 或匹配风险的 blocking gate。
+`Implement` 完成后启动 `diff-review`、`verification` 或匹配风险的阻塞式关卡。
 
 审查至少覆盖：
 
@@ -129,14 +129,14 @@ prompt_basis: <匹配的 触发：行摘要；fallback 时写 no matching templa
 - contract、类型、schema 或权限/数据流风险。
 - 验证记录是否覆盖关键风险，未验证项是否具体。
 
-`scope_compliance` 不通过时必须当作阻塞 finding 处理，不能降级成普通质量建议。返回 findings 时进入 `FixFindings`；修复或明确不采纳并记录理由后，必须重过 `Review`。无 findings 且审查 snapshot 仍匹配当前 diff 时，才能进入 `Verify`。
+`scope_compliance` 不通过时必须当作阻塞发现项处理，不能降级成普通质量建议。返回发现项时进入 `FixFindings`；修复或明确不采纳并记录理由后，必须重过 `Review`。无发现项且审查 snapshot 仍匹配当前 diff 时，才能进入 `Verify`。
 
 ## 结果处理
 
 执行体返回后先看契约：
 
-- blocking gate 无 findings：通过对应等待点；`plan-review` 的下一状态是 `PlanApproval`，不是 `Implement`。
-- blocking gate 有 findings：回流到 `UpdatePlan` 或 `FixFindings`，不能继续越过等待点。
+- 阻塞式关卡无发现项：通过对应等待点；`plan-review` 的下一状态是 `PlanApproval`，不是 `Implement`。
+- 阻塞式关卡有发现项：回流到 `UpdatePlan` 或 `FixFindings`，不能继续越过等待点。
 - 子代理通过是被审产物（artifact）的证据，不是完成证明；进入下一状态前确认当前 `plan_revision`、diff snapshot 或 verification record 没有被后续改动替换。
 - 结果已被后续改动覆盖：记录证据，但仍要判断是否需要重审当前 diff 或方案。
 - 结果与 repo 事实不符：记录不采纳理由；若它本来挡关卡，必须说明为何不采纳后仍满足守卫条件。

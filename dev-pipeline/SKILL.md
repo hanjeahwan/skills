@@ -51,7 +51,7 @@ Intake -> ContextGather -> Plan -> PlanReview -> PlanApproval -> Implement -> Re
 - `PlanApproval`：高约束方案的用户批准关卡；没有当前计划版本的明确批准，不能写文件。
 - `Review`：实现完成后的阻塞式子代理审查关卡；通过后才进入 `Verify`。
 - `ImplementSlice`：偏大任务按纵向片推进，每片独立实现和最小验证。
-- `UpdatePlan` / `FixFindings`：方案审查或实现审查 findings 的回流状态。
+- `UpdatePlan` / `FixFindings`：方案审查或实现审查发现项的回流状态。
 - `RuleDistill`：任务结束前的规则沉淀检查；只有用户纠正或 review/测试/子代理暴露可复用决策偏差时才落规则。
 
 完整状态、事件、守卫条件、动作和退出条件见 `references/statechart.md`。
@@ -63,7 +63,7 @@ Intake -> ContextGather -> Plan -> PlanReview -> PlanApproval -> Implement -> Re
 - 涉及状态流或用户动作时，沿事件做守卫条件/副作用审查：允许状态、禁止状态、no-op 行为、缺失守卫条件、副作用归属、终止行为，以及测试/文档是否覆盖当前行为。
 - 重构、迁移、架构调整这类高风险工作，按 `references/refactor-prep.md` 准备。
 - 高约束实现默认启动 `context-manager` 子代理作为 `ContextGather` 关卡，打包 repo 证据、入口、contract、风险和未解问题；它只产证据包，不替主线程定方案。
-- `ContextGather` 是 blocking 关卡。子代理回来慢不是降级理由；只有工具不可用、平台禁止或安全边界冲突时，才记录本地替代证据包后继续。
+- `ContextGather` 是阻塞式关卡。子代理回来慢不是降级理由；只有工具不可用、平台禁止或安全边界冲突时，才记录本地替代证据包后继续。
 
 ### 方案
 
@@ -72,7 +72,7 @@ Intake -> ContextGather -> Plan -> PlanReview -> PlanApproval -> Implement -> Re
 - 任务偏大时，方案里切纵向片：每片是一条薄的端到端改动，有明确验证入口。
 - 进入 `PlanReview` 前，执行计划必须通过质量自查：需求覆盖、无 TODO/TBD/占位符、切片可执行且可验证、文件/contract/状态流/副作用边界清楚、验证计划具体。
 - 主线程基于 `ContextGather` 证据包形成方案，然后进入 `PlanReview`：按 `references/delegation.md` 声明子代理执行体的 `purpose`、`join_point`、`max_impact`、`wait_policy`、`prompt_source` 和 `prompt_basis`。
-- `PlanReview` 是 blocking 关卡，输入必须包含 `plan.md`、`ContextGather` 证据包和关键源码/contract 引用。返回 findings 时先 `UpdatePlan`：改变目标行为、contract、状态流、副作用归属、验证策略或实现边界的 material change 必须更新 `plan.md`、刷新 `current_plan_revision`、置旧批准失效并重过 `PlanReview`；不改变这些边界的 minor scoped note 可记录采纳/不采纳理由后进入 `PlanApproval`。
+- `PlanReview` 是阻塞式关卡，输入必须包含 `plan.md`、`ContextGather` 证据包和关键源码/contract 引用。返回发现项时先 `UpdatePlan`：改变目标行为、contract、状态流、副作用归属、验证策略或实现边界的 material change 必须更新 `plan.md`、刷新 `current_plan_revision`、置旧批准失效并重过 `PlanReview`；不改变这些边界的 minor scoped note 可记录采纳/不采纳理由后进入 `PlanApproval`。
 - `PlanApproval` 是用户批准关卡。主线程把执行计划摘要和 `plan.md` 路径发给用户，等待明确批准；只有批准当前计划版本后才能进入 `Implement`。用户要求改执行计划时回 `UpdatePlan`；批准语义含糊时停在 `PlanApproval`。
 - `ReadOnly` 在此交付方案或审查结论即止。`Implementation` 只有在轻量路径守卫通过，或高约束主干满足 `plan_approval_guard` 后，才进入 `Implement`。
 
@@ -82,11 +82,11 @@ Intake -> ContextGather -> Plan -> PlanReview -> PlanApproval -> Implement -> Re
 - 高约束主干开始写入前，检查 `approved_plan_revision == current_plan_revision`；不满足时回到 `PlanApproval`，不要用最初的“按完整流程执行”当作批准。
 - 已切片时进入 `ImplementSlice`：片状态随状态转移更新为 `planned`、`implementing`、`min_verified`、`complete` 或 `rework`。
 - 实现规则见 `references/implementation.md`；调试、TDD、文档等分支按下方分支模式加载对应参考文件。
-- 实现完成后进入 `Review` blocking 关卡：子代理按 `scope_compliance` 和 `implementation_quality` 审查当前 diff snapshot、行为回归和验证覆盖。发现 findings 时进入 `FixFindings`，修复后重过 `Review`；无 findings 且当前 diff 未替换审查 snapshot，才进入 `Verify`。
+- 实现完成后进入 `Review` 阻塞式关卡：子代理按 `scope_compliance` 和 `implementation_quality` 审查当前 diff snapshot、行为回归和验证覆盖。发现项进入 `FixFindings`，修复后重过 `Review`；无发现项且当前 diff 未替换审查 snapshot，才进入 `Verify`。
 
 ### 验证
 
-- 修改后走检查清单：命名、重复状态、非法状态、数据来源是否唯一、副作用归属、事件守卫条件、boolean 前缀、范围是否漂移、可读性、验证是否足够。
+- 修改后走检查清单：命名是否能追溯到 domain、是否存在重复状态或非法状态、数据来源是否唯一、副作用归属、事件守卫条件、boolean 前缀、范围是否漂移、分支是否重复表达同一状态、验证记录是否覆盖本次改动的行为/contract/风险。
 - 按验证选择矩阵执行；没做的验证要明确说。
 - `Verify` 由主线程执行实际验证，例如定向测试、typecheck、lint、静态检查、代码路径审查或未验证项记录；`Review` 不能替代 `Verify`。
 - 验证发现实现 bug -> 回 Implement；发现需求/方案理解错 -> 回 Plan；发现验证覆盖不足 -> 留在 Verify 补验证或记录缺口。
@@ -149,7 +149,7 @@ Intake -> ContextGather -> Plan -> PlanReview -> PlanApproval -> Implement -> Re
 - 把子代理作为状态机里的执行体管理：启动前先定义目的、等待点、影响范围和等待策略。
 - 命中高风险守卫条件且有独立审查/验证价值时默认启动；只有工具不可用、平台禁止或安全边界冲突时，才进入本地替代审查降级。未启动必须记录低风险、强耦合、工具失败或安全边界原因。
 - 启动任何子代理前必须先完成 prompts 发现协议，并声明 `purpose`、`join_point`、`max_impact`、`wait_policy`、`prompt_source` 和 `prompt_basis`；没有 `join_point`、`prompt_source` 或 `prompt_basis` 的子代理不启动。
-- blocking 关卡执行体未满足前不能越过对应状态；回来慢不是降级理由。只有工具不可用、平台禁止或安全边界冲突时，才记录本地替代审查降级。
+- 阻塞式关卡执行体未满足前不能越过对应状态；回来慢不是降级理由。只有工具不可用、平台禁止或安全边界冲突时，才记录本地替代审查降级。
 - 细节和发现协议见 `references/delegation.md`。
 
 ### 验证选择矩阵

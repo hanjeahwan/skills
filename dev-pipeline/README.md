@@ -17,7 +17,7 @@
 
 ## 阻塞式状态流
 
-高约束实现任务使用上下文、方案审查、用户批准和实现审查关卡。子代理在审查关卡里是 blocking actor，不是旁路建议；用户批准关卡决定当前计划版本是否允许进入写入。
+高约束实现任务使用上下文、方案审查、用户批准和实现审查关卡。子代理在审查关卡里是阻塞式执行体，不是旁路建议；用户批准关卡决定当前计划版本是否允许进入写入。
 
 ```mermaid
 flowchart TD
@@ -27,14 +27,14 @@ flowchart TD
   ContextGather["ContextGather: subagent, blocking"]
   Plan["Plan: main"]
   PlanReview["PlanReview: subagent, blocking"]
-  PlanFindings{"PlanReview 有 findings?"}
+  PlanFindings{"PlanReview 有发现项?"}
   UpdatePlan["UpdatePlan: main"]
   PlanChange{"material plan change?"}
   PlanApproval["PlanApproval: user approval, blocking"]
   PlanApproved{"approved_plan_revision == current_plan_revision?"}
   Implement["Implement: main"]
   Review["Review: subagent, blocking"]
-  ReviewFindings{"Review 有 findings?"}
+  ReviewFindings{"Review 有发现项?"}
   FixFindings["FixFindings: main"]
   Verify["Verify: main, 实际验证"]
   Deliver["Deliver: 验证记录 + 交付"]
@@ -80,13 +80,13 @@ flowchart TD
 
 - `ContextGather` 只打包 repo 证据、入口、contract、风险和未解问题，不替主线程定方案。
 - `Plan` 生成 `.dev-pipeline/<date>-<short-slug>/plan.md`；`.dev-pipeline/<date>-<short-slug>/task.md` 记录任务台账。
-- `PlanReview` 审查执行计划、上下文证据和关键 contract；有实质 findings 时先改方案，重大方案变化重新 review。
+- `PlanReview` 审查执行计划、上下文证据和关键 contract；有实质发现项时先改方案，重大方案变化重新 review。
 - `PlanApproval` 等待用户批准当前计划版本；`approved_plan_revision == current_plan_revision` 后才允许进入 `Implement`。
-- `Review` 审查实现 diff 和验证覆盖；有 findings 时修复后再 review。
+- `Review` 审查实现 diff 和验证覆盖；有发现项时修复后再 review。
 - `Verify` 由主线程执行实际验证，例如定向测试、typecheck、lint、静态检查或未验证项记录；build 只在用户明确要求时执行，`Review` 不能直接替代 `Verify`。
 - `Deliver` 是出口检查点；发现仍要修时按问题类型回 `Plan` / `Implement` / `Verify` 或留在 `Deliver` 修回复。
 - `RuleDistill` 在最终回复前检查是否有可复用决策偏差；只有过四关才沉淀规则，没有就记录不需要。
-- blocking 子代理不能因为“回来慢”被旁路；只有工具不可用、平台禁止或安全边界冲突时，才记录本地替代审查降级。
+- 阻塞式子代理不能因为“回来慢”被旁路；只有工具不可用、平台禁止或安全边界冲突时，才记录本地替代审查降级。
 
 ## 目录结构
 
