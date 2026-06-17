@@ -10,10 +10,10 @@
 
 ## 主干阶段细节
 
-- `statechart.md`：阻塞式状态机来源。需要理解 `ContextGather -> Plan -> PlanReview -> PlanApproval -> Implement -> Review -> Verify -> Deliver`、状态转移、守卫条件、动作、退出条件，或处理回流、子代理 `join_point`、计划批准、验证记录时读取。
+- `statechart.md`：阻塞式状态机来源。需要理解 `ContextGather -> Plan -> PlanReview -> PlanApproval -> Implement -> Review -> Verify -> Deliver -> RuleDistill`、状态转移、守卫条件、动作、退出条件，或处理回流、子代理 `join_point`、计划批准、验证记录、规则沉淀时读取。
 - `implementation.md`：进入 `Implement` 写代码时读取，覆盖单一事实来源、状态机建模、阶段边界和命名规则。
 - `refactor-prep.md`：重构、迁移、架构调整，或涉及多模块/状态流/外部 contract、副作用、权限数据流/用户可见行为时读取。
-- `rule-distillation.md`：交付后被用户纠正，或审查/测试/子代理结果暴露可复用决策偏差，需要沉淀成持久规则时读取。
+- `rule-distillation.md`：进入 `RuleDistill`，或交付前发现用户纠正、审查/测试/子代理结果暴露可复用决策偏差，需要判断是否沉淀成持久规则时读取。
 
 ## 分支流程
 

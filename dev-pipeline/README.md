@@ -38,6 +38,9 @@ flowchart TD
   FixFindings["FixFindings: main"]
   Verify["Verify: main, 实际验证"]
   Deliver["Deliver: 验证记录 + 交付"]
+  DeliveryReady{"delivery_ready?"}
+  DeliverRepair["Deliver repair: Plan / Implement / Verify / response"]
+  RuleDistill["RuleDistill: 规则沉淀检查"]
   WaitForUser["WaitForUser: 高副作用或关键信息缺失"]
 
   Intake --> OffRamp
@@ -63,6 +66,14 @@ flowchart TD
   FixFindings --> Review
   ReviewFindings -- "no" --> Verify
   Verify --> Deliver
+  Deliver --> DeliveryReady
+  DeliveryReady -- "no" --> DeliverRepair
+  DeliverRepair --> Plan
+  DeliverRepair --> UpdatePlan
+  DeliverRepair --> Implement
+  DeliverRepair --> Verify
+  DeliverRepair --> Deliver
+  DeliveryReady -- "yes" --> RuleDistill
 ```
 
 关卡语义：
@@ -74,6 +85,8 @@ flowchart TD
 - `Implement` 默认由主线程执行；只有已批准计划内的明确切片可交给写入型 worker，并且必须绑定 ownership、计划版本和 handoff。
 - `Review` 审查实现 diff 和验证覆盖；有 findings 时修复后再 review。
 - `Verify` 由主线程执行实际验证，例如测试、typecheck、lint、build 或未验证项记录；`Review` 不能直接替代 `Verify`。
+- `Deliver` 是出口检查点；发现仍要修时按问题类型回 `Plan` / `Implement` / `Verify` 或留在 `Deliver` 修回复。
+- `RuleDistill` 在最终回复前检查是否有可复用决策偏差；只有过四关才沉淀规则，没有就记录不需要。
 - blocking 子代理不能因为“回来慢”被旁路；只有工具不可用、平台禁止或安全边界冲突时，才记录本地替代审查降级。
 
 ## 目录结构

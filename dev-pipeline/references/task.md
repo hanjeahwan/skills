@@ -9,7 +9,7 @@
 - **执行计划分离**：`plan.md` 的模板、revision 和审批语义见 `references/plan.md`；`task.md` 只记录它的路径、版本和批准状态。
 - **只依赖写文件**：不依赖宿主的 task/todo 工具；宿主恰好有 task 机制时可同步，但不作为依赖。
 - **保持临时工作态**：绝不 commit；它是工作态，不是交付物。
-- **按状态转移更新**：进入新状态、计划版本变化、批准状态变化、切片状态变化、`ContextGather` 证据包、`PlanReview` findings、`UpdatePlan`、`Review` findings、`FixFindings`、验证失败、阻塞搁置或回流时更新，不等最后补总结。
+- **按状态转移更新**：进入新状态、计划版本变化、批准状态变化、切片状态变化、`ContextGather` 证据包、`PlanReview` findings、`UpdatePlan`、`Review` findings、`FixFindings`、验证失败、交付修复回流、规则沉淀检查、阻塞搁置或回流时更新，不等最后补总结。
 
 ## 模板
 
@@ -17,7 +17,7 @@
 # <任务一句话>
 
 mode: OffRamp / ReadOnly / Implementation
-current_state: Intake / Context / ContextGather / Plan / PlanReview / PlanApproval / UpdatePlan / Implement / ImplementSlice / Review / FixFindings / Verify / Deliver / WaitForUser / Parked
+current_state: Intake / Context / ContextGather / Plan / PlanReview / PlanApproval / UpdatePlan / Implement / ImplementSlice / Review / FixFindings / Verify / Deliver / RuleDistill / WaitForUser / Parked
 last_event: <触发当前状态的事件>
 task_dir: .dev-pipeline/<date>-<short-slug>/
 plan_file: .dev-pipeline/<date>-<short-slug>/plan.md
@@ -32,7 +32,7 @@ approval_invalidated_reason: <material plan change / user requested change / non
 
 ## 守卫条件
 - <守卫条件名称>：pass / fail / degraded；evidence <依据>
-- 建议至少记录：`blocking_delegate_guard`、`readonly_prompt_guard`、`worker_contract_guard`、`worker_integration_guard`、`context_pack_guard`、`plan_approval_guard`、`minor_note_guard`、`review_gate_guard`、`verification_guard`、`explicit_command_guard`。
+- 建议至少记录：`blocking_delegate_guard`、`readonly_prompt_guard`、`worker_contract_guard`、`worker_integration_guard`、`context_pack_guard`、`plan_approval_guard`、`minor_note_guard`、`review_gate_guard`、`verification_guard`、`explicit_command_guard`、`delivery_ready_guard`、`deliver_repair_guard`、`rule_distillation_guard`。
 
 ## 上下文证据包
 - source: context-gather / local-substitute / main-thread
@@ -116,9 +116,19 @@ approval_invalidated_reason: <material plan change / user requested change / non
 ## 状态转移
 - <来源> --<事件>--> <目标>：<原因和依据>
 
+## 规则沉淀
+- state: not_needed / distilled / skipped
+- trigger: <用户纠正 / review finding / 测试失败 / 子代理发现 / none>
+- owner: <沉淀到哪个已有文档/skill；无则 None>
+- result: <规则变更摘要；不沉淀时写不满足哪一关>
+
 ## 交付检查
 - final_diff_checked: yes/no
 - verification_record_reflected: yes/no
+- deliver_repair: none / plan / implement / verify / response
+- deliver_repair_reason: <待修项分类依据；没有则 None>
+- delivery_ready: yes/no
+- rule_distillation_checked: yes/no
 - no_unowned_changes_claimed: yes/no
 - commit_requested: yes/no
 ```

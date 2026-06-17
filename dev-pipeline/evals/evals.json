@@ -408,6 +408,32 @@
       "files": []
     },
     {
+      "id": 44,
+      "prompt": "任务已经准备交付，交付物没有待修项，但用户指出这次漏了一个可复用流程步骤。",
+      "expected_output": "Deliver 的交付检查通过后不能直接结束；进入 RuleDistill，判断这是不是可泛化、最小、连贯、可执行的规则。满足时按 rule-distillation.md 沉淀到正确拥有者，不满足时记录 not_needed。",
+      "expectations": [
+        "确认 delivery_ready 后从 Deliver 进入 RuleDistill，而不是直接结束",
+        "读取或遵循 references/rule-distillation.md 的四关：可泛化、最小、连贯、可执行",
+        "把合格规则沉淀到正确拥有者，不新开重复规则",
+        "不满足四关时记录 rule_distillation not_needed，不为凑流程写空规则",
+        "任务台账记录 rule_distillation_checked 和结果"
+      ],
+      "files": []
+    },
+    {
+      "id": 45,
+      "prompt": "任务到了 Deliver，但最终检查发现还有旧命名残留，验证记录也没写清楚。",
+      "expected_output": "Deliver 发现待修项时不能进入 RuleDistill；先按问题类型分类回流。旧命名残留回 Implement，验证记录不足回 Verify，修完后重新 Deliver，只有 delivery_ready 后才进入 RuleDistill。",
+      "expectations": [
+        "识别 Deliver 是出口检查点，不是必然结束",
+        "不进入 RuleDistill，不把规则沉淀当作未完成交付的替代",
+        "把旧命名或 diff 问题分类为 implement repair，回 Implement",
+        "把验证记录不足分类为 verify repair，回 Verify",
+        "任务台账记录 deliver_repair、deliver_repair_reason 和 delivery_ready: no"
+      ],
+      "files": []
+    },
+    {
       "id": 27,
       "prompt": "实现已经写完了，准备交付这个多模块改动。",
       "expected_output": "实现完成后先进入 Review blocking 子代理关卡，审 diff 正确性、行为回归和验证覆盖；不能直接 Verify 或 Deliver。",

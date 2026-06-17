@@ -36,7 +36,7 @@ description: 用于高约束、多阶段的 repo 开发协作：先判定交付�
 高约束实现主干状态是：
 
 ```text
-Intake -> ContextGather -> Plan -> PlanReview -> PlanApproval -> Implement -> Review -> Verify -> Deliver
+Intake -> ContextGather -> Plan -> PlanReview -> PlanApproval -> Implement -> Review -> Verify -> Deliver -> RuleDistill
 ```
 
 常见分支和回流：
@@ -52,6 +52,7 @@ Intake -> ContextGather -> Plan -> PlanReview -> PlanApproval -> Implement -> Re
 - `Review`：实现完成后的阻塞式子代理审查关卡；通过后才进入 `Verify`。
 - `ImplementSlice`：偏大任务按纵向片推进，每片独立实现和最小验证。
 - `UpdatePlan` / `FixFindings`：方案审查或实现审查 findings 的回流状态。
+- `RuleDistill`：任务结束前的规则沉淀检查；只有用户纠正或 review/测试/子代理暴露可复用决策偏差时才落规则。
 
 完整状态、事件、守卫条件、动作和退出条件见 `references/statechart.md`。
 
@@ -94,9 +95,10 @@ Intake -> ContextGather -> Plan -> PlanReview -> PlanApproval -> Implement -> Re
 ### 交付
 
 - 检查最终 diff、旧命名、重复状态、工作区 dirty、导出命名和 `git diff --check`。
+- `Deliver` 发现仍要修东西时，先按问题类型回流，不进入 `RuleDistill`：实现漏改、旧命名或 diff 问题回 `Implement`；验证记录不足或该补验证回 `Verify`；需求或方案理解错回 `Plan` / `UpdatePlan` 并让旧批准失效；只有最终回复内容缺依据或表达不完整时留在 `Deliver` 修交付内容。
 - 任务台账启用时，最终回复从验证记录和当前 diff 生成；交付回复保留可复跑的验证依据。
 - 仅在用户明确要求提交，或交付 diff 后用户确认提交时，才 commit；不 push，除非用户明确要求。
-- 交付后若被用户纠正，按 `references/rule-distillation.md` 沉淀可复用规则。
+- 只有 `delivery_ready` 后才进入 `RuleDistill` 检查：用户纠正、review/测试/子代理结果暴露可复用决策偏差时，按 `references/rule-distillation.md` 判断是否沉淀；没有可复用规则时记录 `not_needed`，不要为凑流程写空规则。
 
 ## 分支模式
 

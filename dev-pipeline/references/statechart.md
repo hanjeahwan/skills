@@ -5,7 +5,7 @@
 高约束实现主干：
 
 ```text
-Intake -> ContextGather -> Plan -> PlanReview -> PlanApproval -> Implement -> Review -> Verify -> Deliver
+Intake -> ContextGather -> Plan -> PlanReview -> PlanApproval -> Implement -> Review -> Verify -> Deliver -> RuleDistill
 ```
 
 只读、轻量和阻塞分支仍可按事件进入 `OffRamp`、`ReadOnly`、`Context`、`WaitForUser`、`Parked` 或 `ImplementSlice`。
@@ -28,7 +28,8 @@ Intake -> ContextGather -> Plan -> PlanReview -> PlanApproval -> Implement -> Re
 | `Review` | 阻塞式实现审查子代理关卡，审 diff 正确性、行为回归和验证覆盖 | 无 findings 进入 `Verify`；有 findings 进入 `FixFindings` |
 | `FixFindings` | 主线程修复实现审查 findings | 修复完成后回到 `Review` |
 | `Verify` | 主线程执行实际验证：定向测试、typecheck、lint、静态检查、代码路径审查或未验证项记录 | 验证足够；或按问题类型回流 |
-| `Deliver` | 最终 diff 或只读结论、验证记录、交付回复和提交边界检查 | 交付完成；或发现问题回流 |
+| `Deliver` | 最终 diff 或只读结论、验证记录、交付回复和提交边界检查 | `delivery_ready` 后进入 `RuleDistill`；发现仍要修时先按问题类型回流 |
+| `RuleDistill` | 任务结束前判断是否需要沉淀可复用规则 | 规则已沉淀或明确不需要沉淀，最终回复完成 |
 | `WaitForUser` | 等待确认、关键信息或高副作用授权 | 用户补齐信息或确认后回到原状态 |
 | `Parked` | 外部阻塞被搁置但仍可推进其它部分 | 阻塞解除后回到记录的状态 |
 
@@ -68,11 +69,19 @@ Intake -> ContextGather -> Plan -> PlanReview -> PlanApproval -> Implement -> Re
 | `requirement_or_plan_wrong` | `Verify` | `Plan` | 验证发现需求或方案理解错 |
 | `validation_gap` | `Verify` | `Verify` | 验证不足但可继续补 |
 | `verification_sufficient` | `Verify` | `Deliver` | 验证记录能支撑交付 |
-| `final_check_failed` | `Deliver` | `Verify` 或 `Implement` | diff、验证、工作区或命名检查失败 |
+| `deliver_plan_fix_needed` | `Deliver` | `Plan` 或 `UpdatePlan` | 交付检查发现需求、方案、contract、状态流、副作用或实现边界理解错；旧批准必须置为 stale |
+| `deliver_implementation_fix_needed` | `Deliver` | `Implement` | 交付检查发现实现漏改、旧命名残留、diff 问题或导出/命名错误 |
+| `deliver_verification_fix_needed` | `Deliver` | `Verify` | 交付检查发现验证记录不足、缺应跑验证或未验证项不具体 |
+| `deliver_response_fix_needed` | `Deliver` | `Deliver` | 交付物本身已就绪，但最终回复缺依据、措辞不清或没有反映验证记录 |
+| `final_check_failed` | `Deliver` | `Plan` / `UpdatePlan` / `Implement` / `Verify` / `Deliver` | 兜底事件：按问题类型分流；不能进入 `RuleDistill` |
+| `delivery_ready` | `Deliver` | `RuleDistill` | 最终 diff、验证记录、提交边界和交付内容已检查，且没有待修项 |
+| `rule_distillation_needed` | `RuleDistill` | `RuleDistill` | 用户纠正、review/测试/子代理结果暴露可复用决策偏差，且通过规则沉淀四关 |
+| `rule_distillation_not_needed` | `RuleDistill` | 结束 | 未发现可复用决策偏差，或不满足可泛化/最小/连贯/可执行 |
+| `rule_distilled` | `RuleDistill` | 结束 | 已把规则沉淀到正确拥有者，并完成必要校验 |
 | `blocker_parked` | 任意可局部推进状态 | `Parked` | 外部阻塞影响部分范围，已记录 `resume_state` 和可推进范围 |
 | `independent_work_continues` | `Parked` | 原可推进状态 | 只推进与阻塞决策独立的工作 |
 | `blocker_resolved` | `Parked` | `resume_state` | 阻塞解除，回到记录状态 |
-| `delivered` | `Deliver` | 结束 | 最终回复完成，且未越过 commit/push 授权 |
+| `delivered` | `RuleDistill` | 结束 | 最终回复完成，且未越过 commit/push 授权 |
 
 ## 守卫条件
 
@@ -92,6 +101,9 @@ Intake -> ContextGather -> Plan -> PlanReview -> PlanApproval -> Implement -> Re
 - `parked_guard`：`Parked` 只允许推进与阻塞决策独立的工作；整条任务被阻塞时进入 `WaitForUser`。
 - `oscillation_guard`：同一类 PlanReview 或 Review 回流超过 2 次，停下总结卡点，给用户选项。
 - `verification_guard`：最终回复里的验证结论必须能从验证记录、实际工具调用或当前 diff 追溯。
+- `delivery_ready_guard`：只有 diff、验证记录、提交边界、工作区归属和最终回复内容都不需要继续修正时，`Deliver` 才能进入 `RuleDistill`。
+- `deliver_repair_guard`：`Deliver` 发现待修项时必须先分类回流；实现问题回 `Implement`，验证问题回 `Verify`，需求/方案问题回 `Plan` / `UpdatePlan` 并置旧批准为 stale，回复内容问题留在 `Deliver`。
+- `rule_distillation_guard`：任务结束前必须判断是否存在可复用决策偏差；只有同时满足可泛化、最小、连贯、可执行，才按 `references/rule-distillation.md` 沉淀到正确拥有者。没有合格规则时记录 `not_needed`，不写空规则。
 - `explicit_command_guard`：build、打包、启动 server 和浏览器验证必须由用户明确要求；未明确要求时按策略跳过并记录替代证据。
 
 ## 动作
@@ -113,6 +125,8 @@ Intake -> ContextGather -> Plan -> PlanReview -> PlanApproval -> Implement -> Re
 - `record_fix_findings`：记录修复或不采纳的 findings 以及重审结果。
 - `record_verification`：记录实际命令或完整目标范围、覆盖风险、未验证项和替代证据。
 - `record_skipped_by_policy`：记录按策略跳过的 build、server 或浏览器验证命令、跳过原因和替代证据。
+- `record_deliver_repair`：记录 `Deliver` 检查发现的待修项、分类、回流目标和旧批准是否失效。
+- `record_rule_distillation`：记录规则沉淀检查结果：`not_needed`、`distilled` 或 `skipped`，以及依据和落点。
 - `record_parked_blocker`：记录阻塞点、等待对象、解除后回到的状态。
 
 ## 切片子状态
