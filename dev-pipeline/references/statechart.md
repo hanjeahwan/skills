@@ -19,7 +19,7 @@ Intake -> ContextGather -> Plan -> PlanReview -> PlanApproval -> Implement -> Re
 | `ReadOnly` | 只读模式门：禁止写文件、任务台账和实现关卡 | 进入 `Context` 收集证据，启动只读审查子代理，或在 `Plan` 后交付判断 |
 | `Context` | 低风险或只读任务由主线程收集 repo 证据 | 足够支撑方案、审查结论；或发现需用户澄清 |
 | `ContextGather` | 高约束实现的阻塞式上下文子代理关卡 | 子代理返回证据包；或工具不可用/平台禁止/安全边界冲突并完成本地替代证据包 |
-| `Plan` | 主线程基于证据包形成方案、风险、范围、验证计划和切片，写入 `plan.md` | 方案可审查；或进入 `WaitForUser` |
+| `Plan` | 主线程基于证据包形成方案、风险、范围、验证计划和切片，写入 `plan.md` | 方案通过计划质量自查且可审查；或进入 `WaitForUser` |
 | `PlanReview` | 阻塞式方案审查子代理关卡，审 `plan.md`、上下文证据包和关键源码/contract 引用 | 无 findings 进入 `PlanApproval`；或 findings 进入 `UpdatePlan` |
 | `PlanApproval` | 用户批准当前计划版本的阻塞关卡 | 当前计划版本被明确批准后进入 `Implement`；方案变更回到 `UpdatePlan` |
 | `UpdatePlan` | 主线程处理方案审查 findings 或用户改动要求 | material change 更新计划版本并回到 `PlanReview`；minor scoped note 记录后进入 `PlanApproval` |
@@ -46,7 +46,7 @@ Intake -> ContextGather -> Plan -> PlanReview -> PlanApproval -> Implement -> Re
 | `context_gather_passed` | `ContextGather` | `Plan` | 阻塞式上下文子代理返回证据包 |
 | `context_gather_degraded` | `ContextGather` | `Plan` | 仅工具不可用、平台禁止或安全边界冲突；已记录本地替代证据包 |
 | `needs_user` | 任意写入前状态 | `WaitForUser` | 信息缺失、高副作用或确认门槛触发 |
-| `plan_ready_for_review` | `Plan` | `PlanReview` | 高约束实现方案可审查 |
+| `plan_ready_for_review` | `Plan` | `PlanReview` | 高约束实现方案通过 `plan_quality_guard`，且当前 `plan.md` 可审查 |
 | `plan_review_passed` | `PlanReview` | `PlanApproval` | 阻塞式方案审查返回无 findings，且 `reviewed_plan_revision == current_plan_revision` |
 | `plan_review_findings` | `PlanReview` | `UpdatePlan` | 方案审查返回有效 findings |
 | `plan_update_material` | `UpdatePlan` | `PlanReview` | finding 或用户要求改变目标行为、contract、状态流、副作用归属、验证策略或实现边界；旧批准已置为 stale |
@@ -58,9 +58,9 @@ Intake -> ContextGather -> Plan -> PlanReview -> PlanApproval -> Implement -> Re
 | `light_context_ready` | `Context` | `Implement` | 单文件低风险改动，`implementation_light_guard` 通过，未启用高约束主干 |
 | `slice_started` | `Implement` | `ImplementSlice` | 当前片有明确目标和最小验证 |
 | `slice_complete` | `ImplementSlice` | `Implement` | 当前片完成并记录最小验证 |
-| `implementation_done` | `Implement` | `Review` | 所有必要片完成，diff 可独立审查 |
-| `review_passed` | `Review` | `Verify` | 阻塞式实现审查返回无 findings |
-| `review_findings` | `Review` | `FixFindings` | 实现审查返回有效 findings |
+| `implementation_done` | `Implement` | `Review` | 所有必要片完成，当前 diff snapshot 可独立审查 |
+| `review_passed` | `Review` | `Verify` | 阻塞式实现审查返回无 findings，`scope_compliance` 和 `implementation_quality` 均无阻塞项，且审查 snapshot 仍是当前 diff |
+| `review_findings` | `Review` | `FixFindings` | 实现审查返回有效 `scope_compliance` 或 `implementation_quality` findings |
 | `fix_findings_done` | `FixFindings` | `Review` | findings 已修复或明确不采纳并记录理由 |
 | `verification_bug` | `Verify` | `Implement` | 验证发现实现错误 |
 | `requirement_or_plan_wrong` | `Verify` | `Plan` | 验证发现需求或方案理解错 |
@@ -89,13 +89,15 @@ Intake -> ContextGather -> Plan -> PlanReview -> PlanApproval -> Implement -> Re
 - `blocking_delegate_guard`：blocking 子代理返回前不能越过等待点；回来慢不构成降级理由。
 - `prompt_template_guard`：启动任何子代理前必须完成 prompts 发现协议并声明 `prompt_source` 和 `prompt_basis`；`prompt_source` 是模板路径时必须已加载模板全文，`prompt_source: fallback` 时 `prompt_basis` 必须说明没有匹配模板的原因和只读边界。
 - `context_pack_guard`：`ContextGather` 只产 repo 证据、入口、contract、风险和未解问题，不替主线程定方案。
+- `plan_quality_guard`：高约束计划进入 `PlanReview` / `PlanApproval` 前必须通过短自查：需求覆盖、无 TODO/TBD/占位符/“类似上一片”、切片可执行且可验证、涉及文件/owner/contract/命名清楚、验证计划具体；不通过时留在 `Plan` 修正。
 - `plan_approval_guard`：高约束主干进入 `Implement` 前必须满足 `approved_plan_revision == current_plan_revision`；初始请求、模糊认可和旧计划批准都不能替代当前计划批准。
-- `review_gate_guard`：`Review` findings 未处理并重审前不能进入 `Verify` 或 `Deliver`。
+- `review_gate_guard`：`Review` 必须区分 `scope_compliance` 和 `implementation_quality`；任一类 findings 未处理并重审前不能进入 `Verify` 或 `Deliver`，其中 scope/计划不一致不能降级成普通质量建议。
+- `artifact_freshness_guard`：子代理通过只证明它审过的 `plan_revision`、diff snapshot 或 verification record；主线程继续修改后旧通过结果失效，进入 `Verify` / `Deliver` 前必须确认当前 artifact 仍匹配审查对象。
 - `minor_note_guard`：只有不改变目标行为、contract、状态流、副作用归属、验证策略或实现边界的 finding，才能作为 minor scoped note 进入 `PlanApproval`。
 - `side_effect_approval_guard`：`PlanApproval` 只授权按执行计划改文件；删除、部署、发送消息、批量联网改状态、付费调用等高副作用动作仍需单独确认，除非执行计划逐项列明环境、范围、回滚/停止条件且用户批准语明确覆盖。
 - `parked_guard`：`Parked` 只允许推进与阻塞决策独立的工作；整条任务被阻塞时进入 `WaitForUser`。
 - `oscillation_guard`：同一类 PlanReview 或 Review 回流超过 2 次，停下总结卡点，给用户选项。
-- `verification_guard`：最终回复里的验证结论必须能从验证记录、实际工具调用或当前 diff 追溯。
+- `verification_guard`：最终回复里的验证结论必须能从验证记录、实际工具调用或当前 diff 追溯；子代理通过是证据，不替代主线程对当前 diff、任务台账和验证记录的检查。
 - `delivery_ready_guard`：只有 diff、验证记录、提交边界、工作区归属和最终回复内容都不需要继续修正时，`Deliver` 才能进入 `RuleDistill`。
 - `deliver_repair_guard`：`Deliver` 发现待修项时必须先分类回流；实现问题回 `Implement`，验证问题回 `Verify`，需求/方案问题回 `Plan` / `UpdatePlan` 并置旧批准为 stale，回复内容问题留在 `Deliver`。
 - `rule_distillation_guard`：任务结束前必须判断是否存在可复用决策偏差；只有同时满足可泛化、最小、连贯、可执行，才按 `references/rule-distillation.md` 沉淀到正确拥有者。没有合格规则时记录 `not_needed`，不写空规则。
@@ -108,13 +110,14 @@ Intake -> ContextGather -> Plan -> PlanReview -> PlanApproval -> Implement -> Re
 - `spawn_context_gather_actor`：满足 `prompt_template_guard` 后，按 `references/delegation.md` 启动阻塞式上下文子代理。
 - `record_context_pack`：记录上下文证据包、未解问题和本地替代原因。
 - `record_plan_revision`：写入或更新 `plan.md` 后记录 `current_plan_revision`；material change 必须置旧批准为 stale。
+- `record_plan_quality_check`：记录计划质量自查结果；未通过时留在 `Plan` 修正，不进入 `PlanReview`。
 - `record_plan_update`：记录 PlanReview findings、采纳/不采纳理由、是否 material change。
 - `record_plan_approval`：记录批准状态、批准消息、`approved_plan_revision`、无效化原因和下一状态。
 - `record_slice_transition`：切片进入、最小验证、完成或回流时更新切片状态（`slice_states`）。
 - `spawn_plan_review_actor`：满足 `prompt_template_guard` 后，按 `references/delegation.md` 启动阻塞式方案审查子代理。
 - `spawn_review_actor`：满足 `prompt_template_guard` 后，按 `references/delegation.md` 启动阻塞式实现审查子代理。
 - `spawn_read_only_or_sidecar_actor`：满足 `prompt_template_guard` 后，按 `references/delegation.md` 启动只读审查或旁路子代理。
-- `record_review_result`：记录 Review findings、影响状态、是否回流。
+- `record_review_result`：按 `scope_compliance` 和 `implementation_quality` 记录 Review findings、审查 snapshot、影响状态和是否回流。
 - `record_fix_findings`：记录修复或不采纳的 findings 以及重审结果。
 - `record_verification`：记录实际命令或完整目标范围、覆盖风险、未验证项和替代证据。
 - `record_skipped_by_policy`：记录按策略跳过的 build、server 或浏览器验证命令、跳过原因和替代证据。

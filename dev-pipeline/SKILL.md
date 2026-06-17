@@ -70,6 +70,7 @@ Intake -> ContextGather -> Plan -> PlanReview -> PlanApproval -> Implement -> Re
 - 大改前先形成执行计划：当前行为、目标行为、改动范围、保持不变的行为、风险、验证计划。
 - 启用任务台账时，执行计划写入 `.dev-pipeline/<date>-<short-slug>/plan.md`，任务台账写入同目录 `task.md`。
 - 任务偏大时，方案里切纵向片：每片是一条薄的端到端改动，有明确验证入口。
+- 进入 `PlanReview` 前，执行计划必须通过质量自查：需求覆盖、无 TODO/TBD/占位符、切片可执行且可验证、文件/contract/状态流/副作用边界清楚、验证计划具体。
 - 主线程基于 `ContextGather` 证据包形成方案，然后进入 `PlanReview`：按 `references/delegation.md` 声明子代理执行体的 `purpose`、`join_point`、`max_impact`、`wait_policy`、`prompt_source` 和 `prompt_basis`。
 - `PlanReview` 是 blocking 关卡，输入必须包含 `plan.md`、`ContextGather` 证据包和关键源码/contract 引用。返回 findings 时先 `UpdatePlan`：改变目标行为、contract、状态流、副作用归属、验证策略或实现边界的 material change 必须更新 `plan.md`、刷新 `current_plan_revision`、置旧批准失效并重过 `PlanReview`；不改变这些边界的 minor scoped note 可记录采纳/不采纳理由后进入 `PlanApproval`。
 - `PlanApproval` 是用户批准关卡。主线程把执行计划摘要和 `plan.md` 路径发给用户，等待明确批准；只有批准当前计划版本后才能进入 `Implement`。用户要求改执行计划时回 `UpdatePlan`；批准语义含糊时停在 `PlanApproval`。
@@ -81,7 +82,7 @@ Intake -> ContextGather -> Plan -> PlanReview -> PlanApproval -> Implement -> Re
 - 高约束主干开始写入前，检查 `approved_plan_revision == current_plan_revision`；不满足时回到 `PlanApproval`，不要用最初的“按完整流程执行”当作批准。
 - 已切片时进入 `ImplementSlice`：片状态随状态转移更新为 `planned`、`implementing`、`min_verified`、`complete` 或 `rework`。
 - 实现规则见 `references/implementation.md`；调试、TDD、文档等分支按下方分支模式加载对应参考文件。
-- 实现完成后进入 `Review` blocking 关卡：子代理审查 diff 正确性、行为回归和验证覆盖。发现 findings 时进入 `FixFindings`，修复后重过 `Review`；无 findings 才进入 `Verify`。
+- 实现完成后进入 `Review` blocking 关卡：子代理按 `scope_compliance` 和 `implementation_quality` 审查当前 diff snapshot、行为回归和验证覆盖。发现 findings 时进入 `FixFindings`，修复后重过 `Review`；无 findings 且当前 diff 未替换审查 snapshot，才进入 `Verify`。
 
 ### 验证
 
@@ -104,7 +105,7 @@ Intake -> ContextGather -> Plan -> PlanReview -> PlanApproval -> Implement -> Re
 
 - **代码审查** — 触发：`review`、`code review`、`看 diff`、`审这个 PR`。只读，不进 Implement。加载 `references/code-review.md`。
 - **调试** — 触发：报 bug、行为异常、排查、`debug`。加载 `references/debugging.md`。
-- **测试驱动** — 触发：`TDD`、`test-first`、`red-green-refactor`。加载 `references/tdd.md`。
+- **测试驱动** — 触发：`TDD`、`test-first`、`red-green-refactor`、明确要求 test-first integration coverage，或高风险行为且已有可维护 test harness。普通 integration tests 不自动触发 TDD。加载 `references/tdd.md`。
 - **文档** — 触发：改 README/ADR/技术说明。加载 `references/docs.md`。
 - **重构准备** — 触发：高风险重构/迁移/架构调整。加载 `references/refactor-prep.md`。
 

@@ -515,6 +515,54 @@
         "不把 ReadOnly 误解为禁止所有子代理"
       ],
       "files": []
+    },
+    {
+      "id": 46,
+      "prompt": "这个多模块方案里有一片先写 TBD，另一个入口按上一片类似处理，先拿去 PlanReview 吧。",
+      "expected_output": "不能进入 PlanReview；先在 Plan 里通过计划质量自查，修掉 TBD/类似上一片这类占位内容，再让方案可审查。",
+      "expectations": [
+        "识别高约束计划进入 PlanReview 前受 plan_quality_guard 约束",
+        "指出 TODO/TBD/类似上一片属于占位符或不可执行计划",
+        "留在 Plan 修正计划质量，不启动 PlanReview",
+        "修正后才允许 plan_ready_for_review"
+      ],
+      "files": []
+    },
+    {
+      "id": 47,
+      "prompt": "Review 子代理说 OK，但我刚又改了 diff，可以直接 Verify 吗？",
+      "expected_output": "不能直接 Verify；子代理通过只绑定被审 diff snapshot，当前 diff 变了需要重新审查或记录为何仍匹配。",
+      "expectations": [
+        "识别子代理通过是证据，不是完成证明",
+        "检查当前 diff 是否仍匹配被审 snapshot",
+        "diff 改变时回到 Review 或记录充分的 freshness 依据",
+        "不把旧通过结果当作当前 diff 的交付证明"
+      ],
+      "files": []
+    },
+    {
+      "id": 48,
+      "prompt": "把用户资料 mapper 的 payload 字段改一下，项目已经有 mapper 单测。",
+      "expected_output": "识别为高风险 API mapper 行为且已有可维护 test harness，进入 Implement 后采用 TDD 分支：先 RED，再 GREEN，再 REFACTOR。",
+      "expectations": [
+        "识别 API mapper/payload 属于高风险行为",
+        "已有可维护 test harness 时读取 tdd.md",
+        "TDD 只改变 Implement 节奏，不跳过 PlanApproval",
+        "先写失败的行为测试，再做最小实现"
+      ],
+      "files": []
+    },
+    {
+      "id": 49,
+      "prompt": "跑一下 integration tests，可能要启动服务和浏览器，你自己看着办。",
+      "expected_output": "普通 integration tests 不自动触发 TDD；需要 build/server/browser 的验证仍受 explicit_command_guard，未明确授权时跳过高成本命令并给更窄替代。",
+      "expectations": [
+        "不把普通 integration tests 当作 TDD 触发",
+        "识别 server/browser/build 需要用户明确授权",
+        "未授权时不启动服务、不打开浏览器、不跑构建产物命令",
+        "记录 skipped_by_policy 和替代验证证据"
+      ],
+      "files": []
     }
   ]
 }

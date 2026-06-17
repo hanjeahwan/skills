@@ -41,6 +41,8 @@
 
 ## 执行体契约
 
+启动前把执行体契约和输入包一起给子代理；不要让子代理靠整段聊天历史或完整计划自己猜重点。
+
 每次启动前先声明：
 
 ```text
@@ -60,6 +62,14 @@ prompt_basis: <匹配的 触发：行摘要；fallback 时写 no matching templa
 - `wait_policy`：等待到返回、仅不可执行时降级，或作为旁路任务继续。
 - `prompt_source`：按发现协议加载的模板路径；没有匹配模板时只能写 `fallback`。
 - `prompt_basis`：为什么选这个模板；fallback 时写明未匹配原因和临时说明的只读边界。
+
+输入包至少包含：
+
+- `task_goal`：本次要判断或降低的风险。
+- `artifact_ref`：正在审的 `plan.md` revision、diff snapshot、verification record 或证据包版本。
+- `evidence`：相关文件、diff、contract、schema、测试入口或任务台账路径；只给与本次目的相关的范围。
+- `forbidden_actions`：只读边界、禁止写入、禁止 stage/commit/push、禁止运行未授权高成本命令或改变 runtime 状态。
+- `expected_output`：期望返回 findings、pass 条件、残余风险和需要回流的状态。
 
 等待点语义：
 
@@ -113,12 +123,13 @@ prompt_basis: <匹配的 触发：行摘要；fallback 时写 no matching templa
 
 审查至少覆盖：
 
-- diff 是否符合方案和范围。
+- `scope_compliance`：diff 是否符合用户需求、当前批准方案和改动范围，有无漏做、误做或额外行为。
+- `implementation_quality`：代码质量、测试、可维护性、错误处理和风险控制是否足够。
 - 行为回归、非法状态和副作用归属。
 - contract、类型、schema 或权限/数据流风险。
 - 验证记录是否覆盖关键风险，未验证项是否具体。
 
-返回 findings 时进入 `FixFindings`；修复或明确不采纳并记录理由后，必须重过 `Review`。无 findings 才能进入 `Verify`。
+`scope_compliance` 不通过时必须当作阻塞 finding 处理，不能降级成普通质量建议。返回 findings 时进入 `FixFindings`；修复或明确不采纳并记录理由后，必须重过 `Review`。无 findings 且审查 snapshot 仍匹配当前 diff 时，才能进入 `Verify`。
 
 ## 结果处理
 
@@ -126,6 +137,7 @@ prompt_basis: <匹配的 触发：行摘要；fallback 时写 no matching templa
 
 - blocking gate 无 findings：通过对应等待点；`plan-review` 的下一状态是 `PlanApproval`，不是 `Implement`。
 - blocking gate 有 findings：回流到 `UpdatePlan` 或 `FixFindings`，不能继续越过等待点。
+- 子代理通过是被审产物（artifact）的证据，不是完成证明；进入下一状态前确认当前 `plan_revision`、diff snapshot 或 verification record 没有被后续改动替换。
 - 结果已被后续改动覆盖：记录证据，但仍要判断是否需要重审当前 diff 或方案。
 - 结果与 repo 事实不符：记录不采纳理由；若它本来挡关卡，必须说明为何不采纳后仍满足守卫条件。
 - 工具不可用、平台规则不允许或安全边界冲突：记录 `unavailable_degrade_only` 的本地替代审查。

@@ -19,7 +19,7 @@
 
 - `code-review.md`：用户要求 review、code review、看 diff、审 PR 时读取，只读不进 `Implement`。
 - `debugging.md`：用户报告 bug、行为异常、排查或 debug 时读取。
-- `tdd.md`：用户明确要求 TDD、test-first、red-green-refactor，或行为风险高且项目已有可维护 test harness 时读取。
+- `tdd.md`：用户明确要求 TDD、test-first、red-green-refactor、test-first integration coverage，或业务状态流、API mapper/schema、权限/计费/保存/发布/删除、可复现 bug、多 boolean/enum 状态等高风险行为且项目已有可维护 test harness 时读取。普通 integration tests 不自动触发 TDD。
 - `docs.md`：改 README、ADR、技术说明或同步技术文档时读取。
 
 ## 子代理委派
