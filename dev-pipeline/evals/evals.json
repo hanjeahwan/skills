@@ -187,12 +187,13 @@
     {
       "id": 17,
       "prompt": "把这个组件里的文案从 Save 改成保存。",
-      "expected_output": "单文件低风险改动走轻量路径：不启动子代理、不切片、不创建任务台账，必要时一句话说明低风险原因。",
+      "expected_output": "单文件低风险改动走轻量路径：不启动子代理、不切片、不创建任务台账，不进入 Review 子代理；完成后做主线程 diff 自查和必要验证，必要时说明低风险依据。",
       "expectations": [
         "判定为单文件低风险任务",
         "不启动子代理、不执行 prompts/ 发现协议",
         "不创建 .dev-pipeline 任务台账",
-        "保持范围只改目标文案"
+        "保持范围只改目标文案",
+        "跳过 Review 子代理时有低风险依据，并用主线程 diff 自查或验证记录支撑交付"
       ],
       "files": []
     },
@@ -409,24 +410,26 @@
     {
       "id": 27,
       "prompt": "实现已经写完了，准备交付这个多模块改动。",
-      "expected_output": "实现完成后先进入 Review blocking 子代理关卡，审 diff 正确性、行为回归和验证覆盖；不能直接 Verify 或 Deliver。",
+      "expected_output": "高约束实现完成后必须进入 Review(subagent, blocking)，启动 purpose: diff-review 的阻塞式关卡审当前 diff snapshot；verification 只能补充验证覆盖，不能满足 review_gate_guard；不能直接 Verify 或 Deliver。",
       "expectations": [
         "从 Implement 进入 Review 而不是直接 Verify/Deliver",
-        "启动 diff-review 或 verification blocking 子代理",
-        "Review 通过前不进入 Verify",
-        "任务台账写入 Review gate 和子代理状态"
+        "启动 purpose: diff-review 的阻塞式子代理",
+        "不把 verification 子代理、测试或验证覆盖审查当作 diff-review 的替代",
+        "Review 通过前不进入正式 Verify 或 Deliver",
+        "任务台账写入 Review gate、review_required、review_status、artifact_ref 和子代理状态"
       ],
       "files": []
     },
     {
       "id": 28,
       "prompt": "Review 子代理发现 diff 漏了 published edit 路径。",
-      "expected_output": "进入 FixFindings 修复，再重过 Review；不能只把 finding 记在交付备注里。",
+      "expected_output": "进入 FixFindings 修复；只要修复改变 diff，旧 Review snapshot 失效，必须重新启动 Review(subagent, blocking) / diff-review；不能只把 finding 记在交付备注里。",
       "expectations": [
         "识别漏路径是有效 Review finding",
         "进入 FixFindings 修复或明确不采纳并说明 repo 证据",
-        "FixFindings 后重新进入 Review",
-        "Review 通过后才进入 Verify"
+        "FixFindings 后重新启动 diff-review 阻塞式子代理",
+        "记录 rerun_required_after_fix 或 review_passed_for_current_diff，防止复用旧 Review 结果",
+        "Review 通过后才进入正式 Verify"
       ],
       "files": []
     },

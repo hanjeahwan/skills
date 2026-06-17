@@ -17,7 +17,7 @@
 
 ## 阻塞式状态流
 
-高约束实现任务使用上下文、方案审查、用户批准和实现审查关卡。子代理在审查关卡里是阻塞式执行体，不是旁路建议；用户批准关卡决定当前计划版本是否允许进入写入。
+高约束实现任务使用上下文、方案审查、用户批准和实现审查关卡。子代理在审查关卡里是阻塞式执行体，不是旁路建议；用户批准关卡决定当前计划版本是否允许进入写入。图示为高约束主干；轻量路径通过低风险依据和主线程 diff 自查跳过子代理 `Review`。
 
 ```mermaid
 flowchart TD
@@ -82,7 +82,7 @@ flowchart TD
 - `Plan` 生成 `.dev-pipeline/<date>-<short-slug>/plan.md`；`.dev-pipeline/<date>-<short-slug>/task.md` 记录任务台账。
 - `PlanReview` 审查执行计划、上下文证据和关键 contract；有实质发现项时先改方案，重大方案变化重新 review。
 - `PlanApproval` 等待用户批准当前计划版本；`approved_plan_revision == current_plan_revision` 后才允许进入 `Implement`。
-- `Review` 审查实现 diff 和验证覆盖；有发现项时修复后再 review。
+- `Review` 审查实现 diff 和验证覆盖；有发现项时修复后再 review。`FixFindings -> Review` 是对新 diff snapshot 的重审，旧 Review 结果不可复用。
 - `Verify` 由主线程执行实际验证，例如定向测试、typecheck、lint、静态检查或未验证项记录；build 只在用户明确要求时执行，`Review` 不能直接替代 `Verify`。
 - `Deliver` 是出口检查点；发现仍要修时按问题类型回 `Plan` / `Implement` / `Verify` 或留在 `Deliver` 修回复。
 - `RuleDistill` 在最终回复前检查是否有可复用决策偏差；只有过四关才沉淀规则，没有就记录不需要。

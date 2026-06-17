@@ -83,11 +83,16 @@ approval_invalidated_reason: <material plan change / user requested change / non
 - next_state: Implement / UpdatePlan / PlanApproval / WaitForUser
 
 ## 实现审查处理
+- review_required: yes/no
+- review_skip_reason: <none / light path not_applicable / unavailable_degrade_only>
+- review_status: pending / passed / findings / degraded / not_applicable
+- review_passed_for_current_diff: yes/no
+- artifact_ref: <被审 diff snapshot；FixFindings 或后续 diff 改变时旧审查失效>
+- rerun_required_after_fix: yes/no
 - finding: <Review finding>
   - category: scope_compliance / implementation_quality
   - disposition: fixed / rejected / already_covered
   - affected_slice: <片名或 none>
-  - artifact_ref: <被审 diff snapshot；后续 diff 改变时必须重审>
   - evidence: <修复证据或不采纳理由>
   - next_state: Review / Verify / WaitForUser
 

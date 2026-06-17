@@ -8,7 +8,7 @@
 Intake -> ContextGather -> Plan -> PlanReview -> PlanApproval -> Implement -> Review -> Verify -> Deliver -> RuleDistill
 ```
 
-只读、轻量和阻塞分支仍可按事件进入 `OffRamp`、`ReadOnly`、`Context`、`WaitForUser`、`Parked` 或 `ImplementSlice`。
+只读、轻量和阻塞分支仍可按事件进入 `OffRamp`、`ReadOnly`、`Context`、`WaitForUser`、`Parked` 或 `ImplementSlice`。轻量实现不走高约束 `Review` 子代理关卡，完成后用 `light_implementation_done` 进入 `Verify`。
 
 ## 状态
 
@@ -58,10 +58,11 @@ Intake -> ContextGather -> Plan -> PlanReview -> PlanApproval -> Implement -> Re
 | `light_context_ready` | `Context` | `Implement` | 单文件低风险改动，`implementation_light_guard` 通过，未启用高约束主干 |
 | `slice_started` | `Implement` | `ImplementSlice` | 当前片有明确目标和最小验证 |
 | `slice_complete` | `ImplementSlice` | `Implement` | 当前片完成并记录最小验证 |
-| `implementation_done` | `Implement` | `Review` | 所有必要片完成，当前 diff snapshot 可独立审查 |
+| `implementation_done` | `Implement` | `Review` | 高约束主干所有必要片完成，当前 diff snapshot 可独立审查；`Review` 通过前不能进入正式 `Verify` 或 `Deliver` |
+| `light_implementation_done` | `Implement` | `Verify` | 单文件低风险轻量实现完成；已记录 `review_gate_guard: not_applicable`、低风险依据、主线程 diff 自查和验证记录 |
 | `review_passed` | `Review` | `Verify` | 阻塞式实现审查返回无发现项，`scope_compliance` 和 `implementation_quality` 均无阻塞项，且审查 snapshot 仍是当前 diff |
 | `review_findings` | `Review` | `FixFindings` | 实现审查返回有效 `scope_compliance` 或 `implementation_quality` 发现项 |
-| `fix_findings_done` | `FixFindings` | `Review` | 发现项已修复或明确不采纳并记录理由 |
+| `fix_findings_done` | `FixFindings` | `Review` | 发现项已修复或明确不采纳并记录理由；修复改变 diff 时旧审查 snapshot 失效，必须重审 |
 | `verification_bug` | `Verify` | `Implement` | 验证发现实现错误 |
 | `requirement_or_plan_wrong` | `Verify` | `Plan` | 验证发现需求或方案理解错 |
 | `validation_gap` | `Verify` | `Verify` | 验证不足但可继续补 |
@@ -91,7 +92,7 @@ Intake -> ContextGather -> Plan -> PlanReview -> PlanApproval -> Implement -> Re
 - `context_pack_guard`：`ContextGather` 只产 repo 证据、入口、contract、风险和未解问题，不替主线程定方案。
 - `plan_quality_guard`：高约束计划进入 `PlanReview` / `PlanApproval` 前必须通过短自查：需求覆盖、无 TODO/TBD/占位符/“类似上一片”、切片可执行且可验证、涉及文件/owner/contract/命名清楚、验证计划具体；不通过时留在 `Plan` 修正。
 - `plan_approval_guard`：高约束主干进入 `Implement` 前必须满足 `approved_plan_revision == current_plan_revision`；初始请求、模糊认可和旧计划批准都不能替代当前计划批准。
-- `review_gate_guard`：`Review` 必须区分 `scope_compliance` 和 `implementation_quality`；任一类发现项未处理并重审前不能进入 `Verify` 或 `Deliver`，其中 scope/计划不一致不能降级成普通质量建议。
+- `review_gate_guard`：高约束主干的 `Review` 必须启动 `diff-review` 阻塞式子代理并区分 `scope_compliance` 和 `implementation_quality`；任一类发现项未处理并重审前不能进入正式 `Verify` 或 `Deliver`，其中 scope/计划不一致不能降级成普通质量建议。轻量路径跳过子代理审查时必须记录 `not_applicable`、低风险依据、主线程 diff 自查和验证记录。
 - `artifact_freshness_guard`：子代理通过只证明它审过的 `plan_revision`、diff snapshot 或 verification record；主线程继续修改后旧通过结果失效，进入 `Verify` / `Deliver` 前必须确认当前 artifact 仍匹配审查对象。
 - `minor_note_guard`：只有不改变目标行为、contract、状态流、副作用归属、验证策略或实现边界的发现项，才能作为 minor scoped note 进入 `PlanApproval`。
 - `side_effect_approval_guard`：`PlanApproval` 只授权按执行计划改文件；删除、部署、发送消息、批量联网改状态、付费调用等高副作用动作仍需单独确认，除非执行计划逐项列明环境、范围、回滚/停止条件且用户批准语义明确覆盖。

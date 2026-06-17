@@ -82,7 +82,7 @@ Intake -> ContextGather -> Plan -> PlanReview -> PlanApproval -> Implement -> Re
 - 高约束主干开始写入前，检查 `approved_plan_revision == current_plan_revision`；不满足时回到 `PlanApproval`，不要用最初的“按完整流程执行”当作批准。
 - 已切片时进入 `ImplementSlice`：片状态随状态转移更新为 `planned`、`implementing`、`min_verified`、`complete` 或 `rework`。
 - 实现规则见 `references/implementation.md`；调试、TDD、文档等分支按下方分支模式加载对应参考文件。
-- 实现完成后进入 `Review` 阻塞式关卡：子代理按 `scope_compliance` 和 `implementation_quality` 审查当前 diff snapshot、行为回归和验证覆盖。发现项进入 `FixFindings`，修复后重过 `Review`；无发现项且当前 diff 未替换审查 snapshot，才进入 `Verify`。
+- 高约束主干实现完成后必须进入 `Review` 阻塞式子代理关卡：子代理按 `scope_compliance` 和 `implementation_quality` 审查当前 diff snapshot、行为回归和验证覆盖；通过前不能进入正式 `Verify` 或 `Deliver`。发现项进入 `FixFindings`；只要修复改变 diff，旧审查结果失效，必须重过 `Review`。实现阶段内的 TDD、切片最小验证或编译级 sanity check 可以保留并记录，但不能替代 `Review`。轻量路径可跳过子代理 `Review`，但必须做主线程 diff 自查和验证记录，并记录 `review_gate_guard: not_applicable` 及低风险依据。
 
 ### 验证
 

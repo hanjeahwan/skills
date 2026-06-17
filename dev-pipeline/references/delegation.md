@@ -89,7 +89,7 @@ prompt_basis: <匹配的 触发：行摘要；fallback 时写 no matching templa
 | `diff-review` | `before_verify` | `implement` | yes | `wait_until_returned` | 交付前独立审查 diff 正确性、行为回归和缺测试 |
 | `security-review` | `before_implement` 或 `before_verify` | `plan` 或 `implement` | yes | `wait_until_returned` | auth、密钥、敏感数据、输入校验、网络/配置暴露 |
 | `architecture-review` | `before_implement` | `plan` | yes | `wait_until_returned` | 架构边界、耦合、数据归属、长期维护性 |
-| `verification` | `before_verify` | `verify` | yes | `wait_until_returned` | 并行跑独立验证或审查验证覆盖 |
+| `verification` | `before_verify` | `verify` | yes | `wait_until_returned` | 并行跑独立验证或审查验证覆盖；不能替代 `diff-review` 满足 `review_gate_guard` |
 | `synthesis` | `before_implement`、`before_verify` 或 `non_blocking` | `plan` / `verify` / `deliver` | depends | 按等待点声明 | 多个子代理结果需要去重、保留冲突和决策汇总 |
 | `sidecar-research` | `non_blocking` | 按任务声明 | no | `non_blocking` | 不挡主流程的旁路探索 |
 
@@ -119,7 +119,7 @@ prompt_basis: <匹配的 触发：行摘要；fallback 时写 no matching templa
 
 ## 实现审查关卡
 
-`Implement` 完成后启动 `diff-review`、`verification` 或匹配风险的阻塞式关卡。
+高约束主干 `Implement` 完成后默认启动 `purpose: diff-review` 的阻塞式关卡。`verification`、`security-review` 或 `architecture-review` 可以作为附加关卡降低对应风险，但不能单独满足 `review_gate_guard`，也不能替代 `diff-review`。实现阶段内的 TDD、切片最小验证或编译级 sanity check 可以保留并记录；它们不等于进入正式 `Verify`。
 
 审查至少覆盖：
 
@@ -129,7 +129,7 @@ prompt_basis: <匹配的 触发：行摘要；fallback 时写 no matching templa
 - contract、类型、schema 或权限/数据流风险。
 - 验证记录是否覆盖关键风险，未验证项是否具体。
 
-`scope_compliance` 不通过时必须当作阻塞发现项处理，不能降级成普通质量建议。返回发现项时进入 `FixFindings`；修复或明确不采纳并记录理由后，必须重过 `Review`。无发现项且审查 snapshot 仍匹配当前 diff 时，才能进入 `Verify`。
+`scope_compliance` 不通过时必须当作阻塞发现项处理，不能降级成普通质量建议。返回发现项时进入 `FixFindings`；修复或明确不采纳并记录理由后，必须重过 `Review`。只要修复或后续改动改变 diff，旧审查 snapshot 失效；无发现项且审查 snapshot 仍匹配当前 diff 时，才能进入正式 `Verify`。
 
 ## 结果处理
 
