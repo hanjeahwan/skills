@@ -23,7 +23,7 @@ last_event: <触发当前状态的事件>
 
 ## 守卫条件
 - <守卫条件名称>：pass / fail / degraded；evidence <依据>
-- 建议至少记录：`blocking_delegate_guard`、`context_pack_guard`、`minor_note_guard`、`review_gate_guard`、`verification_guard`。
+- 建议至少记录：`blocking_delegate_guard`、`context_pack_guard`、`minor_note_guard`、`review_gate_guard`、`verification_guard`、`explicit_command_guard`。
 
 ## 上下文证据包
 - source: context-gather / local-substitute / main-thread
@@ -70,6 +70,10 @@ last_event: <触发当前状态的事件>
 - verified:
   - command_or_scope: <实际命令，或命令名 + 完整目标范围 + 关键参数>
     covers: <覆盖的行为、contract 或风险>
+- skipped_by_policy:
+  - command_or_scope: <按策略跳过的 build/server/browser 验证命令或类型>
+    reason: <用户未明确要求 build/server/browser；缺少端口/登录态/测试数据/停止策略等>
+    substitute_evidence: <更窄验证、代码路径审查或未验证项>
 - unverified:
   - behavior: <具体行为或状态>
     expected: <预期结果>

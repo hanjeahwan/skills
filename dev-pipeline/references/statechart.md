@@ -26,7 +26,7 @@ Intake -> ContextGather -> Plan -> PlanReview -> Implement -> Review -> Verify -
 | `ImplementSlice` | 纵向片子状态 | 当前片达到 `complete` 或 `rework` |
 | `Review` | 阻塞式实现审查子代理关卡，审 diff 正确性、行为回归和验证覆盖 | 无 findings 进入 `Verify`；有 findings 进入 `FixFindings` |
 | `FixFindings` | 主线程修复实现审查 findings | 修复完成后回到 `Review` |
-| `Verify` | 主线程执行实际验证：测试、typecheck、lint、build、手动路径或未验证项记录 | 验证足够；或按问题类型回流 |
+| `Verify` | 主线程执行实际验证：定向测试、typecheck、lint、静态检查、代码路径审查或未验证项记录 | 验证足够；或按问题类型回流 |
 | `Deliver` | 最终 diff 或只读结论、验证记录、交付回复和提交边界检查 | 交付完成；或发现问题回流 |
 | `WaitForUser` | 等待确认、关键信息或高副作用授权 | 用户补齐信息或确认后回到原状态 |
 | `Parked` | 外部阻塞被搁置但仍可推进其它部分 | 阻塞解除后回到记录的状态 |
@@ -78,6 +78,7 @@ Intake -> ContextGather -> Plan -> PlanReview -> Implement -> Review -> Verify -
 - `parked_guard`：`Parked` 只允许推进与阻塞决策独立的工作；整条任务被阻塞时进入 `WaitForUser`。
 - `oscillation_guard`：同一类 PlanReview 或 Review 回流超过 2 次，停下总结卡点，给用户选项。
 - `verification_guard`：最终回复里的验证结论必须能从验证记录、实际工具调用或当前 diff 追溯。
+- `explicit_command_guard`：build、打包、启动 server 和浏览器验证必须由用户明确要求；未明确要求时按策略跳过并记录替代证据。
 
 ## 动作
 
@@ -91,6 +92,7 @@ Intake -> ContextGather -> Plan -> PlanReview -> Implement -> Review -> Verify -
 - `record_review_result`：记录 Review findings、影响状态、是否回流。
 - `record_fix_findings`：记录修复或不采纳的 findings 以及重审结果。
 - `record_verification`：记录实际命令或完整目标范围、覆盖风险、未验证项和替代证据。
+- `record_skipped_by_policy`：记录按策略跳过的 build、server 或浏览器验证命令、跳过原因和替代证据。
 - `record_parked_blocker`：记录阻塞点、等待对象、解除后回到的状态。
 
 ## 切片子状态
@@ -114,6 +116,7 @@ planned -> implementing -> min_verified -> complete
 
 - 已跑验证：实际命令，或命令名 + 完整目标范围 + 关键参数；说明覆盖的行为、contract 或风险。
 - 未跑验证：具体行为或状态、预期结果、未跑原因、替代证据。
+- 按策略跳过：具体命令或验证类型、跳过原因、替代证据；适用于用户未明确要求的 build、server 或浏览器验证。
 - 失败验证：错误摘要、归因、回流到哪个状态、补跑结果。
 
 不要把验证压成不可复跑摘要，例如只写“相关测试通过”或省略目标范围。

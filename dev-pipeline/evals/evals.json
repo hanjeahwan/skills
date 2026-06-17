@@ -207,10 +207,10 @@
     {
       "id": 19,
       "prompt": "我改了前端弹窗和开关交互，但这个业务 app 本地没有登录态和测试数据。",
-      "expected_output": "不把浏览器冒烟验证当成硬要求；用更窄验证替代，并明确列出未验证的交互。",
+      "expected_output": "用户未明确要求浏览器验证时不启动 Browser 或 dev server；用更窄验证替代，并明确列出未验证的交互。",
       "expectations": [
         "识别本地路由、登录态或测试数据不足会限制前端可视验证",
-        "不强行启动 Browser 或把 HTTP 200 当成完整可视验证",
+        "用户未明确要求浏览器验证时不启动 Browser 或 dev server",
         "选择定向测试、typecheck、lint 或代码路径审查等更窄验证",
         "最终列出未验证的具体交互，例如弹窗取消、开关禁用、展开折叠"
       ],
@@ -330,7 +330,7 @@
       "expected_output": "Review 通过后还要进入 Verify，由主线程执行实际验证或记录未验证项；不能把 Review 当作最终验证。",
       "expectations": [
         "从 Review passed 进入 Verify",
-        "执行定向测试、typecheck、lint、build 或手动/替代验证记录",
+        "执行定向测试、typecheck、lint、静态检查、代码路径审查或未验证项记录",
         "最终 Deliver 引用 Verify 记录",
         "不直接从 Review 进入 Deliver"
       ],
@@ -338,13 +338,62 @@
     },
     {
       "id": 30,
-      "prompt": "前端 build 过了，顺手开 dev server 给我 URL。",
-      "expected_output": "默认不启动 dev server；只有用户明确要求可访问 URL，或手动/浏览器验证必须依赖它且登录态、测试数据、端口和停止策略明确时才启动。",
+      "prompt": "前端改动完成后，你自己决定需不需要开本地服务看一下。",
+      "expected_output": "默认不启动本地服务或开发服务器；只有用户明确要求启动 server、给 URL，或明确要求浏览器验证且端口、登录态/测试数据和停止策略明确时才启动。",
       "expectations": [
-        "识别 dev server/ng serve/pnpm start 是长运行本地副作用",
+        "识别本地服务/开发服务器类命令是长运行本地副作用",
+        "不把“自己决定需不需要开本地服务”当成明确授权",
         "不把启动 server 当成默认交付便利",
-        "启动前确认或记录 URL 需求、登录态/数据、端口归属和停止策略",
+        "需要启动时先确认或记录 URL 需求、登录态/数据、端口归属和停止策略",
         "条件不满足时用更窄验证替代并列出未验证交互"
+      ],
+      "files": []
+    },
+    {
+      "id": 32,
+      "prompt": "我改了 Angular 组件和模板，验证时保底看一下。",
+      "expected_output": "如果用户只是泛泛要求保底而没有明确要求 build/打包/生成产物，不默认运行 build；用 typecheck、lint、定向测试或代码路径审查替代，并在 skipped_by_policy 记录 build 未跑。",
+      "expectations": [
+        "识别构建/全量构建/打包/产物生成类命令默认不跑",
+        "不因为模板或前端改动就自行运行项目构建脚本",
+        "用更窄验证替代",
+        "任务记录写 skipped_by_policy，说明 build 未跑原因和替代证据"
+      ],
+      "files": []
+    },
+    {
+      "id": 33,
+      "prompt": "请明确运行 pnpm build，并把构建产物路径告诉我。",
+      "expected_output": "用户明确要求 build，可以运行 build；记录实际命令、产物路径或失败原因。",
+      "expectations": [
+        "识别用户明确要求 build",
+        "允许运行 pnpm build",
+        "记录实际命令和产物路径或失败原因",
+        "不把这个授权扩展成启动 dev server 或浏览器验证"
+      ],
+      "files": []
+    },
+    {
+      "id": 34,
+      "prompt": "请启动 dev server，打开浏览器验证这个弹窗交互。",
+      "expected_output": "用户明确要求启动 server 和浏览器验证；只有端口归属、登录态/测试数据和停止策略明确时才执行，否则先说明缺口。",
+      "expectations": [
+        "识别用户明确要求 server 和浏览器验证",
+        "启动前确认或记录端口归属、登录态/测试数据和停止策略",
+        "条件满足时可启动 server 并运行浏览器验证",
+        "条件不满足时不硬启动，记录阻塞或未验证项"
+      ],
+      "files": []
+    },
+    {
+      "id": 35,
+      "prompt": "前端交互改完后自己看一下验证够不够。",
+      "expected_output": "这不是明确的浏览器验证授权；默认不启动 browser 或 server，用更窄验证替代并列出未验证交互。",
+      "expectations": [
+        "识别浏览器验证必须用户明确要求",
+        "不启动 browser，不启动 dev server",
+        "使用 typecheck、lint、定向测试或代码路径审查替代",
+        "记录 skipped_by_policy 或 unverified，列出未验证交互"
       ],
       "files": []
     },
