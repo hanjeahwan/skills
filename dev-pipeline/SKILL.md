@@ -9,10 +9,10 @@ description: 用于高约束、多阶段的 repo 开发协作：先判定交付�
 
 ## 关键边界
 
-- 遇到 `plan only` / `review only` / `explain only`，本轮就是只读任务：不创建任务记录，不改文件，不 stage，不 commit。
+- 遇到 `plan only` / `review only` / `explain only`，本轮就是只读任务：不创建任务台账，不改文件，不 stage，不 commit。
 - 提交保持显式授权：只有用户明确要求提交，或交付 diff 后确认提交，才按 repo 约定 commit；push 同理。
-- 任务记录只用于多步实现、长任务恢复、切片、执行计划批准、回流和已搁置阻塞；只读任务和单文件低风险任务默认跳过。
-- 单文件低风险任务走轻量路径：不启动子代理、不切片、不建任务记录、不强制执行计划批准；需要解释时，用一句话说明跳过原因。一旦范围扩大到多模块、contract、状态流、副作用或用户可见行为，转入高约束主干。
+- 任务台账只用于多步实现、长任务恢复、切片、执行计划批准、回流和已搁置阻塞；只读任务和单文件低风险任务默认跳过。
+- 单文件低风险任务走轻量路径：不启动子代理、不切片、不建任务台账、不强制执行计划批准；需要解释时，用一句话说明跳过原因。一旦范围扩大到多模块、contract、状态流、副作用或用户可见行为，转入高约束主干。
 - 高约束实现进入写入前必须停在 `PlanApproval`：`approved_plan_revision == current_plan_revision` 才能进入 `Implement`；用户在初始请求里说“完整流程执行”不等于批准后续生成的执行计划。
 - 删除、覆盖、迁移、部署、发送消息、批量写入、联网改状态、付费调用等高副作用操作，必须先停下拿到明确确认。
 
@@ -42,7 +42,7 @@ Intake -> ContextGather -> Plan -> PlanReview -> PlanApproval -> Implement -> Re
 常见分支和回流：
 
 - `OffRamp`：单步问答直接结束。
-- `ReadOnly`：只读模式；不写文件、不建任务记录、不进实现关卡。普通 plan/explain 不强制子代理；review/security/architecture/synthesis 等有独立审查价值时可启动只读子代理。
+- `ReadOnly`：只读模式；不写文件、不建任务台账、不进实现关卡。普通 plan/explain 不强制子代理；review/security/architecture/synthesis 等有独立审查价值时可启动只读子代理。
 - `WaitForUser`：高副作用、破坏性操作、关键信息缺失或用户确认门槛触发时停下。
 - `Parked`：外部阻塞明确化，只推进与阻塞决策独立的工作，记录解除后回到哪个状态。
 - `Context`：低风险或只读任务由主线程收集证据；高约束实现默认走 `ContextGather`。
@@ -67,9 +67,9 @@ Intake -> ContextGather -> Plan -> PlanReview -> PlanApproval -> Implement -> Re
 ### 方案
 
 - 大改前先形成执行计划：当前行为、目标行为、改动范围、保持不变的行为、风险、验证计划。
-- 启用任务记录时，执行计划写入 `.dev-pipeline/<date>-<short-slug>/plan.md`，任务台账写入同目录 `task.md`。
+- 启用任务台账时，执行计划写入 `.dev-pipeline/<date>-<short-slug>/plan.md`，任务台账写入同目录 `task.md`。
 - 任务偏大时，方案里切纵向片：每片是一条薄的端到端改动，有明确验证入口。
-- 主线程基于 `ContextGather` 证据包形成方案，然后进入 `PlanReview`：按 `references/delegation.md` 声明子代理执行体的 `purpose`、`join_point`、`max_impact` 和 `wait_policy`。
+- 主线程基于 `ContextGather` 证据包形成方案，然后进入 `PlanReview`：按 `references/delegation.md` 声明子代理执行体的 `purpose`、`join_point`、`max_impact`、`wait_policy`、`prompt_source` 和 `prompt_basis`。
 - `PlanReview` 是 blocking 关卡，输入必须包含 `plan.md`、`ContextGather` 证据包和关键源码/contract 引用。返回 findings 时先 `UpdatePlan`：改变目标行为、contract、状态流、副作用归属、验证策略或实现边界的 material change 必须更新 `plan.md`、刷新 `current_plan_revision`、置旧批准失效并重过 `PlanReview`；不改变这些边界的 minor scoped note 可记录采纳/不采纳理由后进入 `PlanApproval`。
 - `PlanApproval` 是用户批准关卡。主线程把执行计划摘要和 `plan.md` 路径发给用户，等待明确批准；只有批准当前计划版本后才能进入 `Implement`。用户要求改执行计划时回 `UpdatePlan`；批准语义含糊时停在 `PlanApproval`。
 - `ReadOnly` 在此交付方案或审查结论即止。`Implementation` 只有在轻量路径守卫通过，或高约束主干满足 `plan_approval_guard` 后，才进入 `Implement`。
@@ -92,7 +92,7 @@ Intake -> ContextGather -> Plan -> PlanReview -> PlanApproval -> Implement -> Re
 ### 交付
 
 - 检查最终 diff、旧命名、重复状态、工作区 dirty、导出命名和 `git diff --check`。
-- 任务记录启用时，最终回复从验证记录和当前 diff 生成；交付回复保留可复跑的验证依据。
+- 任务台账启用时，最终回复从验证记录和当前 diff 生成；交付回复保留可复跑的验证依据。
 - 仅在用户明确要求提交，或交付 diff 后用户确认提交时，才 commit；不 push，除非用户明确要求。
 - 交付后若被用户纠正，按 `references/rule-distillation.md` 沉淀可复用规则。
 
@@ -134,10 +134,10 @@ Intake -> ContextGather -> Plan -> PlanReview -> PlanApproval -> Implement -> Re
 - 阻塞只影响部分范围时进入 `Parked`，记录阻塞点和 `resume_state`，先推进与该决策独立的工作。
 - 整条任务被阻塞时进入 `WaitForUser`；不要猜测业务规则、接口行为、环境状态或他人决策。
 
-### 任务记录
+### 任务台账
 
-- 启用任务记录时，先列 `.dev-pipeline/`；有同任务目录就接续，没有再新开 `.dev-pipeline/<date>-<short-slug>/`。
-- 任务记录目录包含两份文件：`task.md` 是任务台账，记录 `current_state`、计划版本、批准状态、切片状态、`delegate_states`、已搁置阻塞、验证记录和回流历史；`plan.md` 是待批准执行计划。
+- 启用任务台账时，先列 `.dev-pipeline/`；有同任务目录就接续，没有再新开 `.dev-pipeline/<date>-<short-slug>/`。
+- 任务台账目录包含两份文件：`task.md` 是任务台账，记录 `current_state`、计划版本、批准状态、切片状态、`delegate_states`、已搁置阻塞、验证记录和回流历史；`plan.md` 是待批准执行计划。
 - 只依赖写文件，不依赖宿主的 task 工具；保持临时工作态，绝不 commit。
 - 任务台账模板和更新规则见 `references/task.md`；执行计划模板、revision 和审批语义见 `references/plan.md`。
 
@@ -145,7 +145,7 @@ Intake -> ContextGather -> Plan -> PlanReview -> PlanApproval -> Implement -> Re
 
 - 把子代理作为状态机里的执行体管理：启动前先定义目的、等待点、影响范围和等待策略。
 - 命中高风险守卫条件且有独立审查/验证价值时默认启动；只有工具不可用、平台禁止或安全边界冲突时，才进入本地替代审查降级。未启动必须记录低风险、强耦合、工具失败或安全边界原因。
-- 启动前必须声明 `purpose`、`join_point`、`max_impact` 和 `wait_policy`；没有 `join_point` 的子代理不启动。
+- 启动任何子代理前必须先完成 prompts 发现协议，并声明 `purpose`、`join_point`、`max_impact`、`wait_policy`、`prompt_source` 和 `prompt_basis`；没有 `join_point`、`prompt_source` 或 `prompt_basis` 的子代理不启动。
 - blocking 关卡执行体未满足前不能越过对应状态；回来慢不是降级理由。只有工具不可用、平台禁止或安全边界冲突时，才记录本地替代审查降级。
 - 细节和发现协议见 `references/delegation.md`。
 

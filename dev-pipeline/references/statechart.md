@@ -15,8 +15,8 @@ Intake -> ContextGather -> Plan -> PlanReview -> PlanApproval -> Implement -> Re
 | 状态 | 目的 | 退出条件 |
 | --- | --- | --- |
 | `Intake` | 理解用户请求并判定交付模式 | 明确进入 `OffRamp`、`ReadOnly`、`Context`、`ContextGather` 或 `WaitForUser` |
-| `OffRamp` | 单命令、纯概念或无需 repo 的一步问答 | 直接回答，不创建任务记录 |
-| `ReadOnly` | 只读模式门：禁止写文件、任务记录和实现关卡 | 进入 `Context` 收集证据，启动只读审查子代理，或在 `Plan` 后交付判断 |
+| `OffRamp` | 单命令、纯概念或无需 repo 的一步问答 | 直接回答，不创建任务台账 |
+| `ReadOnly` | 只读模式门：禁止写文件、任务台账和实现关卡 | 进入 `Context` 收集证据，启动只读审查子代理，或在 `Plan` 后交付判断 |
 | `Context` | 低风险或只读任务由主线程收集 repo 证据 | 足够支撑方案、审查结论；或发现需用户澄清 |
 | `ContextGather` | 高约束实现的阻塞式上下文子代理关卡 | 子代理返回证据包；或工具不可用/平台禁止/安全边界冲突并完成本地替代证据包 |
 | `Plan` | 主线程基于证据包形成方案、风险、范围、验证计划和切片，写入 `plan.md` | 方案可审查；或进入 `WaitForUser` |
@@ -73,11 +73,12 @@ Intake -> ContextGather -> Plan -> PlanReview -> PlanApproval -> Implement -> Re
 
 ## 守卫条件
 
-- `read_only_guard`：只读模式不创建任务记录、不写文件、不 stage、不 commit；只读 review/security/architecture/synthesis 可启动只读子代理。
+- `read_only_guard`：只读模式不创建任务台账、不写文件、不 stage、不 commit；只读 review/security/architecture/synthesis 可启动只读子代理。
 - `side_effect_guard`：删除、覆盖、迁移、部署、发送消息、批量写入、联网改状态、付费调用等高副作用操作必须进入 `WaitForUser`。
 - `scope_guard`：实现只纳入本轮目标必需的相邻流程、入口校验、交互策略、持久化、运行期副作用和数据模型变化。
 - `implementation_light_guard`：只允许单文件低风险改动跳过执行计划批准；不得涉及多模块、状态流、外部 contract、副作用、权限/数据流或用户可见高风险行为。范围扩大时转入高约束主干。
 - `blocking_delegate_guard`：blocking 子代理返回前不能越过等待点；回来慢不构成降级理由。
+- `prompt_template_guard`：启动任何子代理前必须完成 prompts 发现协议并声明 `prompt_source` 和 `prompt_basis`；`prompt_source` 是模板路径时必须已加载模板全文，`prompt_source: fallback` 时 `prompt_basis` 必须说明没有匹配模板的原因和只读边界。
 - `context_pack_guard`：`ContextGather` 只产 repo 证据、入口、contract、风险和未解问题，不替主线程定方案。
 - `plan_approval_guard`：高约束主干进入 `Implement` 前必须满足 `approved_plan_revision == current_plan_revision`；初始请求、模糊认可和旧计划批准都不能替代当前计划批准。
 - `review_gate_guard`：`Review` findings 未处理并重审前不能进入 `Verify` 或 `Deliver`。
@@ -90,15 +91,17 @@ Intake -> ContextGather -> Plan -> PlanReview -> PlanApproval -> Implement -> Re
 
 ## 动作
 
-- `record_state`：任务记录启用时，记录当前状态、触发事件、关键守卫条件和下一步。
+- `record_state`：任务台账启用时，记录当前状态、触发事件、关键守卫条件和下一步。
 - `record_assumption`：未澄清就推进时，记录假设和假设错了要回头改什么。
-- `spawn_context_gather_actor`：按 `references/delegation.md` 启动阻塞式上下文子代理。
+- `spawn_context_gather_actor`：满足 `prompt_template_guard` 后，按 `references/delegation.md` 启动阻塞式上下文子代理。
 - `record_context_pack`：记录上下文证据包、未解问题和本地替代原因。
 - `record_plan_revision`：写入或更新 `plan.md` 后记录 `current_plan_revision`；material change 必须置旧批准为 stale。
 - `record_plan_update`：记录 PlanReview findings、采纳/不采纳理由、是否 material change。
 - `record_plan_approval`：记录批准状态、批准消息、`approved_plan_revision`、无效化原因和下一状态。
 - `record_slice_transition`：切片进入、最小验证、完成或回流时更新切片状态（`slice_states`）。
-- `spawn_review_actor`：按 `references/delegation.md` 启动阻塞式实现审查子代理。
+- `spawn_plan_review_actor`：满足 `prompt_template_guard` 后，按 `references/delegation.md` 启动阻塞式方案审查子代理。
+- `spawn_review_actor`：满足 `prompt_template_guard` 后，按 `references/delegation.md` 启动阻塞式实现审查子代理。
+- `spawn_read_only_or_sidecar_actor`：满足 `prompt_template_guard` 后，按 `references/delegation.md` 启动只读审查或旁路子代理。
 - `record_review_result`：记录 Review findings、影响状态、是否回流。
 - `record_fix_findings`：记录修复或不采纳的 findings 以及重审结果。
 - `record_verification`：记录实际命令或完整目标范围、覆盖风险、未验证项和替代证据。

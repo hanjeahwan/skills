@@ -15,7 +15,7 @@
 
 status: draft / reviewed / pending_approval / approved / superseded
 revision: <hash / timestamp / monotonic id>
-task_record: .dev-pipeline/<date>-<short-slug>/task.md
+task_file: .dev-pipeline/<date>-<short-slug>/task.md
 
 ## 证据来源
 - context_pack: <ContextGather / local substitute / main-thread>

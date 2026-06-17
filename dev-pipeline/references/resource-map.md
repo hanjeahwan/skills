@@ -25,7 +25,7 @@
 ## 子代理委派
 
 - `delegation.md`：任务命中子代理委派触发条件，或需要判断 blocking gate / non_blocking sidecar、是否应跳过启动子代理时读取。
-- `prompts/*.md`：只在真正启动子代理时按发现协议读取。这里的 `prompts/` 是本文件旁边的 `./prompts/`，即 `<skill-root>/references/prompts/`。先列文件，读每个文件头部的 H1 和 `触发：` 行，再按下面地图只加载匹配模板：
+- `prompts/*.md`：启动任何子代理前的必经步骤。这里的 `prompts/` 是本文件旁边的 `./prompts/`，即 `<skill-root>/references/prompts/`。先列文件，读每个文件头部的 H1 和 `触发：` 行，再按下面地图只加载匹配模板，并把结果记录为 `prompt_source` 和 `prompt_basis`：
   - `prompts/context-manager.md`：上下文分散，需要先把 repo 证据、入口、约束、风险和未解问题打包给后续工作时选。
   - `prompts/codebase-orchestrator.md`：repo 级重构、迁移或架构治理，需要风险排序、影响面和提案关卡时选。
   - `prompts/architect-reviewer.md`：需要审查耦合、系统边界、数据归属、长期可维护性或设计连贯性时选。
@@ -36,5 +36,5 @@
 
 ## 评估与宿主信息
 
-- `../evals/evals.json`：修改触发、状态机守卫条件、子代理委派、任务记录、commit 或交付规则后读取并补少量回归用例。
+- `../evals/evals.json`：修改触发、状态机守卫条件、子代理委派、任务台账、commit 或交付规则后读取并补少量回归用例。
 - `../agents/openai.yaml`：只在调整宿主界面展示文案时读取；它不是执行规则来源。

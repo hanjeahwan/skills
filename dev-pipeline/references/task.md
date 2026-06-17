@@ -2,8 +2,8 @@
 
 `task.md` 用于保留实现模式的任务工作态。只在多步实现、长任务恢复、切片、执行计划批准、阻塞式子代理关卡、回流、搁置阻塞，或用户允许记录时，在 `.dev-pipeline/<date>-<short-slug>/task.md` 记录状态机状态。
 
-- **启用前先判定**：只读、`OffRamp`、单步低风险任务默认不创建任务记录。
-- **重入先读回**：启用任务记录时先列 `.dev-pipeline/`，优先接续同目标目录。
+- **启用前先判定**：只读、`OffRamp`、单步低风险任务默认不创建任务台账。
+- **重入先读回**：启用任务台账时先列 `.dev-pipeline/`，优先接续同目标目录。
 - **一任务一目录**：`<date>` 用今天日期，`<short-slug>` 是任务的 kebab 短描述；目录内 `task.md` 是任务台账，`plan.md` 是待批准执行计划。
 - **同名冲突**：同日同 slug 且目标一致时接续；目标不一致时追加 `-2`、`-3` 等后缀，不覆盖旧目录。
 - **执行计划分离**：`plan.md` 的模板、revision 和审批语义见 `references/plan.md`；`task.md` 只记录它的路径、版本和批准状态。
@@ -32,7 +32,7 @@ approval_invalidated_reason: <material plan change / user requested change / non
 
 ## 守卫条件
 - <守卫条件名称>：pass / fail / degraded；evidence <依据>
-- 建议至少记录：`blocking_delegate_guard`、`context_pack_guard`、`plan_approval_guard`、`minor_note_guard`、`review_gate_guard`、`verification_guard`、`explicit_command_guard`。
+- 建议至少记录：`blocking_delegate_guard`、`prompt_template_guard`、`context_pack_guard`、`plan_approval_guard`、`minor_note_guard`、`review_gate_guard`、`verification_guard`、`explicit_command_guard`。
 
 ## 上下文证据包
 - source: context-gather / local-substitute / main-thread
@@ -55,6 +55,8 @@ approval_invalidated_reason: <material plan change / user requested change / non
   - max_impact: <context / plan / implement / verify / deliver>
   - blocking: yes/no
   - wait_policy: <wait_until_returned / unavailable_degrade_only / non_blocking>
+  - prompt_source: <references/prompts/<template>.md | fallback>
+  - prompt_basis: <匹配的 触发：行摘要；fallback 时写 no matching template + 原因和只读边界>
   - status: pending / passed / findings / degraded / ignored
   - result: <结论、采纳情况、回流状态>
 

@@ -5,10 +5,10 @@
     {
       "id": 1,
       "prompt": "用一句话解释什么是 idempotent。",
-      "expected_output": "走 off-ramp 直接回答，不套完整流水线、不开任务记录、不启动子代理。",
+      "expected_output": "走 off-ramp 直接回答，不套完整流水线、不开任务台账、不启动子代理。",
       "expectations": [
         "不进入完整状态机流水线",
-        "不创建任务记录",
+        "不创建任务台账",
         "不 spawn 任何子代理"
       ],
       "files": []
@@ -37,11 +37,12 @@
     {
       "id": 4,
       "prompt": "实现一个跨订单、库存、通知三个服务的下单流程，要改它们的接口。",
-      "expected_output": "命中高风险守卫条件（多模块+外部 contract+用户可见行为）即进入 ContextGather、PlanReview 和 PlanApproval 关卡；启动子代理前声明 purpose、join_point、max_impact、blocking 和 wait_policy；工具不可用时才允许本地替代审查降级；偏大任务切纵向片并用任务记录保留状态。",
+      "expected_output": "命中高风险守卫条件（多模块+外部 contract+用户可见行为）即进入 ContextGather、PlanReview 和 PlanApproval 关卡；启动子代理前声明 purpose、join_point、max_impact、blocking、wait_policy、prompt_source 和 prompt_basis；工具不可用时才允许本地替代审查降级；偏大任务切纵向片并用任务台账保留状态。",
       "expectations": [
         "识别命中子代理委派触发条件，默认启动 blocking 子代理作为质量门槛",
         "进入 Plan 前先通过 ContextGather 证据包，或明确记录工具不可用/平台禁止/安全边界冲突后的本地替代证据包",
-        "启动子代理前声明 purpose、join_point、max_impact、blocking 和 wait_policy",
+        "启动子代理前声明 purpose、join_point、max_impact、blocking、wait_policy、prompt_source 和 prompt_basis",
+        "prompt_source 是匹配模板路径时，必须已按发现协议加载该模板全文；prompt_source 为 fallback 时，prompt_basis 必须说明没有匹配模板的原因和只读边界",
         "进入 Implement 前 plan-review 关卡通过，且当前 plan.md 版本得到用户明确批准；不能因为子代理回来慢而本地降级放行",
         "把大任务切成纵向片，逐片走 Implement/Review/Verify",
         "进入完整状态机，开任务目录维护 task.md、plan.md、current_state、计划版本、批准状态、切片状态和 delegate_states"
@@ -54,6 +55,7 @@
       "expected_output": "代码审查：按发现协议选 reviewer 模板 spawn 只读子代理；只读不改文件。",
       "expectations": [
         "按发现协议从 prompts/ 选中 reviewer 模板（而非凭空写）",
+        "启动前记录 prompt_source 为 reviewer 模板路径，并用 prompt_basis 说明匹配到的触发语义",
         "spawn 的子代理是只读的，不 Edit/Write/commit",
         "不点名具体平台工具或 subagent_type，用 host 自身 spawn 机制"
       ],
@@ -142,6 +144,7 @@
       "expected_output": "host 无注册 agent 也不依赖；按发现协议从 skill 自带 references/prompts/ 选 reviewer；子代理工具调用失败或平台规则不允许时降级为本地二次审查并说明。回来慢不是降级理由。",
       "expectations": [
         "委派内容来自 skill 自带 references/prompts/，不依赖 host 注册的 agent",
+        "启动前记录 prompt_source 和 prompt_basis；不能只写“已按模板发现”这种不可审计表述",
         "若子代理工具调用失败或平台规则不允许，降级为本地二次审查并在回复说明",
         "不把子代理回来慢当作降级理由",
         "不因为 repo 没装 host 注册 agent 就跳过审查"
@@ -162,10 +165,10 @@
     {
       "id": 15,
       "prompt": "review only：帮我看这个 diff 有没有问题，不要写任何文件。",
-      "expected_output": "进入只读代码审查/分析模式，不修改文件、不创建 .dev-pipeline 任务记录、不 stage、不 commit。",
+      "expected_output": "进入只读代码审查/分析模式，不修改文件、不创建 .dev-pipeline 任务台账、不 stage、不 commit。",
       "expectations": [
         "严格保持 review only，只输出发现项或无问题结论",
-        "不创建或更新 .dev-pipeline 任务记录",
+        "不创建或更新 .dev-pipeline 任务台账",
         "不 Edit/Write、stage、commit 或 push"
       ],
       "files": []
@@ -184,11 +187,11 @@
     {
       "id": 17,
       "prompt": "把这个组件里的文案从 Save 改成保存。",
-      "expected_output": "单文件低风险改动走轻量路径：不启动子代理、不切片、不创建任务记录，必要时一句话说明低风险原因。",
+      "expected_output": "单文件低风险改动走轻量路径：不启动子代理、不切片、不创建任务台账，必要时一句话说明低风险原因。",
       "expectations": [
         "判定为单文件低风险任务",
         "不启动子代理、不执行 prompts/ 发现协议",
-        "不创建 .dev-pipeline 任务记录",
+        "不创建 .dev-pipeline 任务台账",
         "保持范围只改目标文案"
       ],
       "files": []
@@ -222,7 +225,7 @@
       "expected_output": "进入 ImplementSlice 子状态；每片随状态转移更新 planned/implementing/min_verified/complete/rework，而不是最后一次性补总结。",
       "expectations": [
         "识别这是偏大任务的纵向片执行",
-        "用任务记录维护切片状态",
+        "用任务台账维护切片状态",
         "每片有 goal 和 min_verification",
         "验证或 reviewer 打回时标记对应片 rework，而不是只写总状态"
       ],
@@ -231,10 +234,11 @@
     {
       "id": 21,
       "prompt": "我想让一个子代理在旁边看看，有结果就说，没结果你继续。",
-      "expected_output": "不能启动没有 join_point 的子代理；必须声明 purpose、join_point、max_impact、blocking 和 wait_policy。若是 non_blocking 旁路任务，也要声明最大影响范围。",
+      "expected_output": "不能启动没有 join_point 和 prompt 依据的子代理；必须声明 purpose、join_point、max_impact、blocking、wait_policy、prompt_source 和 prompt_basis。若是 non_blocking 旁路任务，也要声明最大影响范围。",
       "expectations": [
         "拒绝无生命周期契约的随手启动",
         "要求声明 purpose 和 join_point",
+        "要求按 prompts 发现协议记录 prompt_source 和 prompt_basis",
         "non_blocking 子代理也必须声明 max_impact",
         "说明关卡执行体和旁路任务的处理不同"
       ],
@@ -243,7 +247,7 @@
     {
       "id": 22,
       "prompt": "验证失败了，发现不是代码 bug，是我一开始把需求理解错了。",
-      "expected_output": "从 Verify 通过 requirement_or_plan_wrong 事件回流到 Plan，更新任务记录的状态转移，不在错误方案上继续修实现。",
+      "expected_output": "从 Verify 通过 requirement_or_plan_wrong 事件回流到 Plan，更新任务台账的状态转移，不在错误方案上继续修实现。",
       "expectations": [
         "识别失败归因是需求/方案错误，不是实现 bug",
         "按状态机从 Verify 回到 Plan",
@@ -297,7 +301,7 @@
         "识别回来慢不是降级理由",
         "不进入 Implement",
         "继续等待 blocking PlanReview，或仅在工具不可用/平台禁止/安全边界冲突时记录本地替代审查",
-        "任务记录保留 PlanReview pending 或明确 unavailable_degrade_only 原因"
+        "任务台账保留 PlanReview pending 或明确 unavailable_degrade_only 原因"
       ],
       "files": []
     },
@@ -364,6 +368,19 @@
       "files": []
     },
     {
+      "id": 41,
+      "prompt": "这个多模块任务需要先让子代理看上下文和方案，但你直接写个 prompt 给它就行。",
+      "expected_output": "不能随手写 prompt 启动子代理；启动任何子代理前必须执行 prompts 发现协议，并记录 prompt_source 和 prompt_basis。没有匹配模板时才能使用 fallback，并说明原因和只读边界。",
+      "expectations": [
+        "识别任何子代理启动前都受 prompt_template_guard 约束",
+        "先列 references/prompts/ 并读取每个模板的 H1 和 触发：行",
+        "匹配模板时记录 prompt_source 为模板路径，prompt_basis 为触发语义摘要",
+        "fallback 只在没有匹配模板时允许，且 prompt_basis 写明 no matching template、原因和只读边界",
+        "不能先 spawn 再补模板约束"
+      ],
+      "files": []
+    },
+    {
       "id": 27,
       "prompt": "实现已经写完了，准备交付这个多模块改动。",
       "expected_output": "实现完成后先进入 Review blocking 子代理关卡，审 diff 正确性、行为回归和验证覆盖；不能直接 Verify 或 Deliver。",
@@ -371,7 +388,7 @@
         "从 Implement 进入 Review 而不是直接 Verify/Deliver",
         "启动 diff-review 或 verification blocking 子代理",
         "Review 通过前不进入 Verify",
-        "任务记录写入 Review gate 和子代理状态"
+        "任务台账写入 Review gate 和子代理状态"
       ],
       "files": []
     },
@@ -420,7 +437,7 @@
         "识别构建/全量构建/打包/产物生成类命令默认不跑",
         "不因为模板或前端改动就自行运行项目构建脚本",
         "用更窄验证替代",
-        "任务记录写 skipped_by_policy，说明 build 未跑原因和替代证据"
+        "任务台账写 skipped_by_policy，说明 build 未跑原因和替代证据"
       ],
       "files": []
     },
@@ -463,11 +480,12 @@
     {
       "id": 31,
       "prompt": "review only：帮我做安全和架构审查，不要改文件。",
-      "expected_output": "ReadOnly 不创建任务记录、不写文件、不进入实现关卡；但可启动只读 security/architecture 子代理审查。",
+      "expected_output": "ReadOnly 不创建任务台账、不写文件、不进入实现关卡；但可启动只读 security/architecture 子代理审查。",
       "expectations": [
-        "保持 ReadOnly，不创建 .dev-pipeline 任务记录",
+        "保持 ReadOnly，不创建 .dev-pipeline 任务台账",
         "不 Edit/Write、stage、commit 或 push",
         "按发现协议启动只读 security-auditor 或 architect-reviewer 子代理",
+        "启动前记录 prompt_source 和 prompt_basis，证明选择了哪个模板及原因",
         "不把 ReadOnly 误解为禁止所有子代理"
       ],
       "files": []

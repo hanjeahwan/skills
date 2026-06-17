@@ -19,9 +19,25 @@
 - 有可独立审查的上下文证据包、方案、diff 或验证计划。
 - 多个发现项需要去重、保留冲突并形成决策视图。
 
-单文件低风险、强耦合设计判断、需要连续用户交互、或当前上下文必须由主线程直接决定时，不启动；用一句话或任务记录说明低风险、强耦合、工具失败或安全边界原因。
+单文件低风险、强耦合设计判断、需要连续用户交互、或当前上下文必须由主线程直接决定时，不启动；用一句话或任务台账说明低风险、强耦合、工具失败或安全边界原因。
 
-只读任务不创建任务记录、不进入实现关卡；但 review/security/architecture/synthesis 等只读审查有独立价值时，仍可启动只读子代理。
+只读任务不创建任务台账、不进入实现关卡；但 review/security/architecture/synthesis 等只读审查有独立价值时，仍可启动只读子代理。
+
+## 发现协议
+
+启动任何子代理前先按约定发现模板；这是 `prompt_template_guard` 的输入，不是可选说明：
+
+1. 列出本文件旁边的 `./prompts/`，即 `<skill-root>/references/prompts/`。
+2. 读每个文件头部的 H1 和 `触发：` 行。
+3. 只加载匹配的一个模板，把模板全文和本次具体输入喂给子代理。
+4. 没有匹配模板时，现写任务说明，但必须包含只读边界：禁止 Edit/Write/revert/stage/commit/push，只回结论。
+
+每次启动前把发现结果压成两个字段：
+
+- `prompt_source`：匹配模板路径，例如 `references/prompts/context-manager.md`；没有匹配模板时写 `fallback`。
+- `prompt_basis`：匹配到的 `触发：` 行摘要；`prompt_source: fallback` 时写没有匹配模板的原因和只读边界。
+
+不要点名宿主注册的 agent、subagent_type、agent 路径或模型；使用当前宿主的子代理启动机制。
 
 ## 执行体契约
 
@@ -33,6 +49,8 @@ join_point: before_plan | before_implement | before_verify | non_blocking
 max_impact: context | plan | implement | verify | deliver
 blocking: yes | no
 wait_policy: wait_until_returned | unavailable_degrade_only | non_blocking
+prompt_source: references/prompts/<template>.md | fallback
+prompt_basis: <匹配的 触发：行摘要；fallback 时写 no matching template + 原因和只读边界>
 ```
 
 - `purpose`：为什么启动。没有明确目的不启动。
@@ -40,6 +58,8 @@ wait_policy: wait_until_returned | unavailable_degrade_only | non_blocking
 - `max_impact`：它最多能让主线程回流到哪里，避免晚到结果无限推翻。
 - `blocking`：是否阻塞状态转移。
 - `wait_policy`：等待到返回、仅不可执行时降级，或作为旁路任务继续。
+- `prompt_source`：按发现协议加载的模板路径；没有匹配模板时只能写 `fallback`。
+- `prompt_basis`：为什么选这个模板；fallback 时写明未匹配原因和临时说明的只读边界。
 
 等待点语义：
 
@@ -49,17 +69,6 @@ wait_policy: wait_until_returned | unavailable_degrade_only | non_blocking
 - `non_blocking`：旁路探索。主线程可以继续，但必须记录 `max_impact`；返回后只在影响范围内决定是否回流。
 
 兼容旧阶段名时可把 `before_stage_3` 理解为 `before_implement`，把 `before_stage_5` 理解为 `before_verify`；新记录优先使用新等待点。
-
-## 发现协议
-
-启动子代理时不查中心表，按约定发现模板：
-
-1. 列出本文件旁边的 `./prompts/`，即 `<skill-root>/references/prompts/`。
-2. 读每个文件头部的 H1 和 `触发：` 行。
-3. 只加载匹配的一个模板，把模板全文和本次具体输入喂给子代理。
-4. 没有匹配模板时，现写任务说明，但必须包含只读边界：禁止 Edit/Write/revert/stage/commit/push，只回结论。
-
-不要点名宿主注册的 agent、subagent_type、agent 路径或模型；使用当前宿主的子代理启动机制。
 
 ## 常见执行体
 
@@ -96,7 +105,7 @@ wait_policy: wait_until_returned | unavailable_degrade_only | non_blocking
 - 改变目标行为、contract、状态流、副作用归属、验证策略或实现边界的 finding 是 material change，必须更新方案并重过 `PlanReview`。
 - 不改变这些边界的 finding 才能作为 minor scoped note，记录采纳/不采纳理由后进入 `PlanApproval`。
 
-`PlanReview` 通过后只能进入 `PlanApproval`。只有用户明确批准当前 `plan.md` 版本，且任务记录满足 `approved_plan_revision == current_plan_revision`，才能进入 `Implement`。用户在初始请求里说“完整流程执行”不算批准后续生成的执行计划。
+`PlanReview` 通过后只能进入 `PlanApproval`。只有用户明确批准当前 `plan.md` 版本，且任务台账满足 `approved_plan_revision == current_plan_revision`，才能进入 `Implement`。用户在初始请求里说“完整流程执行”不算批准后续生成的执行计划。
 
 ## 实现审查关卡
 
