@@ -5,11 +5,11 @@
 ## 入口与模式
 
 - `entry-modes.md`：用户请求有边界问题时读取，例如 `plan only`、`review only`、重构默认先出方案、上一轮建议被接受、是否等待确认。
-- `task-record.md`：只有需要启用 `.dev-pipeline/` 工作态记录时读取；高约束实现要记录 context/plan/review gate、切片、findings、回流和验证。只读模式、`OffRamp`、单文件低风险任务默认不需要。
+- `task-record.md`：只有需要启用 `.dev-pipeline/` 工作态记录时读取；高约束实现要记录 context/plan/review gate、计划版本、用户批准、切片、findings、回流和验证。只读模式、`OffRamp`、单文件低风险任务默认不需要。
 
 ## 主干阶段细节
 
-- `statechart.md`：阻塞式状态机来源。需要理解 `ContextGather -> PlanReview -> Implement -> Review -> Verify -> Deliver`、状态转移、守卫条件、动作、退出条件，或处理回流、子代理 `join_point`、验证记录时读取。
+- `statechart.md`：阻塞式状态机来源。需要理解 `ContextGather -> Plan -> PlanReview -> PlanApproval -> Implement -> Review -> Verify -> Deliver`、状态转移、守卫条件、动作、退出条件，或处理回流、子代理 `join_point`、计划批准、验证记录时读取。
 - `implementation.md`：进入 `Implement` 写代码时读取，覆盖单一事实来源、状态机建模、阶段边界和命名规则。
 - `refactor-prep.md`：重构、迁移、架构调整，或涉及多模块/状态流/外部 contract、副作用、权限数据流/用户可见行为时读取。
 - `rule-distillation.md`：交付后被用户纠正，或审查/测试/子代理结果暴露可复用决策偏差，需要沉淀成持久规则时读取。

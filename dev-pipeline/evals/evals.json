@@ -37,14 +37,14 @@
     {
       "id": 4,
       "prompt": "实现一个跨订单、库存、通知三个服务的下单流程，要改它们的接口。",
-      "expected_output": "命中高风险守卫条件（多模块+外部 contract+用户可见行为）即进入 ContextGather 和 PlanReview blocking 关卡；启动子代理前声明 purpose、join_point、max_impact、blocking 和 wait_policy；工具不可用时才允许本地替代审查降级；偏大任务切纵向片并用任务记录保留状态。",
+      "expected_output": "命中高风险守卫条件（多模块+外部 contract+用户可见行为）即进入 ContextGather、PlanReview 和 PlanApproval 关卡；启动子代理前声明 purpose、join_point、max_impact、blocking 和 wait_policy；工具不可用时才允许本地替代审查降级；偏大任务切纵向片并用任务记录保留状态。",
       "expectations": [
         "识别命中子代理委派触发条件，默认启动 blocking 子代理作为质量门槛",
         "进入 Plan 前先通过 ContextGather 证据包，或明确记录工具不可用/平台禁止/安全边界冲突后的本地替代证据包",
         "启动子代理前声明 purpose、join_point、max_impact、blocking 和 wait_policy",
-        "进入 Implement 前 plan-review 关卡通过；不能因为子代理回来慢而本地降级放行",
+        "进入 Implement 前 plan-review 关卡通过，且当前 plan.md 版本得到用户明确批准；不能因为子代理回来慢而本地降级放行",
         "把大任务切成纵向片，逐片走 Implement/Review/Verify",
-        "进入完整状态机，开任务记录维护 current_state、切片状态和 delegate_states"
+        "进入完整状态机，开任务目录维护 task.md、plan.md、current_state、计划版本、批准状态、切片状态和 delegate_states"
       ],
       "files": []
     },
@@ -151,9 +151,9 @@
     {
       "id": 14,
       "prompt": "给这个函数加个空数组的边界处理。",
-      "expected_output": "单文件窄改动：实现模式直接做，不切片、不启动子代理（须简短交代未命中门槛），范围保持窄。",
+      "expected_output": "单文件窄改动：实现模式直接做，不切片、不启动子代理、不强制计划书批准（须简短交代未命中门槛），范围保持窄。",
       "expectations": [
-        "进入实现模式直接完成，不过度套用切片/子代理委派",
+        "进入轻量实现模式直接完成，不过度套用切片/子代理委派/PlanApproval",
         "保持范围窄，不顺手扩散到相邻逻辑",
         "不启动子代理时一句话交代未命中门槛的理由"
       ],
@@ -279,11 +279,12 @@
     {
       "id": 25,
       "prompt": "PlanReview 子代理返回说方案把字段放错层级，会影响 API contract。",
-      "expected_output": "把 finding 归类为 material plan change，进入 UpdatePlan 并重过 PlanReview，不能作为小备注直接进入实现。",
+      "expected_output": "把 finding 归类为 material plan change，进入 UpdatePlan，更新 plan.md revision 并重过 PlanReview；旧批准失效，不能作为小备注直接进入实现。",
       "expectations": [
         "识别 API contract 层级变化属于 material plan change",
         "进入 UpdatePlan 记录采纳/不采纳理由",
-        "更新方案后重新进入 PlanReview",
+        "更新方案和 current_plan_revision 后重新进入 PlanReview",
+        "如已有批准则标记 approval_state stale",
         "不直接进入 Implement"
       ],
       "files": []
@@ -297,6 +298,68 @@
         "不进入 Implement",
         "继续等待 blocking PlanReview，或仅在工具不可用/平台禁止/安全边界冲突时记录本地替代审查",
         "任务记录保留 PlanReview pending 或明确 unavailable_degrade_only 原因"
+      ],
+      "files": []
+    },
+    {
+      "id": 36,
+      "prompt": "PlanReview 子代理已经返回 no findings，可以开始实现了吗？",
+      "expected_output": "不能直接实现；PlanReview 通过后进入 PlanApproval，输出计划摘要和 plan.md 路径，等待用户明确批准当前计划版本。",
+      "expectations": [
+        "从 PlanReview passed 进入 PlanApproval，而不是 Implement",
+        "向用户提供当前 plan.md 路径或摘要",
+        "记录 reviewed_plan_revision == current_plan_revision",
+        "没有 approved_plan_revision == current_plan_revision 前不写代码"
+      ],
+      "files": []
+    },
+    {
+      "id": 37,
+      "prompt": "PlanReview 只有一个小建议：把验证计划里补一条代码路径审查，不影响范围。",
+      "expected_output": "把 finding 归类为 minor scoped note，记录采纳/不采纳理由后进入 PlanApproval；不能因为是小建议就直接进入 Implement。",
+      "expectations": [
+        "识别不改变目标行为、contract、状态流、副作用归属、验证策略边界或实现边界时才是 minor",
+        "记录 finding disposition 和 reason",
+        "进入 PlanApproval 等用户批准",
+        "不直接进入 Implement"
+      ],
+      "files": []
+    },
+    {
+      "id": 38,
+      "prompt": "按完整流程执行这个多模块改动，我后面不想再确认。",
+      "expected_output": "初始请求里的完整流程授权不能跳过后续 PlanApproval；生成并审查 plan.md 后仍要等待用户批准当前计划版本。",
+      "expectations": [
+        "识别这是高约束实现主干",
+        "不把初始“完整流程执行”当作 approved_plan_revision",
+        "PlanReview 通过后停在 PlanApproval",
+        "未获当前计划版本批准前不进入 Implement"
+      ],
+      "files": []
+    },
+    {
+      "id": 39,
+      "prompt": "我已经批准了 plan.md，但刚才又把方案里的 API contract 改了一层。",
+      "expected_output": "把旧批准标记为 stale，更新 current_plan_revision，重新进入 PlanReview；新计划通过审查后还要重新 PlanApproval。",
+      "expectations": [
+        "识别 API contract 改层级是 material plan change",
+        "更新 plan.md revision",
+        "把 approved_plan_revision 标记为不匹配或 approval_state stale",
+        "重新 PlanReview，再重新请求用户批准",
+        "不沿用旧批准进入 Implement"
+      ],
+      "files": []
+    },
+    {
+      "id": 40,
+      "prompt": "这个任务需要开 .dev-pipeline 记录。",
+      "expected_output": "创建或接续 .dev-pipeline/<date>-<short-slug>/ 目录，使用 task.md 记录过程台账、plan.md 作为批准物；不再创建单个 .dev-pipeline/<date>-<short-slug>.md。",
+      "expectations": [
+        "先列 .dev-pipeline/ 查找可接续目录",
+        "使用一任务一目录结构",
+        "task.md 记录 current_state、计划版本、批准状态、子代理状态和验证记录",
+        "plan.md 记录用户可读计划书和 revision",
+        "同日同 slug 但目标不同的任务使用 -2/-3 后缀"
       ],
       "files": []
     },

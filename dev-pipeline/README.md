@@ -11,13 +11,13 @@
 ## 默认边界
 
 - `plan only` / `review only` / `explain only` 保持只读，不创建任务记录，不改文件，不 stage，不 commit。
-- 单文件低风险任务走轻量路径，不启动子代理、不切片、不创建任务记录。
+- 单文件低风险任务走轻量路径，不启动子代理、不切片、不创建任务记录、不强制计划书批准。
 - 提交保持显式授权。只有用户明确要求提交，或交付 diff 后确认提交，才允许 commit；push 同理。
 - 删除、覆盖、迁移、部署、发送消息、批量写入、联网改状态、付费调用等高副作用操作必须先确认。
 
 ## 阻塞式状态流
 
-高约束实现任务使用两道子代理关卡：方案门和实现门。子代理在这些关卡里是 blocking actor，不是旁路建议；返回 findings 时先更新方案或修复实现，再重新过对应关卡。
+高约束实现任务使用上下文、方案审查、用户批准和实现审查关卡。子代理在审查关卡里是 blocking actor，不是旁路建议；用户批准关卡决定当前计划版本是否允许进入写入。
 
 ```mermaid
 flowchart TD
@@ -30,6 +30,8 @@ flowchart TD
   PlanFindings{"PlanReview 有 findings?"}
   UpdatePlan["UpdatePlan: main"]
   PlanChange{"material plan change?"}
+  PlanApproval["PlanApproval: user approval, blocking"]
+  PlanApproved{"approved_plan_revision == current_plan_revision?"}
   Implement["Implement: main"]
   Review["Review: subagent, blocking"]
   ReviewFindings{"Review 有 findings?"}
@@ -49,8 +51,11 @@ flowchart TD
   PlanFindings -- "yes" --> UpdatePlan
   UpdatePlan --> PlanChange
   PlanChange -- "yes" --> PlanReview
-  PlanChange -- "no, minor scoped note" --> Implement
-  PlanFindings -- "no" --> Implement
+  PlanChange -- "no, minor scoped note" --> PlanApproval
+  PlanFindings -- "no" --> PlanApproval
+  PlanApproval --> PlanApproved
+  PlanApproved -- "yes" --> Implement
+  PlanApproved -- "no / change requested" --> UpdatePlan
 
   Implement --> Review
   Review --> ReviewFindings
@@ -63,7 +68,9 @@ flowchart TD
 关卡语义：
 
 - `ContextGather` 只打包 repo 证据、入口、contract、风险和未解问题，不替主线程定方案。
-- `PlanReview` 审查方案；有实质 findings 时先改方案，重大方案变化重新 review。
+- `Plan` 生成 `.dev-pipeline/<date>-<short-slug>/plan.md`；`.dev-pipeline/<date>-<short-slug>/task.md` 记录过程状态。
+- `PlanReview` 审查计划书、上下文证据和关键 contract；有实质 findings 时先改方案，重大方案变化重新 review。
+- `PlanApproval` 等待用户批准当前计划版本；`approved_plan_revision == current_plan_revision` 后才允许进入 `Implement`。
 - `Review` 审查实现 diff 和验证覆盖；有 findings 时修复后再 review。
 - `Verify` 由主线程执行实际验证，例如测试、typecheck、lint、build 或未验证项记录；`Review` 不能直接替代 `Verify`。
 - blocking 子代理不能因为“回来慢”被旁路；只有工具不可用、平台禁止或安全边界冲突时，才记录本地替代审查降级。

@@ -5,7 +5,7 @@
 高约束实现主干：
 
 ```text
-Intake -> ContextGather -> Plan -> PlanReview -> Implement -> Review -> Verify -> Deliver
+Intake -> ContextGather -> Plan -> PlanReview -> PlanApproval -> Implement -> Review -> Verify -> Deliver
 ```
 
 只读、轻量和阻塞分支仍可按事件进入 `OffRamp`、`ReadOnly`、`Context`、`WaitForUser`、`Parked` 或 `ImplementSlice`。
@@ -19,9 +19,10 @@ Intake -> ContextGather -> Plan -> PlanReview -> Implement -> Review -> Verify -
 | `ReadOnly` | 只读模式门：禁止写文件、任务记录和实现关卡 | 进入 `Context` 收集证据，启动只读审查子代理，或在 `Plan` 后交付判断 |
 | `Context` | 低风险或只读任务由主线程收集 repo 证据 | 足够支撑方案、审查结论；或发现需用户澄清 |
 | `ContextGather` | 高约束实现的阻塞式上下文子代理关卡 | 子代理返回证据包；或工具不可用/平台禁止/安全边界冲突并完成本地替代证据包 |
-| `Plan` | 主线程基于证据包形成方案、风险、范围、验证计划和切片 | 方案可审查；或进入 `WaitForUser` |
-| `PlanReview` | 阻塞式方案审查子代理关卡 | 无 findings；或 findings 进入 `UpdatePlan` |
-| `UpdatePlan` | 主线程处理方案审查 findings | material change 回到 `PlanReview`；minor scoped note 记录后进入 `Implement` |
+| `Plan` | 主线程基于证据包形成方案、风险、范围、验证计划和切片，写入 `plan.md` | 方案可审查；或进入 `WaitForUser` |
+| `PlanReview` | 阻塞式方案审查子代理关卡，审 `plan.md`、上下文证据包和关键源码/contract 引用 | 无 findings 进入 `PlanApproval`；或 findings 进入 `UpdatePlan` |
+| `PlanApproval` | 用户批准当前计划版本的阻塞关卡 | 当前计划版本被明确批准后进入 `Implement`；方案变更回到 `UpdatePlan` |
+| `UpdatePlan` | 主线程处理方案审查 findings 或用户改动要求 | material change 更新计划版本并回到 `PlanReview`；minor scoped note 记录后进入 `PlanApproval` |
 | `Implement` | 按方案执行写入 | 所有必要切片完成；或发现需要回流 |
 | `ImplementSlice` | 纵向片子状态 | 当前片达到 `complete` 或 `rework` |
 | `Review` | 阻塞式实现审查子代理关卡，审 diff 正确性、行为回归和验证覆盖 | 无 findings 进入 `Verify`；有 findings 进入 `FixFindings` |
@@ -45,11 +46,15 @@ Intake -> ContextGather -> Plan -> PlanReview -> Implement -> Review -> Verify -
 | `context_gather_degraded` | `ContextGather` | `Plan` | 仅工具不可用、平台禁止或安全边界冲突；已记录本地替代证据包 |
 | `needs_user` | 任意写入前状态 | `WaitForUser` | 信息缺失、高副作用或确认门槛触发 |
 | `plan_ready_for_review` | `Plan` | `PlanReview` | 高约束实现方案可审查 |
-| `plan_review_passed` | `PlanReview` | `Implement` | 阻塞式方案审查返回无 findings |
+| `plan_review_passed` | `PlanReview` | `PlanApproval` | 阻塞式方案审查返回无 findings，且 `reviewed_plan_revision == current_plan_revision` |
 | `plan_review_findings` | `PlanReview` | `UpdatePlan` | 方案审查返回有效 findings |
-| `plan_update_material` | `UpdatePlan` | `PlanReview` | finding 改变目标行为、contract、状态流、副作用归属、验证策略或实现边界 |
-| `plan_update_minor` | `UpdatePlan` | `Implement` | 只是不改变方案边界的 scoped note，已记录采纳/不采纳理由 |
+| `plan_update_material` | `UpdatePlan` | `PlanReview` | finding 或用户要求改变目标行为、contract、状态流、副作用归属、验证策略或实现边界；旧批准已置为 stale |
+| `plan_update_minor` | `UpdatePlan` | `PlanApproval` | 只是不改变方案边界的 scoped note，已记录采纳/不采纳理由 |
+| `plan_approved` | `PlanApproval` | `Implement` | 用户明确批准当前 `plan.md` 版本，且 `approved_plan_revision == current_plan_revision` |
+| `plan_change_requested` | `PlanApproval` | `UpdatePlan` | 用户要求改计划、范围、切片、风险或验证策略 |
+| `approval_ambiguous` | `PlanApproval` | `PlanApproval` 或 `WaitForUser` | 批准语义不明确，继续等待或只问一个关键确认问题 |
 | `read_only_ready` | `Plan` | `Deliver` | `mode: ReadOnly`，方案、判断或审查结论可交付 |
+| `light_context_ready` | `Context` | `Implement` | 单文件低风险改动，`implementation_light_guard` 通过，未启用高约束主干 |
 | `slice_started` | `Implement` | `ImplementSlice` | 当前片有明确目标和最小验证 |
 | `slice_complete` | `ImplementSlice` | `Implement` | 当前片完成并记录最小验证 |
 | `implementation_done` | `Implement` | `Review` | 所有必要片完成，diff 可独立审查 |
@@ -71,10 +76,13 @@ Intake -> ContextGather -> Plan -> PlanReview -> Implement -> Review -> Verify -
 - `read_only_guard`：只读模式不创建任务记录、不写文件、不 stage、不 commit；只读 review/security/architecture/synthesis 可启动只读子代理。
 - `side_effect_guard`：删除、覆盖、迁移、部署、发送消息、批量写入、联网改状态、付费调用等高副作用操作必须进入 `WaitForUser`。
 - `scope_guard`：实现只纳入本轮目标必需的相邻流程、入口校验、交互策略、持久化、运行期副作用和数据模型变化。
+- `implementation_light_guard`：只允许单文件低风险改动跳过计划书批准；不得涉及多模块、状态流、外部 contract、副作用、权限/数据流或用户可见高风险行为。范围扩大时转入高约束主干。
 - `blocking_delegate_guard`：blocking 子代理返回前不能越过等待点；回来慢不构成降级理由。
 - `context_pack_guard`：`ContextGather` 只产 repo 证据、入口、contract、风险和未解问题，不替主线程定方案。
+- `plan_approval_guard`：高约束主干进入 `Implement` 前必须满足 `approved_plan_revision == current_plan_revision`；初始请求、模糊认可和旧计划批准都不能替代当前计划批准。
 - `review_gate_guard`：`Review` findings 未处理并重审前不能进入 `Verify` 或 `Deliver`。
-- `minor_note_guard`：只有不改变目标行为、contract、状态流、副作用归属、验证策略或实现边界的 finding，才能作为 minor scoped note 进入 `Implement`。
+- `minor_note_guard`：只有不改变目标行为、contract、状态流、副作用归属、验证策略或实现边界的 finding，才能作为 minor scoped note 进入 `PlanApproval`。
+- `side_effect_approval_guard`：`PlanApproval` 只授权按计划改文件；删除、部署、发送消息、批量联网改状态、付费调用等高副作用动作仍需单独确认，除非计划书逐项列明环境、范围、回滚/停止条件且用户批准语明确覆盖。
 - `parked_guard`：`Parked` 只允许推进与阻塞决策独立的工作；整条任务被阻塞时进入 `WaitForUser`。
 - `oscillation_guard`：同一类 PlanReview 或 Review 回流超过 2 次，停下总结卡点，给用户选项。
 - `verification_guard`：最终回复里的验证结论必须能从验证记录、实际工具调用或当前 diff 追溯。
@@ -86,7 +94,9 @@ Intake -> ContextGather -> Plan -> PlanReview -> Implement -> Review -> Verify -
 - `record_assumption`：未澄清就推进时，记录假设和假设错了要回头改什么。
 - `spawn_context_gather_actor`：按 `references/delegation.md` 启动阻塞式上下文子代理。
 - `record_context_pack`：记录上下文证据包、未解问题和本地替代原因。
+- `record_plan_revision`：写入或更新 `plan.md` 后记录 `current_plan_revision`；material change 必须置旧批准为 stale。
 - `record_plan_update`：记录 PlanReview findings、采纳/不采纳理由、是否 material change。
+- `record_plan_approval`：记录批准状态、批准消息、`approved_plan_revision`、无效化原因和下一状态。
 - `record_slice_transition`：切片进入、最小验证、完成或回流时更新切片状态（`slice_states`）。
 - `spawn_review_actor`：按 `references/delegation.md` 启动阻塞式实现审查子代理。
 - `record_review_result`：记录 Review findings、影响状态、是否回流。

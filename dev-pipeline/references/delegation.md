@@ -44,7 +44,7 @@ wait_policy: wait_until_returned | unavailable_degrade_only | non_blocking
 等待点语义：
 
 - `before_plan`：上下文关卡。`ContextGather` 返回证据包前不能进入 `Plan`；只允许工具不可用、平台禁止或安全边界冲突时本地替代。
-- `before_implement`：方案关卡。`PlanReview` 返回无 findings，或 findings 经 `UpdatePlan` 处理并满足守卫条件前，不能进入 `Implement`。
+- `before_implement`：方案审查关卡。`PlanReview` 返回无 findings，或 findings 经 `UpdatePlan` 处理并满足守卫条件前，不能进入 `PlanApproval`；用户批准当前计划版本前，不能进入 `Implement`。
 - `before_verify`：实现审查关卡。`Review` 返回无 findings，或 findings 经 `FixFindings` 修复并重审前，不能进入 `Verify`。
 - `non_blocking`：旁路探索。主线程可以继续，但必须记录 `max_impact`；返回后只在影响范围内决定是否回流。
 
@@ -66,7 +66,7 @@ wait_policy: wait_until_returned | unavailable_degrade_only | non_blocking
 | 执行体 | join_point | max_impact | blocking | wait_policy | 适用场景 |
 | --- | --- | --- | --- | --- | --- |
 | `context-gather` | `before_plan` | `context` 或 `plan` | yes | `wait_until_returned` | 高约束实现前打包 repo 证据、入口、contract、风险和未解问题 |
-| `plan-review` | `before_implement` | `plan` | yes | `wait_until_returned` | 高风险方案进入实现前审查范围、contract、状态流和验证计划 |
+| `plan-review` | `before_implement` | `plan` | yes | `wait_until_returned` | 高风险方案进入用户批准前，审查范围、contract、状态流和验证计划 |
 | `diff-review` | `before_verify` | `implement` | yes | `wait_until_returned` | 交付前独立审查 diff 正确性、行为回归和缺测试 |
 | `security-review` | `before_implement` 或 `before_verify` | `plan` 或 `implement` | yes | `wait_until_returned` | auth、密钥、敏感数据、输入校验、网络/配置暴露 |
 | `architecture-review` | `before_implement` | `plan` | yes | `wait_until_returned` | 架构边界、耦合、数据归属、长期维护性 |
@@ -76,7 +76,13 @@ wait_policy: wait_until_returned | unavailable_degrade_only | non_blocking
 
 ## 方案审查关卡
 
-`Plan` 命中高风险守卫条件时，启动 `plan-review` blocking gate。
+`Plan` 命中高风险守卫条件时，启动 `plan-review` blocking gate。它审查计划是否可信，不授权写代码。
+
+计划审查输入至少包含：
+
+- `plan.md` 当前版本。
+- `ContextGather` 证据包或本地替代证据包。
+- 关键源码、contract、schema、service 或测试入口引用。
 
 计划审查至少覆盖四个视角中与任务相关的部分：
 
@@ -88,7 +94,9 @@ wait_policy: wait_until_returned | unavailable_degrade_only | non_blocking
 返回 findings 时进入 `UpdatePlan`：
 
 - 改变目标行为、contract、状态流、副作用归属、验证策略或实现边界的 finding 是 material change，必须更新方案并重过 `PlanReview`。
-- 不改变这些边界的 finding 才能作为 minor scoped note，记录采纳/不采纳理由后进入 `Implement`。
+- 不改变这些边界的 finding 才能作为 minor scoped note，记录采纳/不采纳理由后进入 `PlanApproval`。
+
+`PlanReview` 通过后只能进入 `PlanApproval`。只有用户明确批准当前 `plan.md` 版本，且任务记录满足 `approved_plan_revision == current_plan_revision`，才能进入 `Implement`。用户在初始请求里说“完整流程执行”不算批准后续生成的计划书。
 
 ## 实现审查关卡
 
@@ -107,7 +115,7 @@ wait_policy: wait_until_returned | unavailable_degrade_only | non_blocking
 
 执行体返回后先看契约：
 
-- blocking gate 无 findings：通过对应等待点。
+- blocking gate 无 findings：通过对应等待点；`plan-review` 的下一状态是 `PlanApproval`，不是 `Implement`。
 - blocking gate 有 findings：回流到 `UpdatePlan` 或 `FixFindings`，不能继续越过等待点。
 - 结果已被后续改动覆盖：记录证据，但仍要判断是否需要重审当前 diff 或方案。
 - 结果与 repo 事实不符：记录不采纳理由；若它本来挡关卡，必须说明为何不采纳后仍满足守卫条件。
