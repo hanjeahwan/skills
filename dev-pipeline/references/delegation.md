@@ -7,6 +7,7 @@
 
 - **blocking gate**：挡住某个状态转移；返回前不能越过等待点。高约束实现默认使用这类执行体。
 - **non_blocking sidecar**：旁路探索；主线程可以继续，但必须声明最大影响范围，返回后只在影响范围内决定是否回流。
+- **implement_worker**：写入型 worker；只在 `Implement` / `ImplementSlice` 内使用，负责当前已批准计划里的一个明确切片。
 
 回来慢不是降级理由。只有子代理工具不可用、平台规则不允许调用，或安全边界冲突时，blocking gate 才能进入本地替代审查降级。
 
@@ -23,9 +24,9 @@
 
 只读任务不创建任务台账、不进入实现关卡；但 review/security/architecture/synthesis 等只读审查有独立价值时，仍可启动只读子代理。
 
-## 发现协议
+## 只读发现协议
 
-启动任何子代理前先按约定发现模板；这是 `prompt_template_guard` 的输入，不是可选说明：
+启动只读、审查、上下文、综合或旁路子代理前先按约定发现模板；这是 `readonly_prompt_guard` 的输入，不是可选说明：
 
 1. 列出本文件旁边的 `./prompts/`，即 `<skill-root>/references/prompts/`。
 2. 读每个文件头部的 H1 和 `触发：` 行。
@@ -39,9 +40,9 @@
 
 不要点名宿主注册的 agent、subagent_type、agent 路径或模型；使用当前宿主的子代理启动机制。
 
-## 执行体契约
+## 只读/审查执行体契约
 
-每次启动前先声明：
+启动只读、审查、上下文、综合或旁路子代理前先声明：
 
 ```text
 purpose: context-gather | plan-review | diff-review | security-review | architecture-review | verification | synthesis | sidecar-research
@@ -60,6 +61,28 @@ prompt_basis: <匹配的 触发：行摘要；fallback 时写 no matching templa
 - `wait_policy`：等待到返回、仅不可执行时降级，或作为旁路任务继续。
 - `prompt_source`：按发现协议加载的模板路径；没有匹配模板时只能写 `fallback`。
 - `prompt_basis`：为什么选这个模板；fallback 时写明未匹配原因和临时说明的只读边界。
+
+## 写入型 worker 契约
+
+`implement_worker` 只用于已批准执行计划里的明确切片。默认仍由主线程实现；只有切片清楚、ownership 清楚、并行收益明确时才启动 worker。
+
+启动前先声明：
+
+```text
+worker_scope: <负责哪一片，实现什么目标>
+ownership: <可改哪些文件/模块；禁止碰哪些文件/模块>
+plan_revision: <必须等于 current_plan_revision 和 approved_plan_revision>
+handoff: <返回时必须交代改了什么、验证了什么、没验证什么、是否发现方案问题>
+```
+
+固定语义：
+
+- 只允许在 `Implement` / `ImplementSlice` 内启动。
+- `plan_revision` 必须满足 `plan_revision == current_plan_revision == approved_plan_revision`。
+- worker 只能在 `ownership` 内写入，不能修改 `plan.md`、扩大 scope、改变 contract 边界或越过用户批准范围。
+- worker 发现方案错误时只报告；主线程回 `UpdatePlan` / `PlanReview` / `PlanApproval`，worker 不直接改计划。
+- worker 返回后由主线程集成；集成前必须核对计划版本和实际改动是否仍在 `ownership` 内。
+- 集成后仍进入 `Review` blocking 关卡；worker 的自检不能替代 `Review` 或 `Verify`。
 
 等待点语义：
 
@@ -82,6 +105,7 @@ prompt_basis: <匹配的 触发：行摘要；fallback 时写 no matching templa
 | `verification` | `before_verify` | `verify` | yes | `wait_until_returned` | 并行跑独立验证或审查验证覆盖 |
 | `synthesis` | `before_implement`、`before_verify` 或 `non_blocking` | `plan` / `verify` / `deliver` | depends | 按等待点声明 | 多个子代理结果需要去重、保留冲突和决策汇总 |
 | `sidecar-research` | `non_blocking` | 按任务声明 | no | `non_blocking` | 不挡主流程的旁路探索 |
+| `implement_worker` | `before_review` | `implement` | 当前 slice 内 yes | `wait_until_returned` | 已批准计划内的明确实现切片；必须满足 worker 契约和集成验收 |
 
 ## 方案审查关卡
 
@@ -120,6 +144,21 @@ prompt_basis: <匹配的 触发：行摘要；fallback 时写 no matching templa
 
 返回 findings 时进入 `FixFindings`；修复或明确不采纳并记录理由后，必须重过 `Review`。无 findings 才能进入 `Verify`。
 
+## Worker 结果集成
+
+`implement_worker` 返回后，主线程先做集成验收：
+
+- `worker.plan_revision == current_plan_revision == approved_plan_revision`。
+- 实际改动文件和模块没有越过 `ownership`。
+- `handoff` 说明了改动、验证、未验证项和是否发现方案问题。
+
+验收通过后才能合入当前切片并更新切片状态。验收失败时：
+
+- 计划版本不匹配或 worker 发现方案错误 -> 回 `UpdatePlan`。
+- 越过 ownership、handoff 不完整或实现风险不清 -> 当前切片标记 `rework`，补齐后再集成。
+
+worker 结果集成后仍必须进入 `Review`；不能把 worker 的实现结果当作审查通过。
+
 ## 结果处理
 
 执行体返回后先看契约：
@@ -129,5 +168,6 @@ prompt_basis: <匹配的 触发：行摘要；fallback 时写 no matching templa
 - 结果已被后续改动覆盖：记录证据，但仍要判断是否需要重审当前 diff 或方案。
 - 结果与 repo 事实不符：记录不采纳理由；若它本来挡关卡，必须说明为何不采纳后仍满足守卫条件。
 - 工具不可用、平台规则不允许或安全边界冲突：记录 `unavailable_degrade_only` 的本地替代审查。
+- `implement_worker` 结果版本过期、越过 ownership 或 handoff 不完整：不能合入；回 `UpdatePlan` 或标记当前切片 `rework`。
 
 影响切片时，更新切片状态；影响验证时，更新验证记录。

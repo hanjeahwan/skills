@@ -37,11 +37,11 @@
     {
       "id": 4,
       "prompt": "实现一个跨订单、库存、通知三个服务的下单流程，要改它们的接口。",
-      "expected_output": "命中高风险守卫条件（多模块+外部 contract+用户可见行为）即进入 ContextGather、PlanReview 和 PlanApproval 关卡；启动子代理前声明 purpose、join_point、max_impact、blocking、wait_policy、prompt_source 和 prompt_basis；工具不可用时才允许本地替代审查降级；偏大任务切纵向片并用任务台账保留状态。",
+      "expected_output": "命中高风险守卫条件（多模块+外部 contract+用户可见行为）即进入 ContextGather、PlanReview 和 PlanApproval 关卡；启动只读/审查/上下文子代理前声明 purpose、join_point、max_impact、blocking、wait_policy、prompt_source 和 prompt_basis；工具不可用时才允许本地替代审查降级；偏大任务切纵向片并用任务台账保留状态。",
       "expectations": [
         "识别命中子代理委派触发条件，默认启动 blocking 子代理作为质量门槛",
         "进入 Plan 前先通过 ContextGather 证据包，或明确记录工具不可用/平台禁止/安全边界冲突后的本地替代证据包",
-        "启动子代理前声明 purpose、join_point、max_impact、blocking、wait_policy、prompt_source 和 prompt_basis",
+        "启动只读/审查/上下文子代理前声明 purpose、join_point、max_impact、blocking、wait_policy、prompt_source 和 prompt_basis",
         "prompt_source 是匹配模板路径时，必须已按发现协议加载该模板全文；prompt_source 为 fallback 时，prompt_basis 必须说明没有匹配模板的原因和只读边界",
         "进入 Implement 前 plan-review 关卡通过，且当前 plan.md 版本得到用户明确批准；不能因为子代理回来慢而本地降级放行",
         "把大任务切成纵向片，逐片走 Implement/Review/Verify",
@@ -234,7 +234,7 @@
     {
       "id": 21,
       "prompt": "我想让一个子代理在旁边看看，有结果就说，没结果你继续。",
-      "expected_output": "不能启动没有 join_point 和 prompt 依据的子代理；必须声明 purpose、join_point、max_impact、blocking、wait_policy、prompt_source 和 prompt_basis。若是 non_blocking 旁路任务，也要声明最大影响范围。",
+      "expected_output": "不能启动没有 join_point 和 prompt 依据的旁路子代理；必须声明 purpose、join_point、max_impact、blocking、wait_policy、prompt_source 和 prompt_basis。若是 non_blocking 旁路任务，也要声明最大影响范围。",
       "expectations": [
         "拒绝无生命周期契约的随手启动",
         "要求声明 purpose 和 join_point",
@@ -370,13 +370,40 @@
     {
       "id": 41,
       "prompt": "这个多模块任务需要先让子代理看上下文和方案，但你直接写个 prompt 给它就行。",
-      "expected_output": "不能随手写 prompt 启动子代理；启动任何子代理前必须执行 prompts 发现协议，并记录 prompt_source 和 prompt_basis。没有匹配模板时才能使用 fallback，并说明原因和只读边界。",
+      "expected_output": "不能随手写 prompt 启动只读/审查子代理；启动 ContextGather 或 PlanReview 前必须执行 prompts 发现协议，并记录 prompt_source 和 prompt_basis。没有匹配模板时才能使用 fallback，并说明原因和只读边界。",
       "expectations": [
-        "识别任何子代理启动前都受 prompt_template_guard 约束",
+        "识别只读/审查/上下文子代理启动前受 readonly_prompt_guard 约束",
         "先列 references/prompts/ 并读取每个模板的 H1 和 触发：行",
         "匹配模板时记录 prompt_source 为模板路径，prompt_basis 为触发语义摘要",
         "fallback 只在没有匹配模板时允许，且 prompt_basis 写明 no matching template、原因和只读边界",
         "不能先 spawn 再补模板约束"
+      ],
+      "files": []
+    },
+    {
+      "id": 42,
+      "prompt": "plan.md 已批准，我想把 wizard slice 交给子代理写；但 references/prompts 里没有 implement 模板。",
+      "expected_output": "Implement 阶段写入型 worker 不走 prompts 模板发现；只有在当前 plan.md 已批准、切片和 ownership 清楚时，才能用 worker_contract_guard 启动，并声明 worker_scope、ownership、plan_revision 和 handoff。",
+      "expectations": [
+        "识别 implement_worker 是写入型 worker，不使用只读 prompts 模板，也不强行 fallback 到禁止写入的只读 prompt",
+        "启动前要求 approved_plan_revision == current_plan_revision",
+        "声明 worker_scope、ownership、plan_revision 和 handoff",
+        "plan_revision 必须绑定当前已批准 plan.md revision",
+        "worker 不能改 plan、扩大 scope、改变 contract 边界或越过 ownership",
+        "worker 完成后主线程仍进入 Review blocking 关卡"
+      ],
+      "files": []
+    },
+    {
+      "id": 43,
+      "prompt": "Implement worker 回来说方案里的 API contract 放错层级，顺手把 plan.md 和实现都改了。",
+      "expected_output": "worker 发现方案错误时只能报告；主线程必须拒绝 worker 擅自改 plan 或扩大实现，回 UpdatePlan 并重新走 PlanReview/PlanApproval。集成 worker 结果前要检查 plan_revision 和 ownership。",
+      "expectations": [
+        "识别 worker 不能修改 plan.md 或改变 contract 边界",
+        "检查 worker.plan_revision == current_plan_revision == approved_plan_revision",
+        "检查实际改动没有越过 ownership",
+        "方案错误回 UpdatePlan，而不是直接接受 worker 的改动",
+        "当前切片标记 rework 或 stale，并重新走必要的 PlanReview/PlanApproval"
       ],
       "files": []
     },

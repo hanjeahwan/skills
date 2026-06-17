@@ -24,8 +24,8 @@
 
 ## 子代理委派
 
-- `delegation.md`：任务命中子代理委派触发条件，或需要判断 blocking gate / non_blocking sidecar、是否应跳过启动子代理时读取。
-- `prompts/*.md`：启动任何子代理前的必经步骤。这里的 `prompts/` 是本文件旁边的 `./prompts/`，即 `<skill-root>/references/prompts/`。先列文件，读每个文件头部的 H1 和 `触发：` 行，再按下面地图只加载匹配模板，并把结果记录为 `prompt_source` 和 `prompt_basis`：
+- `delegation.md`：任务命中子代理委派触发条件，或需要判断 blocking gate / non_blocking sidecar / implement worker、是否应跳过启动子代理时读取。
+- `prompts/*.md`：启动只读、审查、上下文、综合或旁路子代理前的必经步骤；写入型 `implement_worker` 不使用这些模板，改走 `delegation.md` 的 worker 契约。这里的 `prompts/` 是本文件旁边的 `./prompts/`，即 `<skill-root>/references/prompts/`。先列文件，读每个文件头部的 H1 和 `触发：` 行，再按下面地图只加载匹配模板，并把结果记录为 `prompt_source` 和 `prompt_basis`：
   - `prompts/context-manager.md`：上下文分散，需要先把 repo 证据、入口、约束、风险和未解问题打包给后续工作时选。
   - `prompts/codebase-orchestrator.md`：repo 级重构、迁移或架构治理，需要风险排序、影响面和提案关卡时选。
   - `prompts/architect-reviewer.md`：需要审查耦合、系统边界、数据归属、长期可维护性或设计连贯性时选。
