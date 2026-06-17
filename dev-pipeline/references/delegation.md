@@ -96,7 +96,7 @@ wait_policy: wait_until_returned | unavailable_degrade_only | non_blocking
 - 改变目标行为、contract、状态流、副作用归属、验证策略或实现边界的 finding 是 material change，必须更新方案并重过 `PlanReview`。
 - 不改变这些边界的 finding 才能作为 minor scoped note，记录采纳/不采纳理由后进入 `PlanApproval`。
 
-`PlanReview` 通过后只能进入 `PlanApproval`。只有用户明确批准当前 `plan.md` 版本，且任务记录满足 `approved_plan_revision == current_plan_revision`，才能进入 `Implement`。用户在初始请求里说“完整流程执行”不算批准后续生成的计划书。
+`PlanReview` 通过后只能进入 `PlanApproval`。只有用户明确批准当前 `plan.md` 版本，且任务记录满足 `approved_plan_revision == current_plan_revision`，才能进入 `Implement`。用户在初始请求里说“完整流程执行”不算批准后续生成的执行计划。
 
 ## 实现审查关卡
 

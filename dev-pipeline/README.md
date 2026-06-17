@@ -11,7 +11,7 @@
 ## 默认边界
 
 - `plan only` / `review only` / `explain only` 保持只读，不创建任务记录，不改文件，不 stage，不 commit。
-- 单文件低风险任务走轻量路径，不启动子代理、不切片、不创建任务记录、不强制计划书批准。
+- 单文件低风险任务走轻量路径，不启动子代理、不切片、不创建任务记录、不强制执行计划批准。
 - 提交保持显式授权。只有用户明确要求提交，或交付 diff 后确认提交，才允许 commit；push 同理。
 - 删除、覆盖、迁移、部署、发送消息、批量写入、联网改状态、付费调用等高副作用操作必须先确认。
 
@@ -68,8 +68,8 @@ flowchart TD
 关卡语义：
 
 - `ContextGather` 只打包 repo 证据、入口、contract、风险和未解问题，不替主线程定方案。
-- `Plan` 生成 `.dev-pipeline/<date>-<short-slug>/plan.md`；`.dev-pipeline/<date>-<short-slug>/task.md` 记录过程状态。
-- `PlanReview` 审查计划书、上下文证据和关键 contract；有实质 findings 时先改方案，重大方案变化重新 review。
+- `Plan` 生成 `.dev-pipeline/<date>-<short-slug>/plan.md`；`.dev-pipeline/<date>-<short-slug>/task.md` 记录任务状态。
+- `PlanReview` 审查执行计划、上下文证据和关键 contract；有实质 findings 时先改方案，重大方案变化重新 review。
 - `PlanApproval` 等待用户批准当前计划版本；`approved_plan_revision == current_plan_revision` 后才允许进入 `Implement`。
 - `Review` 审查实现 diff 和验证覆盖；有 findings 时修复后再 review。
 - `Verify` 由主线程执行实际验证，例如测试、typecheck、lint、build 或未验证项记录；`Review` 不能直接替代 `Verify`。

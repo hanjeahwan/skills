@@ -76,13 +76,13 @@ Intake -> ContextGather -> Plan -> PlanReview -> PlanApproval -> Implement -> Re
 - `read_only_guard`：只读模式不创建任务记录、不写文件、不 stage、不 commit；只读 review/security/architecture/synthesis 可启动只读子代理。
 - `side_effect_guard`：删除、覆盖、迁移、部署、发送消息、批量写入、联网改状态、付费调用等高副作用操作必须进入 `WaitForUser`。
 - `scope_guard`：实现只纳入本轮目标必需的相邻流程、入口校验、交互策略、持久化、运行期副作用和数据模型变化。
-- `implementation_light_guard`：只允许单文件低风险改动跳过计划书批准；不得涉及多模块、状态流、外部 contract、副作用、权限/数据流或用户可见高风险行为。范围扩大时转入高约束主干。
+- `implementation_light_guard`：只允许单文件低风险改动跳过执行计划批准；不得涉及多模块、状态流、外部 contract、副作用、权限/数据流或用户可见高风险行为。范围扩大时转入高约束主干。
 - `blocking_delegate_guard`：blocking 子代理返回前不能越过等待点；回来慢不构成降级理由。
 - `context_pack_guard`：`ContextGather` 只产 repo 证据、入口、contract、风险和未解问题，不替主线程定方案。
 - `plan_approval_guard`：高约束主干进入 `Implement` 前必须满足 `approved_plan_revision == current_plan_revision`；初始请求、模糊认可和旧计划批准都不能替代当前计划批准。
 - `review_gate_guard`：`Review` findings 未处理并重审前不能进入 `Verify` 或 `Deliver`。
 - `minor_note_guard`：只有不改变目标行为、contract、状态流、副作用归属、验证策略或实现边界的 finding，才能作为 minor scoped note 进入 `PlanApproval`。
-- `side_effect_approval_guard`：`PlanApproval` 只授权按计划改文件；删除、部署、发送消息、批量联网改状态、付费调用等高副作用动作仍需单独确认，除非计划书逐项列明环境、范围、回滚/停止条件且用户批准语明确覆盖。
+- `side_effect_approval_guard`：`PlanApproval` 只授权按执行计划改文件；删除、部署、发送消息、批量联网改状态、付费调用等高副作用动作仍需单独确认，除非执行计划逐项列明环境、范围、回滚/停止条件且用户批准语明确覆盖。
 - `parked_guard`：`Parked` 只允许推进与阻塞决策独立的工作；整条任务被阻塞时进入 `WaitForUser`。
 - `oscillation_guard`：同一类 PlanReview 或 Review 回流超过 2 次，停下总结卡点，给用户选项。
 - `verification_guard`：最终回复里的验证结论必须能从验证记录、实际工具调用或当前 diff 追溯。

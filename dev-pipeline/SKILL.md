@@ -11,9 +11,9 @@ description: 用于高约束、多阶段的 repo 开发协作：先判定交付�
 
 - 遇到 `plan only` / `review only` / `explain only`，本轮就是只读任务：不创建任务记录，不改文件，不 stage，不 commit。
 - 提交保持显式授权：只有用户明确要求提交，或交付 diff 后确认提交，才按 repo 约定 commit；push 同理。
-- 任务记录只用于多步实现、长任务恢复、切片、方案批准、回流和已搁置阻塞；只读任务和单文件低风险任务默认跳过。
-- 单文件低风险任务走轻量路径：不启动子代理、不切片、不建任务记录、不强制计划书批准；需要解释时，用一句话说明跳过原因。一旦范围扩大到多模块、contract、状态流、副作用或用户可见行为，转入高约束主干。
-- 高约束实现进入写入前必须停在 `PlanApproval`：`approved_plan_revision == current_plan_revision` 才能进入 `Implement`；用户在初始请求里说“完整流程执行”不等于批准后续生成的计划书。
+- 任务记录只用于多步实现、长任务恢复、切片、执行计划批准、回流和已搁置阻塞；只读任务和单文件低风险任务默认跳过。
+- 单文件低风险任务走轻量路径：不启动子代理、不切片、不建任务记录、不强制执行计划批准；需要解释时，用一句话说明跳过原因。一旦范围扩大到多模块、contract、状态流、副作用或用户可见行为，转入高约束主干。
+- 高约束实现进入写入前必须停在 `PlanApproval`：`approved_plan_revision == current_plan_revision` 才能进入 `Implement`；用户在初始请求里说“完整流程执行”不等于批准后续生成的执行计划。
 - 删除、覆盖、迁移、部署、发送消息、批量写入、联网改状态、付费调用等高副作用操作，必须先停下拿到明确确认。
 
 ## 入口判定
@@ -66,12 +66,12 @@ Intake -> ContextGather -> Plan -> PlanReview -> PlanApproval -> Implement -> Re
 
 ### 方案
 
-- 大改前先形成计划书：当前行为、目标行为、改动范围、保持不变的行为、风险、验证计划。
-- 启用任务记录时，计划书写入 `.dev-pipeline/<date>-<short-slug>/plan.md`，过程台账写入同目录 `task.md`。
+- 大改前先形成执行计划：当前行为、目标行为、改动范围、保持不变的行为、风险、验证计划。
+- 启用任务记录时，执行计划写入 `.dev-pipeline/<date>-<short-slug>/plan.md`，任务台账写入同目录 `task.md`。
 - 任务偏大时，方案里切纵向片：每片是一条薄的端到端改动，有明确验证入口。
 - 主线程基于 `ContextGather` 证据包形成方案，然后进入 `PlanReview`：按 `references/delegation.md` 声明子代理执行体的 `purpose`、`join_point`、`max_impact` 和 `wait_policy`。
 - `PlanReview` 是 blocking 关卡，输入必须包含 `plan.md`、`ContextGather` 证据包和关键源码/contract 引用。返回 findings 时先 `UpdatePlan`：改变目标行为、contract、状态流、副作用归属、验证策略或实现边界的 material change 必须更新 `plan.md`、刷新 `current_plan_revision`、置旧批准失效并重过 `PlanReview`；不改变这些边界的 minor scoped note 可记录采纳/不采纳理由后进入 `PlanApproval`。
-- `PlanApproval` 是用户批准关卡。主线程把计划摘要和 `plan.md` 路径发给用户，等待明确批准；只有批准当前计划版本后才能进入 `Implement`。用户要求改方案时回 `UpdatePlan`；批准语义含糊时停在 `PlanApproval`。
+- `PlanApproval` 是用户批准关卡。主线程把执行计划摘要和 `plan.md` 路径发给用户，等待明确批准；只有批准当前计划版本后才能进入 `Implement`。用户要求改执行计划时回 `UpdatePlan`；批准语义含糊时停在 `PlanApproval`。
 - `ReadOnly` 在此交付方案或审查结论即止。`Implementation` 只有在轻量路径守卫通过，或高约束主干满足 `plan_approval_guard` 后，才进入 `Implement`。
 
 ### 实现
@@ -137,9 +137,9 @@ Intake -> ContextGather -> Plan -> PlanReview -> PlanApproval -> Implement -> Re
 ### 任务记录
 
 - 启用任务记录时，先列 `.dev-pipeline/`；有同任务目录就接续，没有再新开 `.dev-pipeline/<date>-<short-slug>/`。
-- 任务记录是记录台账：`task.md` 记录 `current_state`、计划版本、批准状态、切片状态、`delegate_states`、已搁置阻塞、验证记录和回流历史；`plan.md` 是用户批准物。
+- 任务记录目录包含两份文件：`task.md` 是任务台账，记录 `current_state`、计划版本、批准状态、切片状态、`delegate_states`、已搁置阻塞、验证记录和回流历史；`plan.md` 是待批准执行计划。
 - 只依赖写文件，不依赖宿主的 task 工具；保持临时工作态，绝不 commit。
-- 模板和更新规则见 `references/task-record.md`。
+- 任务台账模板和更新规则见 `references/task.md`；执行计划模板、revision 和审批语义见 `references/plan.md`。
 
 ### 子代理委派
 

@@ -151,7 +151,7 @@
     {
       "id": 14,
       "prompt": "给这个函数加个空数组的边界处理。",
-      "expected_output": "单文件窄改动：实现模式直接做，不切片、不启动子代理、不强制计划书批准（须简短交代未命中门槛），范围保持窄。",
+      "expected_output": "单文件窄改动：实现模式直接做，不切片、不启动子代理、不强制执行计划批准（须简短交代未命中门槛），范围保持窄。",
       "expectations": [
         "进入轻量实现模式直接完成，不过度套用切片/子代理委派/PlanApproval",
         "保持范围窄，不顺手扩散到相邻逻辑",
@@ -353,12 +353,12 @@
     {
       "id": 40,
       "prompt": "这个任务需要开 .dev-pipeline 记录。",
-      "expected_output": "创建或接续 .dev-pipeline/<date>-<short-slug>/ 目录，使用 task.md 记录过程台账、plan.md 作为批准物；不再创建单个 .dev-pipeline/<date>-<short-slug>.md。",
+      "expected_output": "创建或接续 .dev-pipeline/<date>-<short-slug>/ 目录，使用 task.md 记录任务台账、plan.md 作为待批准执行计划；不再创建单个 .dev-pipeline/<date>-<short-slug>.md。",
       "expectations": [
         "先列 .dev-pipeline/ 查找可接续目录",
         "使用一任务一目录结构",
         "task.md 记录 current_state、计划版本、批准状态、子代理状态和验证记录",
-        "plan.md 记录用户可读计划书和 revision",
+        "plan.md 记录用户可读执行计划和 revision",
         "同日同 slug 但目标不同的任务使用 -2/-3 后缀"
       ],
       "files": []

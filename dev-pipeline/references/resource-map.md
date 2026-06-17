@@ -5,7 +5,8 @@
 ## 入口与模式
 
 - `entry-modes.md`：用户请求有边界问题时读取，例如 `plan only`、`review only`、重构默认先出方案、上一轮建议被接受、是否等待确认。
-- `task-record.md`：只有需要启用 `.dev-pipeline/` 工作态记录时读取；高约束实现要记录 context/plan/review gate、计划版本、用户批准、切片、findings、回流和验证。只读模式、`OffRamp`、单文件低风险任务默认不需要。
+- `task.md`：只有需要启用 `.dev-pipeline/<date>-<short-slug>/task.md` 任务台账时读取；记录 current_state、context/plan/review gate、计划版本、用户批准、切片、findings、回流和验证。只读模式、`OffRamp`、单文件低风险任务默认不需要。
+- `plan.md`：进入 `Plan` / `PlanReview` / `PlanApproval`，需要生成或更新 `.dev-pipeline/<date>-<short-slug>/plan.md` 时读取；记录执行计划模板、revision、审批语义和高副作用批准边界。
 
 ## 主干阶段细节
 
