@@ -1,6 +1,6 @@
 # 代码审查分支
 
-用户说 `review`、`code review`、`看 diff`、`审这个 PR` 或类似请求时切入。默认只走主干 Stage 1→2，只读，不进 Stage 3 改文件。
+用户说 `review`、`code review`、`看 diff`、`审这个 PR` 或类似请求时切入。默认只走 `Context -> Plan` 形成只读审查结论，不进 `Implement` 改文件。
 
 - 输出先列 findings，按严重度排序；不要把总结放在问题前面。
 - 每个 finding 要包含文件/行引用、具体故障模式、影响对象、何时会爆发，以及建议修法。证据不足时说明不确定性，不要编造。

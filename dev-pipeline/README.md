@@ -15,6 +15,59 @@
 - 提交保持显式授权。只有用户明确要求提交，或交付 diff 后确认提交，才允许 commit；push 同理。
 - 删除、覆盖、迁移、部署、发送消息、批量写入、联网改状态、付费调用等高副作用操作必须先确认。
 
+## 阻塞式状态流
+
+高约束实现任务使用两道子代理关卡：方案门和实现门。子代理在这些关卡里是 blocking actor，不是旁路建议；返回 findings 时先更新方案或修复实现，再重新过对应关卡。
+
+```mermaid
+flowchart TD
+  Intake["Intake: 判定交付模式"]
+  OffRamp["OffRamp: 单步问答或单命令"]
+  ReadOnly["ReadOnly: plan/review/explain only"]
+  ContextGather["ContextGather: subagent, blocking"]
+  Plan["Plan: main"]
+  PlanReview["PlanReview: subagent, blocking"]
+  PlanFindings{"PlanReview 有 findings?"}
+  UpdatePlan["UpdatePlan: main"]
+  PlanChange{"material plan change?"}
+  Implement["Implement: main"]
+  Review["Review: subagent, blocking"]
+  ReviewFindings{"Review 有 findings?"}
+  FixFindings["FixFindings: main"]
+  Verify["Verify: main, 实际验证"]
+  Deliver["Deliver: 验证记录 + 交付"]
+  WaitForUser["WaitForUser: 高副作用或关键信息缺失"]
+
+  Intake --> OffRamp
+  Intake --> ReadOnly
+  Intake --> ContextGather
+  Intake --> WaitForUser
+
+  ContextGather --> Plan
+  Plan --> PlanReview
+  PlanReview --> PlanFindings
+  PlanFindings -- "yes" --> UpdatePlan
+  UpdatePlan --> PlanChange
+  PlanChange -- "yes" --> PlanReview
+  PlanChange -- "no, minor scoped note" --> Implement
+  PlanFindings -- "no" --> Implement
+
+  Implement --> Review
+  Review --> ReviewFindings
+  ReviewFindings -- "yes" --> FixFindings
+  FixFindings --> Review
+  ReviewFindings -- "no" --> Verify
+  Verify --> Deliver
+```
+
+关卡语义：
+
+- `ContextGather` 只打包 repo 证据、入口、contract、风险和未解问题，不替主线程定方案。
+- `PlanReview` 审查方案；有实质 findings 时先改方案，重大方案变化重新 review。
+- `Review` 审查实现 diff 和验证覆盖；有 findings 时修复后再 review。
+- `Verify` 由主线程执行实际验证，例如测试、typecheck、lint、build 或未验证项记录；`Review` 不能直接替代 `Verify`。
+- blocking 子代理不能因为“回来慢”被旁路；只有工具不可用、平台禁止或安全边界冲突时，才记录本地替代审查降级。
+
 ## 目录结构
 
 - `SKILL.md`：agent 执行规则和主流水线，是唯一的运行时入口。

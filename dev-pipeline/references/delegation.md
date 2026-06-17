@@ -1,40 +1,54 @@
 # 子代理执行体生命周期
 
-把子代理作为状态机里的执行体管理：启动前先定义目的、等待点、影响范围和超时策略。
+把子代理作为状态机里的执行体管理：启动前先定义目的、等待点、影响范围和等待策略。
 调用宿主能力时保留触发语义：`spawn subagents` / `delegate` / `subagent workflows` / `parallel agent work`。
+
+## 执行体类型
+
+- **blocking gate**：挡住某个状态转移；返回前不能越过等待点。高约束实现默认使用这类执行体。
+- **non_blocking sidecar**：旁路探索；主线程可以继续，但必须声明最大影响范围，返回后只在影响范围内决定是否回流。
+
+回来慢不是降级理由。只有子代理工具不可用、平台规则不允许调用，或安全边界冲突时，blocking gate 才能进入本地替代审查降级。
 
 ## 启动条件
 
-命中任一高风险守卫条件，且存在边界清楚的只读审查或独立验证时，默认启动子代理；工具失败、平台规则不允许调用或安全边界冲突时，进入本地替代审查降级：
+命中任一高风险守卫条件，且存在边界清楚的只读审查、上下文打包或独立验证时，默认启动 blocking gate；工具不可用、平台规则不允许调用或安全边界冲突时，进入本地替代审查降级：
 
 - 多模块或跨边界改动。
 - 状态流、权限/数据流、副作用、外部 contract 或用户可见行为变化。
-- 有可独立审查的 diff、方案或验证计划。
+- 有可独立审查的上下文证据包、方案、diff 或验证计划。
 - 多个发现项需要去重、保留冲突并形成决策视图。
 
 单文件低风险、强耦合设计判断、需要连续用户交互、或当前上下文必须由主线程直接决定时，不启动；用一句话或任务记录说明低风险、强耦合、工具失败或安全边界原因。
+
+只读任务不创建任务记录、不进入实现关卡；但 review/security/architecture/synthesis 等只读审查有独立价值时，仍可启动只读子代理。
 
 ## 执行体契约
 
 每次启动前先声明：
 
 ```text
-purpose: plan-review | diff-review | security-review | architecture-review | verification | synthesis | sidecar-research
-join_point: before_stage_3 | before_stage_5 | non_blocking
-max_impact: stage_2 | stage_3 | stage_4 | deliver
-timeout_behavior: wait | degrade_with_local_review | continue_as_sidecar
+purpose: context-gather | plan-review | diff-review | security-review | architecture-review | verification | synthesis | sidecar-research
+join_point: before_plan | before_implement | before_verify | non_blocking
+max_impact: context | plan | implement | verify | deliver
+blocking: yes | no
+wait_policy: wait_until_returned | unavailable_degrade_only | non_blocking
 ```
 
 - `purpose`：为什么启动。没有明确目的不启动。
-- `join_point`：它挡哪个门。没有等待点不启动。
+- `join_point`：它挡哪个门。blocking gate 没有等待点不启动。
 - `max_impact`：它最多能让主线程回流到哪里，避免晚到结果无限推翻。
-- `timeout_behavior`：超时后等待、降级本地审查，或转为非阻塞旁路任务。
+- `blocking`：是否阻塞状态转移。
+- `wait_policy`：等待到返回、仅不可执行时降级，或作为旁路任务继续。
 
-按等待点区分关卡执行体和旁路任务：
+等待点语义：
 
-- `before_stage_3`：计划关卡。未返回或未降级前不能进入实现。
-- `before_stage_5`：交付关卡。未返回或未降级前不能最终交付。
+- `before_plan`：上下文关卡。`ContextGather` 返回证据包前不能进入 `Plan`；只允许工具不可用、平台禁止或安全边界冲突时本地替代。
+- `before_implement`：方案关卡。`PlanReview` 返回无 findings，或 findings 经 `UpdatePlan` 处理并满足守卫条件前，不能进入 `Implement`。
+- `before_verify`：实现审查关卡。`Review` 返回无 findings，或 findings 经 `FixFindings` 修复并重审前，不能进入 `Verify`。
 - `non_blocking`：旁路探索。主线程可以继续，但必须记录 `max_impact`；返回后只在影响范围内决定是否回流。
+
+兼容旧阶段名时可把 `before_stage_3` 理解为 `before_implement`，把 `before_stage_5` 理解为 `before_verify`；新记录优先使用新等待点。
 
 ## 发现协议
 
@@ -49,18 +63,20 @@ timeout_behavior: wait | degrade_with_local_review | continue_as_sidecar
 
 ## 常见执行体
 
-| 执行体 | join_point | max_impact | 适用场景 |
-| --- | --- | --- | --- |
-| `plan-review` | `before_stage_3` | `stage_2` | 高风险方案进入实现前审查范围、contract、状态流和验证计划 |
-| `diff-review` | `before_stage_5` | `stage_3` | 交付前独立审查 diff 正确性、行为回归和缺测试 |
-| `security-review` | `before_stage_5` | `stage_2` 或 `stage_3` | auth、密钥、敏感数据、输入校验、网络/配置暴露 |
-| `architecture-review` | `before_stage_3` | `stage_2` | 架构边界、耦合、数据归属、长期维护性 |
-| `verification` | `before_stage_5` | `stage_4` | 并行跑独立验证或审查验证覆盖 |
-| `synthesis` | `non_blocking` 或 `before_stage_5` | `stage_4` | 多个子代理结果需要去重、保留冲突和决策汇总 |
+| 执行体 | join_point | max_impact | blocking | wait_policy | 适用场景 |
+| --- | --- | --- | --- | --- | --- |
+| `context-gather` | `before_plan` | `context` 或 `plan` | yes | `wait_until_returned` | 高约束实现前打包 repo 证据、入口、contract、风险和未解问题 |
+| `plan-review` | `before_implement` | `plan` | yes | `wait_until_returned` | 高风险方案进入实现前审查范围、contract、状态流和验证计划 |
+| `diff-review` | `before_verify` | `implement` | yes | `wait_until_returned` | 交付前独立审查 diff 正确性、行为回归和缺测试 |
+| `security-review` | `before_implement` 或 `before_verify` | `plan` 或 `implement` | yes | `wait_until_returned` | auth、密钥、敏感数据、输入校验、网络/配置暴露 |
+| `architecture-review` | `before_implement` | `plan` | yes | `wait_until_returned` | 架构边界、耦合、数据归属、长期维护性 |
+| `verification` | `before_verify` | `verify` | yes | `wait_until_returned` | 并行跑独立验证或审查验证覆盖 |
+| `synthesis` | `before_implement`、`before_verify` 或 `non_blocking` | `plan` / `verify` / `deliver` | depends | 按等待点声明 | 多个子代理结果需要去重、保留冲突和决策汇总 |
+| `sidecar-research` | `non_blocking` | 按任务声明 | no | `non_blocking` | 不挡主流程的旁路探索 |
 
-## 计划审查关卡
+## 方案审查关卡
 
-Stage 2 方案命中高风险守卫条件时，启动 `plan-review` 关卡或记录降级原因。
+`Plan` 命中高风险守卫条件时，启动 `plan-review` blocking gate。
 
 计划审查至少覆盖四个视角中与任务相关的部分：
 
@@ -69,15 +85,32 @@ Stage 2 方案命中高风险守卫条件时，启动 `plan-review` 关卡或记
 - contract 与边界。
 - 验证充分性。
 
-如果子代理工具失败、平台规则不允许调用、或安全边界冲突，主线程做本地替代审查，并在任务记录或回复中写明降级原因。
+返回 findings 时进入 `UpdatePlan`：
+
+- 改变目标行为、contract、状态流、副作用归属、验证策略或实现边界的 finding 是 material change，必须更新方案并重过 `PlanReview`。
+- 不改变这些边界的 finding 才能作为 minor scoped note，记录采纳/不采纳理由后进入 `Implement`。
+
+## 实现审查关卡
+
+`Implement` 完成后启动 `diff-review`、`verification` 或匹配风险的 blocking gate。
+
+审查至少覆盖：
+
+- diff 是否符合方案和范围。
+- 行为回归、非法状态和副作用归属。
+- contract、类型、schema 或权限/数据流风险。
+- 验证记录是否覆盖关键风险，未验证项是否具体。
+
+返回 findings 时进入 `FixFindings`；修复或明确不采纳并记录理由后，必须重过 `Review`。无 findings 才能进入 `Verify`。
 
 ## 结果处理
 
 执行体返回后先看契约：
 
-- 结果在 `max_impact` 内且有效：回流到对应状态，或补验证/修实现。
-- 结果已被后续改动覆盖：记录证据，不回流。
-- 结果与 repo 事实不符：记录不采纳理由，不回流。
-- 执行体超时：按 `timeout_behavior` 处理；关卡降级必须有本地替代审查。
+- blocking gate 无 findings：通过对应等待点。
+- blocking gate 有 findings：回流到 `UpdatePlan` 或 `FixFindings`，不能继续越过等待点。
+- 结果已被后续改动覆盖：记录证据，但仍要判断是否需要重审当前 diff 或方案。
+- 结果与 repo 事实不符：记录不采纳理由；若它本来挡关卡，必须说明为何不采纳后仍满足守卫条件。
+- 工具不可用、平台规则不允许或安全边界冲突：记录 `unavailable_degrade_only` 的本地替代审查。
 
 影响切片时，更新切片状态；影响验证时，更新验证记录。

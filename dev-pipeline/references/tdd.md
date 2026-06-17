@@ -1,6 +1,6 @@
 # Test-Driven Development 分支
 
-用户明确要求 TDD、test-first、red-green-refactor、integration tests，或任务行为风险高且当前项目已有可维护 test harness 时切入。该分支改写主干 Stage 3 的节奏。
+用户明确要求 TDD、test-first、red-green-refactor、integration tests，或任务行为风险高且当前项目已有可维护 test harness 时切入。该分支改写 `Implement` 的节奏。
 
 - 默认不进入 TDD 模式。
 - 如果当前项目已有明确的 TDD 流程、测试命令或测试工具链，优先按项目方式执行 red-green-refactor。
