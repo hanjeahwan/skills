@@ -32,7 +32,7 @@ approval_invalidated_reason: <material plan change / user requested change / non
 
 ## 守卫条件
 - <守卫条件名称>：pass / fail / degraded；evidence <依据>
-- 建议至少记录：`blocking_delegate_guard`、`readonly_prompt_guard`、`worker_contract_guard`、`worker_integration_guard`、`context_pack_guard`、`plan_approval_guard`、`minor_note_guard`、`review_gate_guard`、`verification_guard`、`explicit_command_guard`、`delivery_ready_guard`、`deliver_repair_guard`、`rule_distillation_guard`。
+- 建议至少记录：`blocking_delegate_guard`、`prompt_template_guard`、`context_pack_guard`、`plan_approval_guard`、`minor_note_guard`、`review_gate_guard`、`verification_guard`、`explicit_command_guard`、`delivery_ready_guard`、`deliver_repair_guard`、`rule_distillation_guard`。
 
 ## 上下文证据包
 - source: context-gather / local-substitute / main-thread
@@ -49,18 +49,13 @@ approval_invalidated_reason: <material plan change / user requested change / non
 
 ## 子代理执行体
 - <执行体 id 或 purpose>
-  - purpose: <context-gather / plan-review / diff-review / verification / implement_worker / ...>
-  - gate: <context / plan / review / none>
+  - purpose: <context-gather / plan-review / diff-review / verification / ...>
   - join_point: <before_plan / before_implement / before_verify / non_blocking>
   - max_impact: <context / plan / implement / verify / deliver>
   - blocking: yes/no
   - wait_policy: <wait_until_returned / unavailable_degrade_only / non_blocking>
-  - prompt_source: <只读/审查/上下文/综合/旁路子代理填写：references/prompts/<template>.md | fallback>
-  - prompt_basis: <只读/审查/上下文/综合/旁路子代理填写：匹配的 触发：行摘要；fallback 时写 no matching template + 原因和只读边界>
-  - worker_scope: <implement_worker 填写：负责哪一片，实现什么目标>
-  - ownership: <implement_worker 填写：可改哪些文件/模块；禁止碰哪些文件/模块>
-  - plan_revision: <implement_worker 填写：必须等于 current_plan_revision 和 approved_plan_revision>
-  - handoff: <implement_worker 填写：返回时交代改动、验证、未验证项和是否发现方案问题>
+  - prompt_source: <references/prompts/<template>.md | fallback>
+  - prompt_basis: <匹配的 触发：行摘要；fallback 时写 no matching template + 原因和只读边界>
   - status: pending / passed / findings / degraded / ignored
   - result: <结论、采纳情况、回流状态>
 

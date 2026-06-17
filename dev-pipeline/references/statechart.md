@@ -58,9 +58,6 @@ Intake -> ContextGather -> Plan -> PlanReview -> PlanApproval -> Implement -> Re
 | `light_context_ready` | `Context` | `Implement` | 单文件低风险改动，`implementation_light_guard` 通过，未启用高约束主干 |
 | `slice_started` | `Implement` | `ImplementSlice` | 当前片有明确目标和最小验证 |
 | `slice_complete` | `ImplementSlice` | `Implement` | 当前片完成并记录最小验证 |
-| `implement_worker_started` | `ImplementSlice` | `ImplementSlice` | 当前计划已批准，切片和 ownership 清楚，`worker_contract_guard` 通过 |
-| `worker_result_integrated` | `ImplementSlice` | `ImplementSlice` 或 `Implement` | `worker_integration_guard` 通过，切片状态已更新 |
-| `worker_result_rework` | `ImplementSlice` | `ImplementSlice` 或 `UpdatePlan` | 计划版本过期、越过 ownership、handoff 不完整或发现方案错误 |
 | `implementation_done` | `Implement` | `Review` | 所有必要片完成，diff 可独立审查 |
 | `review_passed` | `Review` | `Verify` | 阻塞式实现审查返回无 findings |
 | `review_findings` | `Review` | `FixFindings` | 实现审查返回有效 findings |
@@ -90,9 +87,7 @@ Intake -> ContextGather -> Plan -> PlanReview -> PlanApproval -> Implement -> Re
 - `scope_guard`：实现只纳入本轮目标必需的相邻流程、入口校验、交互策略、持久化、运行期副作用和数据模型变化。
 - `implementation_light_guard`：只允许单文件低风险改动跳过执行计划批准；不得涉及多模块、状态流、外部 contract、副作用、权限/数据流或用户可见高风险行为。范围扩大时转入高约束主干。
 - `blocking_delegate_guard`：blocking 子代理返回前不能越过等待点；回来慢不构成降级理由。
-- `readonly_prompt_guard`：启动只读、审查、上下文、综合或旁路子代理前必须完成 prompts 发现协议并声明 `prompt_source` 和 `prompt_basis`；`prompt_source` 是模板路径时必须已加载模板全文，`prompt_source: fallback` 时 `prompt_basis` 必须说明没有匹配模板的原因和只读边界。
-- `worker_contract_guard`：启动写入型 `implement_worker` 前必须处于 `Implement` / `ImplementSlice`，满足 `approved_plan_revision == current_plan_revision`，并声明 `worker_scope`、`ownership`、`plan_revision` 和 `handoff`；`plan_revision` 必须等于当前已批准计划版本。
-- `worker_integration_guard`：集成 worker 结果前必须重新检查 `worker.plan_revision == current_plan_revision == approved_plan_revision`，且实际改动没有越过 `ownership`；不满足时标记当前片 `rework` 或回 `UpdatePlan`。
+- `prompt_template_guard`：启动任何子代理前必须完成 prompts 发现协议并声明 `prompt_source` 和 `prompt_basis`；`prompt_source` 是模板路径时必须已加载模板全文，`prompt_source: fallback` 时 `prompt_basis` 必须说明没有匹配模板的原因和只读边界。
 - `context_pack_guard`：`ContextGather` 只产 repo 证据、入口、contract、风险和未解问题，不替主线程定方案。
 - `plan_approval_guard`：高约束主干进入 `Implement` 前必须满足 `approved_plan_revision == current_plan_revision`；初始请求、模糊认可和旧计划批准都不能替代当前计划批准。
 - `review_gate_guard`：`Review` findings 未处理并重审前不能进入 `Verify` 或 `Deliver`。
@@ -110,17 +105,15 @@ Intake -> ContextGather -> Plan -> PlanReview -> PlanApproval -> Implement -> Re
 
 - `record_state`：任务台账启用时，记录当前状态、触发事件、关键守卫条件和下一步。
 - `record_assumption`：未澄清就推进时，记录假设和假设错了要回头改什么。
-- `spawn_context_gather_actor`：满足 `readonly_prompt_guard` 后，按 `references/delegation.md` 启动阻塞式上下文子代理。
+- `spawn_context_gather_actor`：满足 `prompt_template_guard` 后，按 `references/delegation.md` 启动阻塞式上下文子代理。
 - `record_context_pack`：记录上下文证据包、未解问题和本地替代原因。
 - `record_plan_revision`：写入或更新 `plan.md` 后记录 `current_plan_revision`；material change 必须置旧批准为 stale。
 - `record_plan_update`：记录 PlanReview findings、采纳/不采纳理由、是否 material change。
 - `record_plan_approval`：记录批准状态、批准消息、`approved_plan_revision`、无效化原因和下一状态。
 - `record_slice_transition`：切片进入、最小验证、完成或回流时更新切片状态（`slice_states`）。
-- `spawn_plan_review_actor`：满足 `readonly_prompt_guard` 后，按 `references/delegation.md` 启动阻塞式方案审查子代理。
-- `spawn_review_actor`：满足 `readonly_prompt_guard` 后，按 `references/delegation.md` 启动阻塞式实现审查子代理。
-- `spawn_read_only_or_sidecar_actor`：满足 `readonly_prompt_guard` 后，按 `references/delegation.md` 启动只读审查或旁路子代理。
-- `spawn_implement_worker`：满足 `worker_contract_guard` 后，在 `ImplementSlice` 内启动写入型 worker。
-- `integrate_worker_result`：满足 `worker_integration_guard` 后，主线程集成 worker 结果，更新切片状态、验证记录和回流历史；验收失败时不合入。
+- `spawn_plan_review_actor`：满足 `prompt_template_guard` 后，按 `references/delegation.md` 启动阻塞式方案审查子代理。
+- `spawn_review_actor`：满足 `prompt_template_guard` 后，按 `references/delegation.md` 启动阻塞式实现审查子代理。
+- `spawn_read_only_or_sidecar_actor`：满足 `prompt_template_guard` 后，按 `references/delegation.md` 启动只读审查或旁路子代理。
 - `record_review_result`：记录 Review findings、影响状态、是否回流。
 - `record_fix_findings`：记录修复或不采纳的 findings 以及重审结果。
 - `record_verification`：记录实际命令或完整目标范围、覆盖风险、未验证项和替代证据。

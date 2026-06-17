@@ -80,8 +80,6 @@ Intake -> ContextGather -> Plan -> PlanReview -> PlanApproval -> Implement -> Re
 - 范围以本轮目标为边界：只纳入完成目标必需的相邻流程、入口校验、交互策略、持久化、运行期副作用和数据模型变化。
 - 高约束主干开始写入前，检查 `approved_plan_revision == current_plan_revision`；不满足时回到 `PlanApproval`，不要用最初的“按完整流程执行”当作批准。
 - 已切片时进入 `ImplementSlice`：片状态随状态转移更新为 `planned`、`implementing`、`min_verified`、`complete` 或 `rework`。
-- 默认由主线程实现；只有当前 `plan.md` 已批准、切片清楚、ownership 清楚且并行收益明确时，才可在 `ImplementSlice` 内启动写入型 `implement_worker`。启动前必须满足 `worker_contract_guard`，声明 `worker_scope`、`ownership`、`plan_revision` 和 `handoff`。
-- `implement_worker` 不能改执行计划、扩大 scope、改变 contract 边界或越过 ownership；发现方案错误时只报告，由主线程回 `UpdatePlan` / `PlanReview` / `PlanApproval`。主线程集成 worker 结果前必须核对 `worker.plan_revision == current_plan_revision == approved_plan_revision` 且实际改动没有越过 `ownership`；不满足时标记当前片 `rework` 或回 `UpdatePlan`。
 - 实现规则见 `references/implementation.md`；调试、TDD、文档等分支按下方分支模式加载对应参考文件。
 - 实现完成后进入 `Review` blocking 关卡：子代理审查 diff 正确性、行为回归和验证覆盖。发现 findings 时进入 `FixFindings`，修复后重过 `Review`；无 findings 才进入 `Verify`。
 
@@ -141,7 +139,7 @@ Intake -> ContextGather -> Plan -> PlanReview -> PlanApproval -> Implement -> Re
 ### 任务台账
 
 - 启用任务台账时，先列 `.dev-pipeline/`；有同任务目录就接续，没有再新开 `.dev-pipeline/<date>-<short-slug>/`。
-- 任务台账目录包含两份文件：`task.md` 是任务台账，记录 `current_state`、计划版本、批准状态、切片状态、`delegate_states`、已搁置阻塞、验证记录和回流历史；`plan.md` 是待批准执行计划。
+- 任务台账目录包含两份文件：`task.md` 是任务台账，记录 `current_state`、计划版本、批准状态、切片状态、子代理执行体状态、已搁置阻塞、验证记录和回流历史；`plan.md` 是待批准执行计划。
 - 只依赖写文件，不依赖宿主的 task 工具；保持临时工作态，绝不 commit。
 - 任务台账模板和更新规则见 `references/task.md`；执行计划模板、revision 和审批语义见 `references/plan.md`。
 
@@ -149,10 +147,9 @@ Intake -> ContextGather -> Plan -> PlanReview -> PlanApproval -> Implement -> Re
 
 - 把子代理作为状态机里的执行体管理：启动前先定义目的、等待点、影响范围和等待策略。
 - 命中高风险守卫条件且有独立审查/验证价值时默认启动；只有工具不可用、平台禁止或安全边界冲突时，才进入本地替代审查降级。未启动必须记录低风险、强耦合、工具失败或安全边界原因。
-- 启动只读、审查、上下文、综合或旁路子代理前必须先完成 prompts 发现协议，并声明 `purpose`、`join_point`、`max_impact`、`wait_policy`、`prompt_source` 和 `prompt_basis`；没有 `join_point`、`prompt_source` 或 `prompt_basis` 的这类子代理不启动。
-- 启动写入型 `implement_worker` 不走 prompts 发现协议；它只能在 `Implement` / `ImplementSlice` 内使用，且必须声明 `worker_scope`、`ownership`、`plan_revision` 和 `handoff`。
+- 启动任何子代理前必须先完成 prompts 发现协议，并声明 `purpose`、`join_point`、`max_impact`、`wait_policy`、`prompt_source` 和 `prompt_basis`；没有 `join_point`、`prompt_source` 或 `prompt_basis` 的子代理不启动。
 - blocking 关卡执行体未满足前不能越过对应状态；回来慢不是降级理由。只有工具不可用、平台禁止或安全边界冲突时，才记录本地替代审查降级。
-- 细节、发现协议和 worker 契约见 `references/delegation.md`。
+- 细节和发现协议见 `references/delegation.md`。
 
 ### 验证选择矩阵
 

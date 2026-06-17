@@ -82,9 +82,8 @@ flowchart TD
 - `Plan` 生成 `.dev-pipeline/<date>-<short-slug>/plan.md`；`.dev-pipeline/<date>-<short-slug>/task.md` 记录任务台账。
 - `PlanReview` 审查执行计划、上下文证据和关键 contract；有实质 findings 时先改方案，重大方案变化重新 review。
 - `PlanApproval` 等待用户批准当前计划版本；`approved_plan_revision == current_plan_revision` 后才允许进入 `Implement`。
-- `Implement` 默认由主线程执行；只有已批准计划内的明确切片可交给写入型 worker，并且必须绑定 ownership、计划版本和 handoff。
 - `Review` 审查实现 diff 和验证覆盖；有 findings 时修复后再 review。
-- `Verify` 由主线程执行实际验证，例如测试、typecheck、lint、build 或未验证项记录；`Review` 不能直接替代 `Verify`。
+- `Verify` 由主线程执行实际验证，例如定向测试、typecheck、lint、静态检查或未验证项记录；build 只在用户明确要求时执行，`Review` 不能直接替代 `Verify`。
 - `Deliver` 是出口检查点；发现仍要修时按问题类型回 `Plan` / `Implement` / `Verify` 或留在 `Deliver` 修回复。
 - `RuleDistill` 在最终回复前检查是否有可复用决策偏差；只有过四关才沉淀规则，没有就记录不需要。
 - blocking 子代理不能因为“回来慢”被旁路；只有工具不可用、平台禁止或安全边界冲突时，才记录本地替代审查降级。
