@@ -16,18 +16,18 @@
     {
       "id": 2,
       "prompt": "帮我看下这个支付模块重构方案对不对，先别改代码。",
-      "expected_output": "进入分析模式，止于 Stage 2，只给方案判断不写文件。",
+      "expected_output": "进入 ReadOnly，只读收集必要上下文并止于方案/审查结论，不写文件。",
       "expectations": [
-        "进入分析模式，在 Stage 2 结束",
+        "进入 ReadOnly 后仍读取必要 repo 上下文并形成方案/审查结论",
         "不写/不改任何文件",
-        "命中高风险（多模块/支付）默认启动子代理做计划 review，或说明跳过/异常降级原因"
+        "命中高风险（多模块/支付）默认启动子代理做计划审查，或进入本地替代审查降级并说明原因"
       ],
       "files": []
     },
     {
       "id": 3,
       "prompt": "把用户头像换个默认图。",
-      "expected_output": "需求模糊（哪个端/默认图来源/尺寸），先问 1 个关键问题；若推进则记录假设。",
+      "expected_output": "需求模糊（哪个端/默认图来源/尺寸），先问 1 个关键问题；若推进则记录假设和 wrong_if。",
       "expectations": [
         "识别需求模糊并先问一个会改变实现路径的关键问题",
         "若选择推进，记录关键假设和『假设错了改什么』"
@@ -37,13 +37,14 @@
     {
       "id": 4,
       "prompt": "实现一个跨订单、库存、通知三个服务的下单流程，要改它们的接口。",
-      "expected_output": "命中子代理委派触发条件（多模块+外部 contract+用户可见行为），默认启动子代理作为质量门槛；只有明确命中跳过条件或异常降级条件时才留在主线程；Stage 2 至少汇总一份计划 review 或记录降级原因；偏大任务切纵向片；用任务记录记状态。",
+      "expected_output": "命中高风险守卫条件（多模块+外部 contract+用户可见行为）即进入 PlanReview 关卡；启动子代理前声明 purpose、join_point、max_impact、timeout_behavior；工具不可用时在关卡内完成本地替代审查降级后才进实现；偏大任务切纵向片并用任务记录保留状态。",
       "expectations": [
         "识别命中子代理委派触发条件，默认启动子代理作为质量门槛",
-        "若未启动子代理，必须写明跳过条件或异常降级原因（不允许 silent skip）",
-        "进入 Stage 3 前至少汇总一份计划 review 结果，或明确记录强耦合/不能等待/子代理工具调用失败的降级原因",
+        "PlanReview 入口不依赖子代理工具可用",
+        "启动子代理前声明 purpose、join_point、max_impact 和 timeout_behavior",
+        "进入 Stage 3 前 plan-review 关卡通过，或明确记录工具不可用/失败/超时后的本地替代审查降级原因",
         "把大任务切成纵向片，逐片走 Stage 3-5",
-        "进入完整流水线，开任务记录记状态"
+        "进入完整状态机，开任务记录维护 current_state、切片状态和 delegate_states"
       ],
       "files": []
     },
@@ -116,10 +117,10 @@
     {
       "id": 11,
       "prompt": "这个功能要等产品确认折扣规则才能定，但你先把能做的脚手架搭起来。",
-      "expected_output": "识别阻塞（等产品决策），显式 park 并标解除后回哪步；先做阻塞外的脚手架，保留折扣规则为待确认决策。",
+      "expected_output": "识别阻塞（等产品决策），显式 park 并记录 resume_state；只推进与折扣规则决策独立的脚手架，保留折扣规则为待确认决策。",
       "expectations": [
-        "显式说出阻塞点（折扣规则待产品确认）并 park",
-        "先推进阻塞外能做的部分（脚手架）",
+        "显式说出阻塞点（折扣规则待产品确认）并记录 resume_state",
+        "只推进与阻塞决策独立的部分（脚手架）",
         "把折扣规则保留为待确认决策，不猜测填进去"
       ],
       "files": []
@@ -138,9 +139,9 @@
     {
       "id": 13,
       "prompt": "在我们这个没装任何自定义 agent 的新 repo 里，帮我审一下这段并发代码。",
-      "expected_output": "host 无注册 agent 也不依赖；按发现协议从 skill 自带 prompts/ 选 reviewer；子代理工具调用失败或平台规则不允许时降级为本地二次审查并说明。",
+      "expected_output": "host 无注册 agent 也不依赖；按发现协议从 skill 自带 references/prompts/ 选 reviewer；子代理工具调用失败或平台规则不允许时降级为本地二次审查并说明。",
       "expectations": [
-        "委派内容来自 skill 自带 prompts/，不依赖 host 注册的 agent",
+        "委派内容来自 skill 自带 references/prompts/，不依赖 host 注册的 agent",
         "若子代理工具调用失败或平台规则不允许，降级为本地二次审查并在回复说明",
         "不因为 repo 没装 host 注册 agent 就跳过审查"
       ],
@@ -211,6 +212,54 @@
         "不强行启动 Browser 或把 HTTP 200 当成完整可视验证",
         "选择定向测试、typecheck、lint 或代码路径审查等更窄验证",
         "最终列出未验证的具体交互，例如弹窗取消、开关禁用、展开折叠"
+      ],
+      "files": []
+    },
+    {
+      "id": 20,
+      "prompt": "我已经把任务切成 contract/helper、wizard、active edit、review/detail 四片了，继续做。",
+      "expected_output": "进入 ImplementSlice 子状态；每片随状态转移更新 planned/implementing/min_verified/complete/rework，而不是最后一次性补总结。",
+      "expectations": [
+        "识别这是偏大任务的纵向片执行",
+        "用任务记录维护切片状态",
+        "每片有 goal 和 min_verification",
+        "验证或 reviewer 打回时标记对应片 rework，而不是只写总状态"
+      ],
+      "files": []
+    },
+    {
+      "id": 21,
+      "prompt": "我想让一个子代理在旁边看看，有结果就说，没结果你继续。",
+      "expected_output": "不能启动没有 join_point 的子代理；必须声明 purpose、join_point、max_impact、timeout_behavior。若是 non_blocking 旁路任务，也要声明最大影响范围。",
+      "expectations": [
+        "拒绝无生命周期契约的随手启动",
+        "要求声明 purpose 和 join_point",
+        "non_blocking 子代理也必须声明 max_impact",
+        "说明关卡执行体和旁路任务的处理不同"
+      ],
+      "files": []
+    },
+    {
+      "id": 22,
+      "prompt": "验证失败了，发现不是代码 bug，是我一开始把需求理解错了。",
+      "expected_output": "从 Verify 通过 requirement_or_plan_wrong 事件回流到 Plan，更新任务记录的状态转移，不在错误方案上继续修实现。",
+      "expectations": [
+        "识别失败归因是需求/方案错误，不是实现 bug",
+        "按状态机从 Verify 回到 Plan",
+        "记录状态转移和原因",
+        "不直接在 Stage 3 继续修补"
+      ],
+      "files": []
+    },
+    {
+      "id": 23,
+      "prompt": "最后汇报验证时，我只想写相关测试通过，具体命令太长。",
+      "expected_output": "最终回复必须从验证记录生成，保留实际命令或命令名+完整目标范围+关键参数；不能把验证压成不可复跑摘要。",
+      "expectations": [
+        "使用验证记录作为最终验证来源",
+        "不接受“相关测试通过”这类不可复跑摘要",
+        "保留命令、完整目标范围或关键参数",
+        "未跑验证要写具体行为、原因和替代证据"
       ],
       "files": []
     }
