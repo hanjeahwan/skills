@@ -1,0 +1,40 @@
+{
+  "skill_name": "skill-brief-builder",
+  "evals": [
+    {
+      "id": 1,
+      "name": "vague-product-skill",
+      "prompt": "我想做一个 skill，帮我把脑子里乱七八糟的产品想法整理清楚，然后可能后面交给别的 agent 写 PRD。你先帮我设计这个 skill 应该是什么。",
+      "expected_output": "Starts with a concise Frame Check instead of a field-by-field interview or full-document dump. It gives a correctable design hypothesis, explains why the proposed skill shape fits the user's messy product-idea workflow, names a likely boundary, asks exactly one next decision question, provides the recommended answer and why it should be the default, and stops at a readable checkpoint. It does not output the full Skill Design Brief in the first turn.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "name": "oversized-skill-scope",
+      "prompt": "我想做一个全能 growth skill：能做用户研究、竞品分析、写 landing page、生成实验方案、分析数据、最后还能帮我改代码上线。最好一个 skill 全搞定。",
+      "expected_output": "Pushes back on the oversized scope with concrete failure modes, explains what will become unverifiable or conflicted, and recommends a narrower correctable design hypothesis centered on one core transformation. It keeps the first response staged and readable by asking exactly one next decision question with a recommended answer instead of producing the full brief immediately.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "name": "existing-notes-to-brief",
+      "prompt": "这里是我零散写的想法：这个 skill 应该帮工程师在改大型旧代码前先搞清楚风险；它要读 repo、找调用链、列测试方案；不要直接改代码；最后给我一份可以执行的改造计划。帮我整理成可以交给 skill-creator 的设计简报。",
+      "expected_output": "Extracts visible signals from the provided notes before asking questions, states a concise correctable design hypothesis, assumes reasonable defaults for missing details, keeps the skill scoped to pre-implementation risk and planning rather than code edits, asks one materially important next decision question with a recommended answer, and offers to expand the brief section by section or assemble the full brief after confirmation.",
+      "files": []
+    },
+    {
+      "id": 4,
+      "name": "user-does-not-know-what-they-want",
+      "prompt": "我其实也说不清楚自己要什么 skill，只是感觉我经常跟 AI 聊半天才发现需求没想清楚。能不能先帮我判断我可能需要哪种 skill，再整理成后面能交给 skill-creator 的东西？",
+      "expected_output": "Uses the core mechanism: does not ask the user to define the skill from scratch or fill objective/persona/output fields first. It offers a concrete starting frame based on the weak signal, explains why that shape fits, asks exactly one next decision question, provides the recommended answer, and stops at a readable checkpoint instead of dumping a full Skill Design Brief.",
+      "files": []
+    },
+    {
+      "id": 5,
+      "name": "explicit-one-shot-brief",
+      "prompt": "这个方向我已经确认了：做一个 brief-first skill，把混乱的产品想法整理成 PRD-ready 设计简报。不要分步问了，这次请一次性输出完整 Skill Design Brief，后面我会直接交给 skill-creator。",
+      "expected_output": "Because the user explicitly requests a one-shot complete brief, produces the full Skill Design Brief with design hypothesis, thesis, scenario, objective, target user, operating stance/persona, triggers, non-triggers, inputs, outputs, interaction model, workflow, decision rules, quality bar, failure modes, eval prompts, and skill-creator handoff.",
+      "files": []
+    }
+  ]
+}
