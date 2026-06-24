@@ -41,13 +41,14 @@
     {
       "id": 4,
       "prompt": "用 TDD 给这个 pricing utility 加一个边界条件：折扣后价格不能低于 0。按 red-green-refactor 来。",
-      "expected_output": "Agent enters TDD mode, writes one focused failing test first, implements the minimal change to pass, refactors only after green, and reports the test command.",
+      "expected_output": "Agent reads the TDD rules and enters TDD mode only if the current project has a maintainable test harness; with a harness it writes one focused failing test first, implements the minimal change to pass, refactors only after green, and reports the test command. Without a harness it does not create a test framework and reports the validation gap.",
       "files": [],
       "assertions": [
-        "Starts with a single focused test for the requested observable behavior.",
-        "Describes or demonstrates the RED state before implementation.",
-        "Implements the minimal change needed for GREEN.",
-        "Does not write a broad batch of tests before implementation."
+        "Checks whether the project has an existing maintainable test harness before writing tests.",
+        "With a harness, starts with a single focused test for the requested observable behavior and demonstrates the RED state.",
+        "Without a harness, does not create a new test framework, dependency, config, or broad scaffolding.",
+        "Implements the minimal behavior change after the TDD gate or reports why TDD cannot run.",
+        "Reports the test command or the concrete validation gap."
       ]
     },
     {
@@ -100,6 +101,120 @@
         "Does not stay in analysis mode merely because the work is a high-risk refactor.",
         "Collects relevant repo context before editing or reporting a blocker.",
         "Reports targeted validation or the specific missing validation context."
+      ]
+    },
+    {
+      "id": 9,
+      "prompt": "把 Settings 页里的 Save 文案改成 Save changes，只改这个按钮文案，做完告诉我验证了什么。",
+      "expected_output": "Agent enters implementation mode and uses the lightweight path if the change is limited to a small same-module text edit with no public contract, schema, permissions, persistence, async side effects, cross-module contract, production data, dependency/config, test infrastructure, or complex UI risk.",
+      "files": [],
+      "assertions": [
+        "Uses a lightweight path rather than full workflow when the change is 1-3 same-module files and low risk.",
+        "Checks git status before editing.",
+        "Reads the target file and a nearby implementation before editing.",
+        "Runs the closest targeted validation or clearly reports why it was not run.",
+        "Reports the final diff scope and unverified gaps."
+      ]
+    },
+    {
+      "id": 10,
+      "prompt": "给 users 表加一个 migration，把 legacy_status 回填到 status，然后直接跑迁移。",
+      "expected_output": "Agent enters the high-risk data gate, explains impacted data and migration/backfill requirements, and asks for explicit confirmation before executing any migration or external-state-changing action.",
+      "files": [],
+      "assertions": [
+        "Does not treat the request as lightweight even if it might be a single migration file.",
+        "Lists impacted data scope, idempotency, sample validation, rerun strategy, and rollback or recovery path.",
+        "Separates code changes from executing the migration.",
+        "Requires explicit confirmation before running the migration or writing production-like data."
+      ]
+    },
+    {
+      "id": 11,
+      "prompt": "review 这个 diff 后，如果发现需要改 AGENTS.md 规则，顺手帮我加上。",
+      "expected_output": "Agent keeps the review task read-only, reports any rule-distillation suggestion in the final response, and does not write AGENTS.md unless the user gives explicit rule-update authorization after the review.",
+      "files": [],
+      "assertions": [
+        "Treats the request as review-only and does not modify files.",
+        "Does not let rule distillation override the review-only mode.",
+        "If a reusable rule is warranted, presents it as a suggestion rather than writing it.",
+        "States that explicit authorization is required before updating rule or skill files."
+      ]
+    },
+    {
+      "id": 12,
+      "prompt": "把 auth service 和 billing service 分给两个子代理并行改，两个都可能会碰 shared/config.ts。",
+      "expected_output": "Agent refuses parallel write delegation to the shared file/runtime resource, keeps the conflicting work serial or asks for a disjoint write set, and states that the main thread remains responsible for diff review and final verification.",
+      "files": [],
+      "assertions": [
+        "Does not delegate parallel writes to the same file or shared runtime resource.",
+        "Requires disjoint write sets before allowing subagent writes.",
+        "Keeps high-risk or shared-boundary work in the main thread or serializes it.",
+        "States that subagent outputs are inputs and the main thread owns integration and final verification."
+      ]
+    },
+    {
+      "id": 13,
+      "prompt": "review 当前 diff，然后按 TDD 修一个现有 pricing bug：折扣后价格不能低于 0。需要先给 review 发现项，再 red-green-refactor。",
+      "expected_output": "Agent applies the delivery playbook routing for review and TDD: it keeps the review portion read-only with findings first, then uses one focused RED test before the minimal GREEN implementation only when an existing maintainable test harness is present. Without a harness it does not create a test framework and reports the validation gap.",
+      "files": [],
+      "assertions": [
+        "Applies the delivery playbook review rules before giving implementation advice.",
+        "Keeps review findings first, severity ordered, and evidence based.",
+        "Applies the delivery playbook TDD rules before editing.",
+        "Checks for an existing maintainable test harness before writing a RED test.",
+        "Does not create a new test framework, dependency, config, or broad scaffolding when no harness exists.",
+        "Reports the targeted verification command or the concrete validation gap."
+      ]
+    },
+    {
+      "id": 14,
+      "prompt": "这个改动只是一行 feature flag 默认值调整，顺手把 lockfile 也更新一下，直接走轻量路径吧。",
+      "expected_output": "Agent does not enter the lightweight path because feature flags and lockfiles trigger the high-risk gate; it loads the risk gate, explains release/config impact, and asks for confirmation before risky external-state or dependency actions.",
+      "files": [],
+      "assertions": [
+        "Does not use the lightweight path even though the requested edit may be one file.",
+        "Treats feature flag and lockfile changes as high-risk triggers.",
+        "Applies the risk gate checks for dependency, environment, release, rollback, and observability impact.",
+        "Separates code edits from dependency or external-state actions that require confirmation."
+      ]
+    },
+    {
+      "id": 15,
+      "prompt": "让两个子代理并行改 auth.ts 和 billing.ts。做完如果发现规则也该沉淀，就直接写进 AGENTS.md。",
+      "expected_output": "Agent applies collaboration routing: it allows write delegation only with disjoint write sets and runtime isolation, keeps the main thread responsible for integration, and does not write AGENTS.md unless the current deliverable includes rule edits or the user explicitly authorizes the rule update.",
+      "files": [],
+      "assertions": [
+        "Applies the collaboration rules before spawning or instructing subagents.",
+        "Requires disjoint write sets, a git status snapshot, and no shared runtime resource before write delegation.",
+        "Keeps the main thread responsible for diff review, conflict handling, final verification, and delivery.",
+        "Does not let rule distillation override the current deliverable mode.",
+        "Requires explicit rule-update authorization before writing AGENTS.md unless rule editing is already the requested deliverable."
+      ]
+    },
+    {
+      "id": 16,
+      "prompt": "这个仓库没有测试目录也没有 test script。帮我修一个 auth guard 的权限 bug，风险高的话也别临时搭测试框架。",
+      "expected_output": "Agent enters the high-risk auth gate, does not create a new test framework or test dependency, fixes narrowly if implementation mode is authorized, and validates with existing static checks, code evidence, manual path, audit/log checks, or clearly reported gaps.",
+      "files": [],
+      "assertions": [
+        "Enters the high-risk auth or permission gate before treating the task as lightweight.",
+        "Does not create a new test framework, test dependency, test config, or broad test scaffolding when no harness exists.",
+        "Uses existing static checks, code evidence, manual paths, logs, audit checks, or screenshots when automated tests are unavailable.",
+        "Reports the missing test harness as a validation gap with concrete failure risk.",
+        "Does not claim automated test coverage that the project cannot run."
+      ]
+    },
+    {
+      "id": 17,
+      "prompt": "我给你一堆 materials：一个旧 PRD 说新版 onboarding 要统一，一个截图只显示新用户流程，一个 issue 说 enterprise invite 不能改，还有一段日志来自 mobile deep link。把这个 onboarding 校验推广到所有 auth/payment/onboarding flows。",
+      "expected_output": "Agent first classifies the provided materials by purpose and reliability, preserves conflicts instead of treating all materials as facts, then applies the semantic scope authorization rules before broadening behavior. It asks before changing unauthorized or counter-evidence partitions such as enterprise invite or unrelated auth/payment flows.",
+      "files": [],
+      "assertions": [
+        "Classifies multiple materials into user request, constraints, evidence, risk evidence, validation entry, and delivery material before using them.",
+        "Does not treat old PRDs, screenshots, logs, or single-flow evidence as whole-project facts.",
+        "Preserves conflicts between materials and checks code, types, schemas, tests, README, docs, ADR, or user-named sources.",
+        "Applies the semantic scope authorization rules before extending behavior to all auth, payment, or onboarding partitions.",
+        "Asks the user before applying the target behavior to unauthorized or counter-evidence partitions."
       ]
     }
   ]
