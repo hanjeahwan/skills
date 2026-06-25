@@ -25,6 +25,7 @@ description: 用于需要读取仓库上下文并完成多步工程工作的开�
 - 如果用户只要单条命令输出、纯概念解释、简单路径查找，或不需要仓库上下文的一步回答，直接完成，不要套完整流程。
 - 低风险局部实现只在进入实现模式后使用轻量路径。轻量路径不得覆盖只读任务、分析模式、review、审批、工作区保护或危险操作确认。
 - 高风险关卡优先于轻量路径。即使只改 1 个文件，只要触及高风险触发条件，也先进入高风险关卡。
+- 需求包含接管、禁用、替换、恢复、重试、保持不变或不影响其它范围时，先执行 `references/delivery-playbooks.md` 的范围与恢复完整性审计，再输出方案；未证明分区覆盖、机制接管和恢复前态前，不要把方案描述成完整方案。
 
 ## 轻量路径
 
@@ -55,6 +56,7 @@ description: 用于需要读取仓库上下文并完成多步工程工作的开�
 - 用户要求 debug、排查、修 bug、对照日志、复现问题或追异步顺序时，读 `references/delivery-playbooks.md` 的调试规则。
 - 用户要求 `review`、`code review`、看 diff、审 PR 或找回归风险时，读 `references/delivery-playbooks.md` 的代码审查模式，并保持只读交付。
 - 用户要求 TDD、test-first、red-green-refactor 或 integration tests 时，读 `references/delivery-playbooks.md` 的 TDD 规则。
+- 用户要求接管、禁用、替换、恢复、重试、保持不变、不影响其它范围、不要使用某机制或不要改变某契约时，读 `references/delivery-playbooks.md` 的范围与恢复完整性审计。
 - 用户要求实现、重构、技术文档更新、YAGNI 判断或验证选择时，读 `references/delivery-playbooks.md` 的对应分支。
 - 需要子代理、并行审查、委派写入、冲突合并或规则沉淀时，读 `references/collaboration-rules.md`。
 
@@ -146,4 +148,3 @@ npx skills use ast-grep/agent-skill --skill ast-grep
 - 跑 `git diff --check`。
 - 按验证选择矩阵执行必要验证并记录未验证项。
 - 最终回复说明改了什么、验证了什么、还有什么没验证。
-

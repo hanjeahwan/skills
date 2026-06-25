@@ -216,6 +216,21 @@
         "Applies the semantic scope authorization rules before extending behavior to all auth, payment, or onboarding partitions.",
         "Asks the user before applying the target behavior to unauthorized or counter-evidence partitions."
       ]
+    },
+    {
+      "id": 18,
+      "prompt": "把上传流程的旧 toast 错误处理禁用，改成新的恢复弹窗接管；恢复后继续之前的上传进度，但不要重复提交、不要重新发通知，也不要影响后台同步和只读预览流程。先给方案。",
+      "expected_output": "Agent loads the delivery playbook scope and recovery integrity audit before proposing a complete plan. It identifies scope and partitions, provides a coverage matrix for old toast handling versus the new recovery modal, lists recovery pre-states and duplicate side effects, audits the forbidden old mechanism, classifies errors, and marks unresolved background sync or read-only preview coverage as a gap.",
+      "files": [],
+      "assertions": [
+        "Executes the scope and recovery integrity audit before presenting the recommendation as complete.",
+        "Extracts target, excluded, preserved, failure, recovery, forbidden mechanism, and contract boundary terms from the prompt.",
+        "Enumerates partitions beyond the main upload path, including background sync and read-only preview.",
+        "Provides a coverage matrix showing original mechanism coverage, new mechanism coverage, retained mechanism, and gap status.",
+        "Lists recovery pre-states and states which side effects may repeat and which must not repeat.",
+        "Audits direct and indirect paths where the forbidden toast mechanism could still drive state.",
+        "Classifies failure types instead of merging all errors into one recovery path."
+      ]
     }
   ]
 }
